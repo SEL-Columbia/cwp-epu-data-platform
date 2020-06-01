@@ -1,0 +1,34 @@
+{
+  "name": "cwp-epu-data-platform",
+  "version": "1.0.0",
+  "description": "Columbia World Projects Energy for Productive Use Data Platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SEL-Columbia/cwp-epu-data-platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SEL-Columbia/cwp-epu-data-platform/issues"
+  },
+  "homepage": "https://github.com/SEL-Columbia/cwp-epu-data-platform#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "2.0.5"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "useTabs": true,
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "always"
+  }
+}
