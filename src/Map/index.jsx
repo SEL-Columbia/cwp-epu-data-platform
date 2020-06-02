@@ -12,8 +12,8 @@ export default class Map extends Component {
 	};
 
 	static defaultProps = {
-		tileLayerId: 'mapbox.satellite',
 		vectorLayers: [],
+		rasterLayers: [],
 	};
 
 	componentDidMount() {
@@ -25,6 +25,7 @@ export default class Map extends Component {
 	}
 
 	render() {
+		const rasterLayers = dataSources.filter(({ kind }) => kind === 'raster');
 		Promise.all(
 			dataSources
 				.filter(({ kind }) => kind !== 'raster')
@@ -33,8 +34,7 @@ export default class Map extends Component {
 					return { ...vectorSource, features };
 				}),
 		).then((vectorLayers) => {
-			console.log(vectorLayers);
-			this.mapRenderer.update({ ...this.props, vectorLayers });
+			this.mapRenderer.update({ ...this.props, vectorLayers, rasterLayers });
 		});
 		return <div ref={(mapElement) => (this.mapElement = mapElement)} className={styles.wrapper} />;
 	}

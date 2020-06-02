@@ -4,7 +4,7 @@
   "description": "Columbia World Projects Energy for Productive Use Data Platform",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/http-server",
+    "start": "./node_modules/.bin/http-server -c-1",
     "watch": "./node_modules/.bin/webpack --watch",
     "build": "./node_modules/.bin/webpack"
   },
