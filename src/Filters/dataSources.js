@@ -28,7 +28,7 @@ export default [
 			},
 		},
 		fetchData: async (filters) => {
-			const response = await fetch(`/data/powerlines.csv`, {
+			const response = await fetch(`./data/powerlines.csv`, {
 				method: 'GET',
 			});
 			const text = await response.text();
@@ -49,7 +49,7 @@ export default [
 		leafletType: 'circleMarker',
 		leafletOptions: { color: 'rgba(51,255,150,0.6)', radius: 1 },
 		fetchData: async (filters) => {
-			const response = await fetch(`/data/geosurvey.csv`, {
+			const response = await fetch(`./data/geosurvey.csv`, {
 				method: 'GET',
 			});
 			const text = await response.text();
