@@ -5,16 +5,15 @@
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const path = require('path');
-
-module.exports = function ({ env = 'development' } = {}) {
+module.exports = function ({ env } = {}) {
 	const output = {
 		context: __dirname,
 		entry: './src/index.jsx',
 		output: {
-			path: `${__dirname}/compiled`,
+			path: `${__dirname}/dist`,
 			filename: '[name].js',
 		},
+		mode: env === 'development' ? 'development' : 'production',
 		optimization: {
 			minimizer: [
 				new TerserPlugin({
@@ -93,8 +92,9 @@ module.exports = function ({ env = 'development' } = {}) {
 		},
 	};
 
-	output.mode = 'development';
-	output.devtool = 'cheap-module-eval-source-map';
+	if (env === 'development') {
+		output.devtool = 'cheap-module-eval-source-map';
+	}
 
 	return output;
 };

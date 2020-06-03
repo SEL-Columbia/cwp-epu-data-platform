@@ -1,5 +1,5 @@
 module.exports = {
-	extends: ['plugin:react/recommended', 'prettier/react', 'plugin:jsx-a11y/recommended'],
+	extends: ['plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
 	plugins: [
 		'import',
 		'react',
@@ -37,8 +37,6 @@ module.exports = {
 		],
 	},
 	rules: {
-		'prettier/react': 'warn',
-
 		// eslint-recommended overrides
 		'no-unused-vars': ['warn', { vars: 'all', args: 'none' }], // need to specify args: none
 		'no-inner-declarations': 0,
