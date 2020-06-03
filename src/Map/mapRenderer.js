@@ -6,7 +6,7 @@ export default class MapRenderer {
 		this.elem = elem;
 		this.props = {};
 		this.map = L.map(elem, { preferCanvas: true });
-		// .setView([1, 32], 8);
+		L.control.scale({ position: 'bottomright' }).addTo(this.map);
 
 		this.layers = new Map();
 

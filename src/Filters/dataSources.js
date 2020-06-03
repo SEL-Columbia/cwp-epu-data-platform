@@ -15,8 +15,8 @@ export default [
 			[11.2, 37.0],
 			[13.1, 38.3],
 		],
-		minNativeZoom: 8,
-		maxNativeZoom: 14,
+		minNativeZoom: 9,
+		maxNativeZoom: 15,
 	},
 	{
 		kind: 'vector',

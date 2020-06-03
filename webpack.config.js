@@ -2,7 +2,6 @@
 /* eslint-disable import/no-nodejs-modules*/
 /* eslint-disable import/unambiguous*/
 
-const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = function ({ env } = {}) {
