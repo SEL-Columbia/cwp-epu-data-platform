@@ -3,12 +3,28 @@ import Papa from 'papaparse';
 export default [
 	{
 		kind: 'raster',
+		displayName: 'Satellite',
 		name: 'satellite',
 		id: 'mapbox.satellite',
 		centroid: [11.2, 37],
 	},
 	{
 		kind: 'raster',
+		displayName: 'Streets',
+		name: 'streets',
+		id: 'mapbox.mapbox-streets-v8',
+		centroid: [11.2, 37],
+	},
+	{
+		kind: 'raster',
+		displayName: 'Terrain',
+		name: 'terrain',
+		id: 'mapbox.mapbox-terrain-v2',
+		centroid: [11.2, 37],
+	},
+	{
+		kind: 'raster',
+		displayName: 'Vegetation',
 		name: 'qgis_orig_ethiopia_raster_wgs-9hdbbn',
 		id: 'droquo.0rcmj345',
 		bounds: [
@@ -20,6 +36,7 @@ export default [
 	},
 	{
 		kind: 'vector',
+		displayName: 'Power lines',
 		name: 'powerlines',
 		leafletType: 'geoJSON',
 		leafletOptions: {
@@ -27,6 +44,7 @@ export default [
 				return { color: 'rgba(255,129,255,0.3)' };
 			},
 		},
+		filterNamesWhitelist: new Set(['Voltage', 'Status', 'Phase']),
 		fetchData: async (filters) => {
 			const response = await fetch(`./data/powerlines.csv`, {
 				method: 'GET',
@@ -44,10 +62,12 @@ export default [
 	},
 	{
 		kind: 'vector',
+		displayName: 'Geo survey',
 		name: 'geosurvey',
 		minZoom: 10,
 		leafletType: 'circleMarker',
 		leafletOptions: { color: 'rgba(51,255,150,0.6)', radius: 1 },
+		filterNamesWhitelist: new Set(['cs', 'wp', 'cp']),
 		fetchData: async (filters) => {
 			const response = await fetch(`./data/geosurvey.csv`, {
 				method: 'GET',
