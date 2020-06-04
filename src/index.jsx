@@ -3,7 +3,7 @@ import { render as reactDOMRender } from 'react-dom';
 // Global styles
 import './styles.css';
 
-import Map from './Map';
+import App from './App'
 
 let root = document.getElementById('root');
 
@@ -14,4 +14,4 @@ if (!root) {
 	document.body.appendChild(root);
 }
 
-reactDOMRender(<Map />, root);
+reactDOMRender(<App />, root);

@@ -1,0 +1,7 @@
+.filterWrapper{
+    width: 500px;
+    overflow: auto;
+    height: 100%;
+    padding: 30px;
+    border-radius: 0 3px 3px 0;
+}
