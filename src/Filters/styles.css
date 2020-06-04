@@ -1,7 +1,14 @@
 .filterWrapper{
     width: 500px;
     overflow: auto;
-    height: 100%;
+    height: calc(100% - 60px);
     padding: 30px;
     border-radius: 0 3px 3px 0;
+}
+
+.filtersWrapper{
+    margin-top: 20px;
+    border: 1px solid grey;
+    border-radius: 3px;
+    padding: 20px;
 }

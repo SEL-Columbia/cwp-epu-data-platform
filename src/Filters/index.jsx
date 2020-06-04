@@ -92,7 +92,7 @@ export default function Filters(
 
     function renderFilter({ vectorName, filterName, valuesSet, selectedValuesSet }){
         return <div key={`${vectorName}_${filterName}`} className={styles.filter}>
-            <p className={styles.filterName}>{filterName}</p>
+            <h5 className={styles.filterName}>{filterName}</h5>
             <Select
                 options={[...valuesSet]}
                 value={[...selectedValuesSet]}
@@ -117,7 +117,7 @@ export default function Filters(
             });
         }
         return <div key={name} className={styles.filtersWrapper}>
-            <p className={styles.name}>{displayName}</p>
+            <h4 className={styles.name}>{displayName}</h4>
             <div className={styles.filters}>
                 {filters.map(renderFilter)}
             </div>
@@ -126,11 +126,11 @@ export default function Filters(
 
     return <div className={styles.filterWrapper}>
         <div className={styles.headerWrapper}>
-            <h3>{'QSEL'}</h3>
+            <h2>{'QSEL'}</h2>
         </div>
         <div className={styles.bodyWrapper}>
             <div className={styles.rasterWrapper}>
-                <p>{'Rasters'}</p>
+                <h3>{'Rasters'}</h3>
                 <Select
                     options={rasterLayers}
                     value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}
@@ -142,7 +142,7 @@ export default function Filters(
                 />
             </div>
             <div className={styles.vectorWrapper}>
-                <p>{'Vectors'}</p>
+                <h3>{'Vectors'}</h3>
                 <Select
                     options={vectorLayers}
                     value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
