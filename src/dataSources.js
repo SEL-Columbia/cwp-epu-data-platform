@@ -1,4 +1,5 @@
 import Papa from 'papaparse';
+const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 
 export default [
 	{
@@ -46,11 +47,22 @@ export default [
 		},
 		filterNamesWhitelist: new Set(['Voltage', 'Status', 'Phase']),
 		fetchData: async (filters) => {
-			const response = await fetch(`./data/powerlines.csv`, {
-				method: 'GET',
-			});
+			const response = await fetch(
+				`https://localhost:8443/api/v1/tables/modilab.uganda_geodata:1.uganda_electricity_transmission_lines:12/rows?selectedVariables=geom,voltage_kv,status&maxResults=10000`,
+				{
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${ACCESS_TOKEN}`,
+					},
+				},
+			);
+			// return Papa.parse(text, { header: true })
+
 			const text = await response.text();
-			return Papa.parse(text, { header: true })
+			console.log(text);
+			return text
+				.split('\n')
+				.map((row) => JSON.parse(row))
 				.data.filter((row) => row.geom)
 				.map((row) => {
 					// TODO: metadata
