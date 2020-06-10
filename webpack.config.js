@@ -26,7 +26,11 @@ module.exports = function ({ env } = {}) {
 			],
 			splitChunks: {},
 		},
-		plugins: [new webpack.EnvironmentPlugin(['REDIVIS_API_TOKEN'])],
+		plugins: [
+			new webpack.DefinePlugin({
+				'process.env.REDIVIS_API_TOKEN': JSON.stringify('AAAAXtGcJ4BCOmXb3OT+XuGr1C5NuWyX'),
+			}),
+		],
 		module: {
 			rules: [
 				{
