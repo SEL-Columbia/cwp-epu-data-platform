@@ -97,7 +97,7 @@ export default class App extends Component {
 
 	loadRasters = async () => {
 		const response = await fetch(
-			`https://localhost:8443/api/v1/tables/modilab.uganda_geodata:1.raster_layer_metadata:13/rows?selectedVariables=mapbox_id,zoom_min,zoom_max,bounding_box,CATALOG_NAME&maxResults=10000`,
+			`https://redivis.com/api/v1/tables/modilab.uganda_geodata:1.raster_layer_metadata:13/rows?selectedVariables=mapbox_id,zoom_min,zoom_max,bounding_box,CATALOG_NAME&maxResults=10000`,
 			{
 				method: 'GET',
 				headers: {

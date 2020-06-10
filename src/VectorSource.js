@@ -48,9 +48,9 @@ export default class VectorSource {
 		}
 
 		const response = await fetch(
-			`https://localhost:8443/api/v1/tables/${
-				this.tableIdentifier
-			}/rows?selectedVariables=${variablesToFetch.join(',')}&maxResults=10000`,
+			`https://redivis.com/api/v1/tables/${this.tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
+				',',
+			)}&maxResults=10000`,
 			{
 				method: 'GET',
 				headers: {
