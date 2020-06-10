@@ -5,7 +5,7 @@ export default class MapRenderer {
 	constructor(elem, props) {
 		this.elem = elem;
 		this.props = {};
-		this.map = L.map(elem, { preferCanvas: true });
+		this.map = L.map(elem, { preferCanvas: true, minZoom: 7 });
 		L.control.scale({ position: 'bottomright' }).addTo(this.map);
 
 		this.layers = new Map();

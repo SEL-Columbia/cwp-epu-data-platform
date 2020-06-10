@@ -126,7 +126,7 @@ const vectors = [
 		leafletType: 'geoJSON',
 		leafletOptions: {
 			style: (feature) => {
-				return { color: 'rgb(255,129,255)', weight: 1 };
+				return { color: 'yellow', weight: 1 };
 			},
 		},
 	}),
