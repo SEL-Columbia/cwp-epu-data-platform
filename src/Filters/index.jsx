@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 
-import chroma from 'chroma-js';
+import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
 
@@ -128,7 +128,7 @@ export default function Filters({
 	}
 
 	function renderFilters({ name, filterVariables = [] }) {
-		if (!filterVariables.length){
+		if (!filterVariables.length) {
 			return null;
 		}
 		const filtersMap = vectorFiltersByNamesMap[name];
@@ -146,70 +146,6 @@ export default function Filters({
 			</div>
 		);
 	}
-
-	const vectorStyles = {
-		control: styles => ({ ...styles, backgroundColor: 'white' }),
-		option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-			const color = data.leafletOptions?.style?.().color || 'black';
-			const chromaColor = chroma(color);
-			return {
-				...styles,
-				backgroundColor: isDisabled
-					? null
-					: isSelected
-						? color
-						: isFocused
-							? chromaColor.alpha(0.1).css()
-							: null,
-				color: isDisabled
-					? '#ccc'
-					: isSelected
-						? chroma.contrast(chromaColor, 'white') > 2
-							? 'white'
-							: 'black'
-						: color,
-				cursor: isDisabled ? 'not-allowed' : 'default',
-
-				':active': {
-					...styles[':active'],
-					backgroundColor: !isDisabled && (isSelected ? 'black' : chromaColor.alpha(0.3).css()),
-				},
-			};
-		},
-		multiValue: (styles, { data }) => {
-			const color = data.leafletOptions?.style?.().color || 'black';
-			const chromaColor = chroma(color);
-			console.log('multivalue color', color, chromaColor, styles);
-			return {
-				...styles,
-				border: chroma.contrast(chromaColor, 'white') > 2
-					? styles.border
-					: '1px solid rgba(0, 0, 0, 0.3)',
-				backgroundColor: chromaColor.alpha(0.1).css(),
-			};
-		},
-		multiValueLabel: (styles, { data }) => {
-			const color = data.leafletOptions?.style?.().color || 'black';
-			const chromaColor = chroma(color);
-			return {
-				...styles,
-				color: chroma.contrast(chromaColor, 'white') > 2
-					? color
-					: 'black',
-			}
-		},
-		multiValueRemove: (styles, { data }) => {
-			const color = data.leafletOptions?.style?.().color || 'black';
-			return {
-				...styles,
-				color: color,
-				':hover': {
-					backgroundColor: color,
-					color: 'black',
-				},
-			}
-		},
-	};
 
 	return (
 		<div className={styles.sideBarWrapper}>
@@ -253,12 +189,15 @@ export default function Filters({
 						isMulti={true}
 						onChange={handleVectorLayerChange}
 						hideSelectedOptions={false}
-						styles={vectorStyles}
+						// styles={vectorStyles}
 						isLoading={isLoadingVectors}
 						isDisabled={!vectorLayers.length}
 					/>
 					<div className={styles.vectorFiltersWrapper}>
 						<div className={styles.sectionHeader}><span>{'Filter by vector values'}</span></div>
+						{!vectorLayers.filter(({ name, filterVariables = [] }) => selectedVectorLayerNamesSet.has(name) && filterVariables.length).length &&
+							<span className={styles.empty}>{'No filterable vectors selected'}</span>
+						}
 						{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}
 					</div>
 				</div>
