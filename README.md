@@ -4,7 +4,7 @@ Columbia World Projects Energy for Productive Use Data Platform
 Live page: https://qsel.columbia.edu/cwp-epu-data-platform/
 
 ## Data sources
-All data are currently stored within the [ModiLab organization](https://redivis.com/ModiLab/datasets) on the [Columbia Data Platform](redivis.com/Columbia). Note that these datasets may not be visible to you unless you are logged in and have been  granted access.
+All data are currently stored within the [ModiLab organization](https://redivis.com/ModiLab/datasets) on the [Columbia Data Platform](https://redivis.com/Columbia). Note that these datasets may not be visible to you unless you are logged in and have been  granted access.
 
 ## Development
 ### Installation
