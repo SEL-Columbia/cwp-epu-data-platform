@@ -121,7 +121,7 @@ export default function Filters({
 					onChange={(selectedOption, options) => handleFilterChange(options, vectorName, filterName)}
 					hideSelectedOptions={false}
 					isDisabled={!valuesSet.size}
-					isLoading={!valuesSet.size}
+					isLoading={isLoadingVectors && !valuesSet.size}
 				/>
 			</div>
 		);
