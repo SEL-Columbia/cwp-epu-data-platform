@@ -1,13 +1,13 @@
 import React, { Component, useRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import MapRenderer from './mapRenderer';
+import MapRenderer from './MapRenderer';
 
 import * as styles from './styles.css';
 
 export default class Map extends Component {
 	static propTypes = {
-		tileLayerId: PropTypes.string,
+		baseMapLayer: PropTypes.object,
 		vectorLayers: PropTypes.arrayOf(PropTypes.object),
 		rasterLayers: PropTypes.arrayOf(PropTypes.object),
 	};
@@ -22,8 +22,7 @@ export default class Map extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { vectorLayers, rasterLayers } = this.props;
-		this.mapRenderer.update({ vectorLayers, rasterLayers });
+		this.mapRenderer.update(this.props);
 	}
 
 	render() {
