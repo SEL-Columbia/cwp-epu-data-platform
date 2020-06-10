@@ -1,6 +1,6 @@
 import * as styles from './styles.css';
 
-import React, { useState, Component } from 'react';
+import React, { Component } from 'react';
 
 import Filters from '../Filters';
 import Map from '../Map';
@@ -9,28 +9,6 @@ import vectors from '../config/vectors';
 import baseMaps from '../config/baseMaps';
 
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
-
-// export default function App(){
-//     const initialRasterLayers = dataSources.filter(({ kind }) => kind === 'raster');
-//     const [currentRasterLayers, setCurrentRasterLayers] = useState(initialRasterLayers);
-//
-//     const initialVectorLayers = dataSources.filter(({ kind }) => kind !== 'raster');
-//     const [currentVectorLayers, setCurrentVectorLayers] = useState(initialVectorLayers);
-//
-//
-//     return <div className={styles.appWrapper}>
-//         <Filters
-//             rasterLayers={currentRasterLayers}
-//             vectorLayers={currentVectorLayers}
-//             setRasterLayers={setCurrentRasterLayers}
-//             setVectorLayers={setCurrentVectorLayers}
-//         />
-//         <Map
-//             rasterLayers={currentRasterLayers}
-//             vectorLayers={currentVectorLayers}
-//         />
-//     </div>
-// }
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -59,12 +37,14 @@ export default class App extends Component {
 			vectorFiltersByNamesMap[vector.name] = {};
 		}
 		this.state = {
-			currentBaseMapName: baseMaps.find(({ isDefault }) => isDefault).name,
-			currentRasterLayerNamesSet: new Set([]),
+			currentBaseMapLayerName: baseMaps.find(({ isDefault }) => isDefault).name,
+			currentRasterLayerName: null,
 			currentVectorLayerNamesSet: new Set(currentVectorLayers.map(({ name }) => name)),
 			rasters: [],
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
+			isLoadingVectors: false,
+			isLoadingRasters: false,
 		};
 	}
 
@@ -74,6 +54,7 @@ export default class App extends Component {
 	}
 
 	loadVectors = async () => {
+		this.setState({ isLoadingVectors: true });
 		const { currentVectorLayerNamesSet } = this.state;
 		const vectorsToFetch = vectors.filter(({ name }) => currentVectorLayerNamesSet.has(name));
 		const nextVectorFeaturesByNamesMap = {};
@@ -91,10 +72,12 @@ export default class App extends Component {
 		this.setState({
 			vectorFeaturesByNamesMap: nextVectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap: nextVectorFiltersByNamesMap,
+			isLoadingVectors: false,
 		});
 	};
 
 	loadRasters = async () => {
+		this.setState({ isLoadingRasters: true });
 		const response = await fetch(
 			`https://redivis.com/api/v1/tables/modilab.uganda_geodata:1.raster_layer_metadata:13/rows?selectedVariables=mapbox_id,zoom_min,zoom_max,bounding_box,CATALOG_NAME&maxResults=10000`,
 			{
@@ -119,11 +102,15 @@ export default class App extends Component {
 					name: row[4],
 				});
 			});
-		this.setState({ rasters });
+		this.setState({ rasters, isLoadingRasters: false });
 	};
 
-	handleUpdateRasterLayers = (currentRasterLayerNamesSet) => {
-		this.setState({ currentRasterLayerNamesSet });
+	handleUpdateBaseMapLayer = (currentBaseMapLayerName) => {
+		this.setState({ currentBaseMapLayerName });
+	}
+
+	handleUpdateRasterLayer = (currentRasterLayerName) => {
+		this.setState({ currentRasterLayerName });
 	};
 
 	handleUpdateVectorLayers = (currentVectorLayerNamesSet) => {
@@ -157,10 +144,12 @@ export default class App extends Component {
 		const {
 			vectorFiltersByNamesMap,
 			vectorFeaturesByNamesMap,
-			currentRasterLayerNamesSet,
+			currentRasterLayerName,
 			currentVectorLayerNamesSet,
-			currentBaseMapName,
+			currentBaseMapLayerName,
 			rasters,
+			isLoadingVectors,
+			isLoadingRasters,
 		} = this.state;
 
 		return (
@@ -170,15 +159,19 @@ export default class App extends Component {
 					rasterLayers={rasters}
 					vectorLayers={vectors}
 					vectorFiltersByNamesMap={vectorFiltersByNamesMap}
-					selectedRasterLayerNamesSet={currentRasterLayerNamesSet}
+					selectedBaseMapLayerName={currentBaseMapLayerName}
+					selectedRasterLayerName={currentRasterLayerName}
 					selectedVectorLayerNamesSet={currentVectorLayerNamesSet}
-					onUpdateRasterLayers={this.handleUpdateRasterLayers}
+					onUpdateBaseMapLayer={this.handleUpdateBaseMapLayer}
+					onUpdateRasterLayer={this.handleUpdateRasterLayer}
 					onUpdateVectorLayers={this.handleUpdateVectorLayers}
 					onUpdateVectorFilters={this.handleUpdateVectorFilters}
+					isLoadingVectors={isLoadingVectors}
+					isLoadingRasters={isLoadingRasters}
 				/>
 				<Map
-					baseMapLayer={baseMaps.find(({ name }) => name === currentBaseMapName)}
-					rasterLayers={rasters.filter(({ name }) => currentRasterLayerNamesSet.has(name))}
+					baseMapLayer={baseMaps.find(({ name }) => name === currentBaseMapLayerName)}
+					rasterLayers={rasters.filter(({ name }) => name === currentRasterLayerName)}
 					vectorLayers={vectors
 						.filter(({ name }) => currentVectorLayerNamesSet.has(name))
 						.map((vector) => ({
