@@ -1,37 +1,57 @@
 import React from 'react';
 import Select from 'react-select';
 
+import vectorStyles from './vectorStyles'
+
 import * as styles from './styles.css';
 
 export default function Filters({
-	baseMapLayers, // TODO
+	baseMapLayers,
 	rasterLayers,
 	vectorLayers,
 	vectorFiltersByNamesMap,
-	selectedRasterLayerNamesSet,
+	selectedBaseMapLayerName,
+	selectedRasterLayerName,
 	selectedVectorLayerNamesSet,
-	onUpdateRasterLayers,
+	onUpdateBaseMapLayer,
+	onUpdateRasterLayer,
 	onUpdateVectorLayers,
 	onUpdateVectorFilters,
+	isLoadingVectors,
+	isLoadingRasters,
 }) {
-	function handleRasterLayerChange(selectedOptions, options) {
-		const { action, removedValue, option } = options;
-		const nextSelectedRasterLayerNamesSet = new Set([...selectedRasterLayerNamesSet]);
+
+	function handleBaseMapLayerChange(selectedOption, options){
+		console.log('options', selectedOption, options);
+		const { action } = options;
+		let nextSelectedBaseMapLayerName;
 		switch (action) {
-			case 'remove-value':
-				nextSelectedRasterLayerNamesSet.delete(removedValue.name);
-				break;
-			case 'deselect-option':
-				nextSelectedRasterLayerNamesSet.delete(option.name);
-				break;
 			case 'select-option':
-				nextSelectedRasterLayerNamesSet.add(option.name);
+				nextSelectedBaseMapLayerName = selectedOption.name;
 				break;
+			case 'remove-value':
+			case 'deselect-option':
 			case 'clear':
-				nextSelectedRasterLayerNamesSet.clear();
+				nextSelectedBaseMapLayerName = baseMapLayers[0].name;
 				break;
 		}
-		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
+		onUpdateBaseMapLayer(nextSelectedBaseMapLayerName);
+	}
+
+	function handleRasterLayerChange(selectedOption, options) {
+		const { action } = options;
+		let nextSelectedRasterLayerName;
+		switch (action) {
+			case 'select-option':
+				nextSelectedRasterLayerName = selectedOption.name;
+				break;
+			case 'remove-value':
+			case 'deselect-option':
+			case 'clear':
+				nextSelectedRasterLayerName = null;
+				break;
+		}
+		onUpdateRasterLayer(nextSelectedRasterLayerName);
 	}
 
 	function handleVectorLayerChange(selectedOptions, options) {
@@ -88,10 +108,10 @@ export default function Filters({
 		});
 	}
 
-	function renderFilter({ vectorName, filterName, valuesSet, selectedValuesSet }) {
+	function renderFilter({ vectorName, filterName, valuesSet = new Set([]), selectedValuesSet = new Set([]) }) {
 		return (
 			<div key={`${vectorName}_${filterName}`} className={styles.filter}>
-				<h5 className={styles.filterName}>{filterName}</h5>
+				<div className={styles.filterName}><span>{filterName}</span></div>
 				<Select
 					options={[...valuesSet]}
 					value={[...selectedValuesSet]}
@@ -100,50 +120,67 @@ export default function Filters({
 					isMulti={true}
 					onChange={(selectedOption, options) => handleFilterChange(options, vectorName, filterName)}
 					hideSelectedOptions={false}
+					isDisabled={!valuesSet.size}
+					isLoading={isLoadingVectors && !valuesSet.size}
 				/>
 			</div>
 		);
 	}
 
-	function renderFilters({ name }) {
-		const filtersMap = vectorFiltersByNamesMap[name];
-		const filters = [];
-		for (const filter in filtersMap) {
-			filters.push({
-				vectorName: name,
-				filterName: filter,
-				valuesSet: filtersMap[filter].valuesSet,
-				selectedValuesSet: filtersMap[filter].selectedValuesSet,
-			});
+	function renderFilters({ name, filterVariables = [] }) {
+		if (!filterVariables.length) {
+			return null;
 		}
+		const filtersMap = vectorFiltersByNamesMap[name];
+		const filters = filterVariables.map((variable) => ({
+			vectorName: name,
+			filterName: variable.name,
+			valuesSet: ((filtersMap || {})[variable.name] || {}).valuesSet,
+			selectedValuesSet: ((filtersMap || {})[variable.name] || {}).selectedValuesSet,
+		}));
+
 		return (
-			<div key={name} className={styles.name}>
-				<h4 className={styles.name}>{name}</h4>
+			<div key={name} className={styles.filterWrapper}>
+				<div className={styles.vectorName}><span>{name}</span></div>
 				<div className={styles.filters}>{filters.map(renderFilter)}</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className={styles.filterWrapper}>
+		<div className={styles.sideBarWrapper}>
 			<div className={styles.headerWrapper}>
 				<h2>{'QSEL'}</h2>
 			</div>
 			<div className={styles.bodyWrapper}>
-				<div className={styles.rasterWrapper}>
-					<h3>{'Rasters'}</h3>
+				<div className={styles.sectionWrapper}>
+					<div className={styles.sectionHeader}><span>{'Base map'}</span></div>
 					<Select
-						options={rasterLayers}
-						value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}
+						options={baseMapLayers}
+						value={baseMapLayers.find(({ name }) => name === selectedBaseMapLayerName)}
 						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => selectedRasterLayerNamesSet.has(name)}
-						isMulti={true}
-						onChange={handleRasterLayerChange}
+						isOptionSelected={({ name }) => name === selectedBaseMapLayerName}
+						onChange={handleBaseMapLayerChange}
 						hideSelectedOptions={false}
 					/>
 				</div>
-				<div className={styles.vectorWrapper}>
-					<h3>{'Vectors'}</h3>
+				<div className={styles.sectionWrapper}>
+					<div className={styles.sectionHeader}><span>{'Rasters'}</span></div>
+					<Select
+						options={rasterLayers}
+						value={rasterLayers.find(({ name }) => name === selectedRasterLayerName)}
+						getOptionLabel={({ name }) => name}
+						isOptionSelected={({ name }) => name === selectedRasterLayerName}
+						onChange={handleRasterLayerChange}
+						hideSelectedOptions={false}
+						isClearable={true}
+						placeholder={'Select raster...'}
+						isLoading={isLoadingRasters}
+						isDisabled={!rasterLayers.length}
+					/>
+				</div>
+				<div className={styles.sectionWrapper}>
+					<div className={styles.sectionHeader}><span>{'Vectors'}</span></div>
 					<Select
 						options={vectorLayers}
 						value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
@@ -152,8 +189,15 @@ export default function Filters({
 						isMulti={true}
 						onChange={handleVectorLayerChange}
 						hideSelectedOptions={false}
+						// styles={vectorStyles}
+						isLoading={isLoadingVectors}
+						isDisabled={!vectorLayers.length}
 					/>
-					<div className={styles.filtersWrapper}>
+					<div className={styles.vectorFiltersWrapper}>
+						<div className={styles.sectionHeader}><span>{'Filter by vector values'}</span></div>
+						{!vectorLayers.filter(({ name, filterVariables = [] }) => selectedVectorLayerNamesSet.has(name) && filterVariables.length).length &&
+							<span className={styles.empty}>{'No filterable vectors selected'}</span>
+						}
 						{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}
 					</div>
 				</div>

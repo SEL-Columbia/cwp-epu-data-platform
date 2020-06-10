@@ -109,7 +109,11 @@ const vectors = [
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		leafletType: 'circleMarker',
-		leafletOptions: { color: 'rgba(51,255,150,0.6)', radius: 1 },
+		leafletOptions: {
+			styles: (feature) => {
+				return { color: 'rgba(51,255,150,0.6)', radius: 1 }
+			},
+		},
 		minZoom: 9,
 	}),
 	new VectorSource({
