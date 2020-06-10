@@ -153,7 +153,7 @@ export default function Filters({
 						onChange={handleVectorLayerChange}
 						hideSelectedOptions={false}
 					/>
-					<div className={styles.vectorFiltersWrapper}>
+					<div className={styles.filtersWrapper}>
 						{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}
 					</div>
 				</div>

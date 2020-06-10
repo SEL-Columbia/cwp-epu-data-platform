@@ -60,13 +60,12 @@ export default class App extends Component {
 		}
 		this.state = {
 			currentBaseMapName: baseMaps.find(({ isDefault }) => isDefault).name,
-			currentRasterLayerNamesSet: new Set(),
+			currentRasterLayerNamesSet: new Set([]),
 			currentVectorLayerNamesSet: new Set(currentVectorLayers.map(({ name }) => name)),
 			rasters: [],
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
 		};
-		console.log(this.state);
 	}
 
 	componentDidMount() {
@@ -83,8 +82,8 @@ export default class App extends Component {
 			vectorsToFetch.map(async (vector) => {
 				const features = await vector.fetchData();
 				nextVectorFeaturesByNamesMap[vector.name] = features;
-				if (vector.filterNamesWhitelist) {
-					const filtersMap = getFiltersMap(features, vector.filterNamesWhitelist);
+				if (vector.filterVariables && vector.filterVariables.length) {
+					const filtersMap = getFiltersMap(features, new Set(vector.filterVariables.map(({ name }) => name)));
 					nextVectorFiltersByNamesMap[vector.name] = filtersMap;
 				}
 			}),

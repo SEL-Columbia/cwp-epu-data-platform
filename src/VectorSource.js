@@ -25,9 +25,6 @@ export default class VectorSource {
 		this.maxZoom = maxZoom;
 		this.isDefault = isDefault;
 		this.getGeometry = getGeometry;
-
-		// TODO: remove?
-		this.filterNamesWhiteList = new Set(filterVariables.map(({ name }) => name));
 	}
 
 	fetchData = async () => {
