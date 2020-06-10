@@ -28,26 +28,36 @@ export default class MapRenderer {
 		}
 	};
 
-	update({ rasterLayers, vectorLayers, centroid = [1, 32], zoom = 6 }) {
+	update({ baseMapLayer, rasterLayers, vectorLayers, centroid = [1, 32], zoom = 6 }) {
 		this.map.eachLayer((layer) => {
 			this.map.removeLayer(layer);
 		});
 
 		this.map.setView(centroid, zoom);
 
+		const baseLayer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
+			id: baseMapLayer.mapboxId,
+			opacity: 1,
+			tileSize: 512,
+			zoomOffset: -1,
+			accessToken: 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA',
+		});
+
+		this.map.addLayer(baseLayer);
+
 		this.layers = new Map();
 
 		for (const rasterLayer of rasterLayers) {
 			const layer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
-				id: rasterLayer.id,
-				opacity: 0.5 + 0.5 / rasterLayers.length,
+				id: rasterLayer.mapboxId,
+				opacity: 0.8,
 				tileSize: 512,
 				zoomOffset: -1,
 				accessToken:
 					'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA',
 				minNativeZoom: rasterLayer.minNativeZoom,
 				maxNativeZoom: rasterLayer.maxNativeZoom,
-				bounds: rasterLayer.bounds,
+				bounds: rasterLayer.boundingBox,
 			});
 			this.layers.set(rasterLayer, layer);
 		}
@@ -57,7 +67,7 @@ export default class MapRenderer {
 			this.layers.set(vectorLayer, layer);
 
 			for (const feature of vectorLayer.features) {
-				const marker = L[vectorLayer.leafletType](feature.geography, vectorLayer.leafletOptions).addTo(layer);
+				const marker = L[vectorLayer.leafletType](feature.geometry, vectorLayer.leafletOptions).addTo(layer);
 
 				if (feature.metadata) {
 					marker.bindPopup(

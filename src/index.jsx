@@ -3,7 +3,7 @@ import { render as reactDOMRender } from 'react-dom';
 // Global styles
 import './styles.css';
 
-import App from './App'
+import App from './App';
 
 let root = document.getElementById('root');
 

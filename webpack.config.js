@@ -3,6 +3,7 @@
 /* eslint-disable import/unambiguous*/
 
 const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = function ({ env } = {}) {
 	const output = {
@@ -25,7 +26,7 @@ module.exports = function ({ env } = {}) {
 			],
 			splitChunks: {},
 		},
-		plugins: [],
+		plugins: [new webpack.EnvironmentPlugin(['REDIVIS_API_TOKEN'])],
 		module: {
 			rules: [
 				{
