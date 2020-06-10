@@ -30,7 +30,6 @@ const vectors = [
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
 		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
 		getGeometry: (lat, lon) => {
-			debugger;
 			return [lat, lon];
 		},
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],

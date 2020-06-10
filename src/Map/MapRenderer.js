@@ -55,9 +55,9 @@ export default class MapRenderer {
 				zoomOffset: -1,
 				accessToken:
 					'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA',
-				minNativeZoom: rasterLayer.minNativeZoom,
-				maxNativeZoom: rasterLayer.maxNativeZoom,
-				bounds: rasterLayer.boundingBox,
+				minNativeZoom: rasterLayer.minNativeZoom + 1,
+				maxNativeZoom: rasterLayer.maxNativeZoom + 1,
+				bounds: rasterLayer.bounds,
 			});
 			this.layers.set(rasterLayer, layer);
 		}

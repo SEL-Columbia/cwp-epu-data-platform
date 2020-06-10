@@ -124,7 +124,6 @@ export default class App extends Component {
 	};
 
 	handleUpdateRasterLayers = (currentRasterLayerNamesSet) => {
-		debugger;
 		this.setState({ currentRasterLayerNamesSet });
 	};
 
