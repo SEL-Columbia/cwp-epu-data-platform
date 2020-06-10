@@ -28,7 +28,7 @@ export default class MapRenderer {
 		}
 	};
 
-	update({ baseMapLayer, rasterLayers, vectorLayers, centroid = [1, 32], zoom = 6 }) {
+	update({ baseMapLayer, rasterLayers, vectorLayers, centroid = [1, 32], zoom = 7 }) {
 		this.map.eachLayer((layer) => {
 			this.map.removeLayer(layer);
 		});
