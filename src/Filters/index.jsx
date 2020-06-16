@@ -5,6 +5,21 @@ import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
 
+function groupOptions(options){
+	const groupLabelsSet = new Set([]);
+	const groups = [];
+	for (const option of options){
+		const label = option.label || '';
+		if (!groupLabelsSet.has(label)){
+			groups.push({ label, options: [] });
+			groupLabelsSet.add(label)
+		}
+		const group = groups.find((group) => group.label === label);
+		group.options.push(option);
+	}
+	return groups;
+}
+
 export default function Filters({
 	baseMapLayers,
 	rasterLayers,
@@ -22,7 +37,6 @@ export default function Filters({
 }) {
 
 	function handleBaseMapLayerChange(selectedOption, options){
-		console.log('options', selectedOption, options);
 		const { action } = options;
 		let nextSelectedBaseMapLayerName;
 		switch (action) {
@@ -147,6 +161,33 @@ export default function Filters({
 		);
 	}
 
+	const groupStyles = {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	};
+	const groupBadgeStyles = {
+		backgroundColor: '#EBECF0',
+		borderRadius: '2em',
+		color: '#172B4D',
+		display: 'inline-block',
+		fontSize: 12,
+		fontWeight: 'normal',
+		lineHeight: '1',
+		minWidth: 1,
+		padding: '0.16666666666667em 0.5em',
+		textAlign: 'center',
+	};
+
+	const renderGroupLabel = (data) => {
+		return (
+			<div style={groupStyles} className={styles.groupWrapper}>
+				<span>{data.label}</span>
+				<span style={groupBadgeStyles} className={styles.groupBadge}>{data.options.length}</span>
+			</div>
+		)
+	}
+
 	return (
 		<div className={styles.sideBarWrapper}>
 			<div className={styles.headerWrapper}>
@@ -182,7 +223,7 @@ export default function Filters({
 				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Vectors'}</span></div>
 					<Select
-						options={vectorLayers}
+						options={groupOptions(vectorLayers)}
 						value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
 						getOptionLabel={({ name }) => name}
 						isOptionSelected={({ name }) => selectedVectorLayerNamesSet.has(name)}
@@ -192,6 +233,7 @@ export default function Filters({
 						// styles={vectorStyles}
 						isLoading={isLoadingVectors}
 						isDisabled={!vectorLayers.length}
+						formatGroupLabel={renderGroupLabel}
 					/>
 					<div className={styles.vectorFiltersWrapper}>
 						<div className={styles.sectionHeader}><span>{'Filter by vector values'}</span></div>

@@ -14,6 +14,7 @@ const vectors = [
 	// Regions
 	new VectorSource({
 		name: 'Uganda Regions',
+		label: 'Uganda',
 		isDefault: true,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_regions:8',
 		geoVariables: [{ name: 'geom' }],
@@ -28,6 +29,7 @@ const vectors = [
 	}),
 	new VectorSource({
 		name: 'Uganda Districts',
+		label: 'Uganda',
 		isDefault: true,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_districts:9',
 		geoVariables: [{ name: 'geom' }],
@@ -43,6 +45,7 @@ const vectors = [
 	}),
 	new VectorSource({
 		name: 'Uganda Subcounties',
+		label: 'Uganda',
 		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_subcounties:11',
 		geoVariables: [{ name: 'geom' }],
@@ -58,6 +61,7 @@ const vectors = [
 	}),
 	new VectorSource({
 		name: 'Uganda Parishes',
+		label: 'Uganda',
 		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_parishes:10',
 		geoVariables: [{ name: 'geom' }],
@@ -71,9 +75,9 @@ const vectors = [
 		},
 		minZoom: 8,
 	}),
-
 	new VectorSource({
 		name: 'Uganda Electricity Transmission Lines',
+		label: 'Uganda',
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_electricity_transmission_lines:12',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'VOLTAGE_KV' }, { name: 'STATUS' }, { name: 'INSTALLATI' }, { name: 'STRUCTURE_' }],
@@ -101,6 +105,7 @@ const vectors = [
 	}),
 	new VectorSource({
 		name: 'Uganda Geosurvey Results',
+		label: 'Uganda',
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
 		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
 		getGeometry: (lat, lon) => {
@@ -118,8 +123,9 @@ const vectors = [
 	}),
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
+		label: 'Uganda',
 		isDefault: true,
-		tableIdentifier: `modilab.uganda_geodata:1:current.umeme_rea_power_distribution_lines_2018:7`,
+		tableIdentifier: `modilab.uganda_geodata:1:v2_5.umeme_rea_power_distribution_lines_2018:7`,
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],

@@ -3,6 +3,7 @@ const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 export default class VectorSource {
 	constructor({
 		name,
+		label,
 		tableIdentifier,
 		geoVariables,
 		getGeometry,
@@ -15,6 +16,7 @@ export default class VectorSource {
 		maxZoom,
 	}) {
 		this.name = name;
+		this.label = label;
 		this.tableIdentifier = tableIdentifier;
 		this.geoVariables = geoVariables;
 		this.filterVariables = filterVariables;
