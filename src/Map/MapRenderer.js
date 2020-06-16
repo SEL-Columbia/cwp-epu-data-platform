@@ -13,10 +13,24 @@ export default class MapRenderer {
 		this.vectorLayers = new Map();
 		this.minZoomByLayer = new Map();
 
+		this.onZoomOrPan = props.onZoomOrPan;
+
 		this.update(props, true);
-		this.map.on('zoomend', () => {
-			this.updateLayers(this.map.getZoom());
-		});
+		this.map.on('zoomend', this.handleZoomEnd);
+		this.map.on('moveend', this.handleMoveEnd)
+	}
+
+	handleMoveEnd = () => {
+		const zoom = this.map.getZoom();
+		const center = this.map.getCenter();
+		this.onZoomOrPan(zoom, center);
+	}
+
+	handleZoomEnd = () => {
+		const zoom = this.map.getZoom();
+		const center = this.map.getCenter();
+		this.onZoomOrPan(zoom, center);
+		this.updateLayers(zoom);
 	}
 
 	updateLayers = (zoom) => {

@@ -9,8 +9,17 @@ const rasterGroups = [
 		minNativeZoomVariable: { name: 'zoom_min' },
 		maxNativeZoomVariable: { name: 'zoom_max' },
 		boundingBoxVariable: { name: 'bounding_box' },
-		nameVariable: { name: 'CATALOG_NAME' },
+		nameVariable: { name: 'catalog_name' },
 	}),
+	new RasterSourceGroup({
+		name: 'Ethiopia',
+		tableIdentifier: `modilab.ethiopia_geodata:2:v1_0.raster_layer_metadata:1`,
+		mapboxIdVariable: { name: 'mapbox_id' },
+		minNativeZoomVariable: { name: 'zoom_min' },
+		maxNativeZoomVariable: { name: 'zoom_max' },
+		boundingBoxVariable: { name: 'bounding_box' },
+		nameVariable: { name: 'catalog_name' },
+	})
 ];
 
 export default rasterGroups;
