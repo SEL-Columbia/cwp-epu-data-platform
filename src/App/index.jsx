@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 
 import Filters from '../Filters';
 import Map from '../Map';
-import RasterSource from '../RasterSource';
-import vectors from '../config/vectors';
 import baseMaps from '../config/baseMaps';
+import rasterGroups from '../config/rasterGroups';
+import vectors from '../config/vectors';
 
-const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
+const METADATA_NULL_VALUE = '(null)'
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -18,8 +18,8 @@ function getFiltersMap(features, whitelist) {
 				if (!filters[property]) {
 					filters[property] = { valuesSet: new Set([]), selectedValuesSet: new Set([]) };
 				}
-				filters[property].valuesSet.add(feature.metadata[property]);
-				filters[property].selectedValuesSet.add(feature.metadata[property]);
+				filters[property].valuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
+				filters[property].selectedValuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
 			}
 		}
 	}
@@ -78,30 +78,12 @@ export default class App extends Component {
 
 	loadRasters = async () => {
 		this.setState({ isLoadingRasters: true });
-		const response = await fetch(
-			`https://redivis.com/api/v1/tables/modilab.uganda_geodata:1.raster_layer_metadata:13/rows?selectedVariables=mapbox_id,zoom_min,zoom_max,bounding_box,CATALOG_NAME&maxResults=10000`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${ACCESS_TOKEN}`,
-				},
-			},
+		const rasterSourceGroups = await Promise.all(
+			rasterGroups.map(async (rasterGroup) => {
+				return await rasterGroup.fetchData();
+			}),
 		);
-		const text = await response.text();
-		const rasters = text
-			.split('\n')
-			.map((row, i) => {
-				return JSON.parse(row);
-			})
-			.map((row) => {
-				return new RasterSource({
-					mapboxId: row[0],
-					minNativeZoom: row[1],
-					maxNativeZoom: row[2],
-					boundingBox: row[3],
-					name: row[4],
-				});
-			});
+		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
 		this.setState({ rasters, isLoadingRasters: false });
 	};
 
@@ -133,8 +115,8 @@ export default class App extends Component {
 				!feature.metadata ||
 				filterNames.every(
 					(filterName) =>
-						!feature.metadata[filterName] ||
-						filtersMap[filterName].selectedValuesSet.has(feature.metadata[filterName]),
+						feature.metadata[filterName] === undefined ||
+						filtersMap[filterName].selectedValuesSet.has(feature.metadata[filterName] || METADATA_NULL_VALUE),
 				)
 			);
 		});

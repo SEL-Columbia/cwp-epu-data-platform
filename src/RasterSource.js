@@ -1,13 +1,13 @@
 export default class RasterSource {
-	constructor({ mapboxId, isDefault, minZoom, maxZoom, minNativeZoom, maxNativeZoom, boundingBox, name }) {
+	constructor({ mapboxId, isDefault, minZoom, maxZoom, minNativeZoom, maxNativeZoom, boundingBox, name, label }) {
+		this.name = name;
+		this.label = label;
 		this.mapboxId = mapboxId;
 		this.minZoom = parseInt(minZoom);
 		this.maxZoom = parseInt(maxZoom);
 		this.minNativeZoom = parseInt(minNativeZoom);
 		this.maxNativeZoom = parseInt(maxNativeZoom);
-		this.name = name;
 		this.isDefault = isDefault;
-		this.displayName = name;
 
 		if (boundingBox) {
 			boundingBox = boundingBox.split(',');
