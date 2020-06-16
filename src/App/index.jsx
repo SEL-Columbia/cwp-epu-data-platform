@@ -4,11 +4,9 @@ import React, { Component } from 'react';
 
 import Filters from '../Filters';
 import Map from '../Map';
-import RasterSource from '../RasterSource';
-import vectors from '../config/vectors';
 import baseMaps from '../config/baseMaps';
-
-const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
+import rasterGroups from '../config/rasterGroups';
+import vectors from '../config/vectors';
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -78,30 +76,12 @@ export default class App extends Component {
 
 	loadRasters = async () => {
 		this.setState({ isLoadingRasters: true });
-		const response = await fetch(
-			`https://redivis.com/api/v1/tables/modilab.uganda_geodata:1.raster_layer_metadata:13/rows?selectedVariables=mapbox_id,zoom_min,zoom_max,bounding_box,CATALOG_NAME&maxResults=10000`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${ACCESS_TOKEN}`,
-				},
-			},
+		const rasterSourceGroups = await Promise.all(
+			rasterGroups.map(async (rasterGroup) => {
+				return await rasterGroup.fetchData();
+			}),
 		);
-		const text = await response.text();
-		const rasters = text
-			.split('\n')
-			.map((row, i) => {
-				return JSON.parse(row);
-			})
-			.map((row) => {
-				return new RasterSource({
-					mapboxId: row[0],
-					minNativeZoom: row[1],
-					maxNativeZoom: row[2],
-					boundingBox: row[3],
-					name: row[4],
-				});
-			});
+		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
 		this.setState({ rasters, isLoadingRasters: false });
 	};
 

@@ -208,7 +208,7 @@ export default function Filters({
 				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Rasters'}</span></div>
 					<Select
-						options={rasterLayers}
+						options={groupOptions(rasterLayers)}
 						value={rasterLayers.find(({ name }) => name === selectedRasterLayerName)}
 						getOptionLabel={({ name }) => name}
 						isOptionSelected={({ name }) => name === selectedRasterLayerName}
@@ -218,6 +218,7 @@ export default function Filters({
 						placeholder={'Select raster...'}
 						isLoading={isLoadingRasters}
 						isDisabled={!rasterLayers.length}
+						formatGroupLabel={renderGroupLabel}
 					/>
 				</div>
 				<div className={styles.sectionWrapper}>
