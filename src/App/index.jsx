@@ -1,6 +1,7 @@
 import * as styles from './styles.css';
 
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 
 import Filters from '../Filters';
 import Map from '../Map';
@@ -9,6 +10,11 @@ import rasterGroups from '../config/rasterGroups';
 import vectors from '../config/vectors';
 
 const METADATA_NULL_VALUE = '(null)'
+
+const ZOOM_REGEX = /zoom=([\d+\.]+)/;
+const LAT_REGEX = /lat=(-?[\d+\.]+)/;
+const LNG_REGEX = /lng=(-?[\d+\.]+)/;
+
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -26,7 +32,7 @@ function getFiltersMap(features, whitelist) {
 	return filters;
 }
 
-export default class App extends Component {
+class App extends Component {
 	constructor(props) {
 		super(props);
 		const currentVectorLayers = vectors.filter(({ isDefault }) => isDefault);
@@ -122,6 +128,37 @@ export default class App extends Component {
 		});
 	};
 
+	handleZoomOrPan = (zoom, center) => {
+		const {
+			location: { pathname },
+			history,
+		} = this.props;
+		history.replace({
+			pathname,
+			search: `zoom=${zoom}&lat=${center.lat}&lng=${center.lng}`
+		});
+	}
+
+	getZoomAndCenter = () => {
+		const {
+			location: {
+				search,
+			}
+		} = this.props;
+		const zoomMatch = search.match(ZOOM_REGEX);
+		const latMatch = search.match(LAT_REGEX);
+		const lngMatch = search.match(LNG_REGEX);
+		const object = {};
+		if (zoomMatch){
+			object.zoom = parseInt(zoomMatch[1], 10);
+		}
+		if (latMatch && lngMatch){
+			object.centroid = [parseFloat(latMatch[1]), parseFloat(lngMatch[1])];
+		}
+
+		return object;
+	}
+
 	render() {
 		const {
 			vectorFiltersByNamesMap,
@@ -133,6 +170,8 @@ export default class App extends Component {
 			isLoadingVectors,
 			isLoadingRasters,
 		} = this.state;
+
+		const { zoom, centroid } = this.getZoomAndCenter();
 
 		return (
 			<div className={styles.appWrapper}>
@@ -160,8 +199,13 @@ export default class App extends Component {
 							...vector,
 							features: this.filterFeatures(vector.name, vectorFeaturesByNamesMap[vector.name] || []),
 						}))}
+					onZoomOrPan={this.handleZoomOrPan}
+					zoom={zoom}
+					centroid={centroid}
 				/>
 			</div>
 		);
 	}
 }
+
+export default withRouter(App);

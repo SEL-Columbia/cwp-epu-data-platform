@@ -1,5 +1,6 @@
 import React from 'react';
 import { render as reactDOMRender } from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 // Global styles
 import './styles.css';
 
@@ -14,4 +15,9 @@ if (!root) {
 	document.body.appendChild(root);
 }
 
-reactDOMRender(<App />, root);
+reactDOMRender(
+	<BrowserRouter>
+		<App />
+	</BrowserRouter>,
+	root,
+);
