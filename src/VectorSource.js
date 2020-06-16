@@ -1,4 +1,5 @@
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
+const MAX_RESULTS = 10000;
 
 export default class VectorSource {
 	constructor({
@@ -49,7 +50,7 @@ export default class VectorSource {
 		const response = await fetch(
 			`https://redivis.com/api/v1/tables/${this.tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
 				',',
-			)}&maxResults=10000`,
+			)}&maxResults=${MAX_RESULTS}`,
 			{
 				method: 'GET',
 				headers: {
