@@ -8,6 +8,8 @@ import baseMaps from '../config/baseMaps';
 import rasterGroups from '../config/rasterGroups';
 import vectors from '../config/vectors';
 
+const METADATA_NULL_VALUE = '(null)'
+
 function getFiltersMap(features, whitelist) {
 	const filters = {};
 	for (const feature of features) {
@@ -16,8 +18,8 @@ function getFiltersMap(features, whitelist) {
 				if (!filters[property]) {
 					filters[property] = { valuesSet: new Set([]), selectedValuesSet: new Set([]) };
 				}
-				filters[property].valuesSet.add(feature.metadata[property]);
-				filters[property].selectedValuesSet.add(feature.metadata[property]);
+				filters[property].valuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
+				filters[property].selectedValuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
 			}
 		}
 	}
@@ -113,8 +115,8 @@ export default class App extends Component {
 				!feature.metadata ||
 				filterNames.every(
 					(filterName) =>
-						!feature.metadata[filterName] ||
-						filtersMap[filterName].selectedValuesSet.has(feature.metadata[filterName]),
+						feature.metadata[filterName] === undefined ||
+						filtersMap[filterName].selectedValuesSet.has(feature.metadata[filterName] || METADATA_NULL_VALUE),
 				)
 			);
 		});
