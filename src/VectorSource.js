@@ -12,6 +12,9 @@ export default class VectorSource {
 		filterVariables,
 		metadataVariables,
 		leafletType,
+		mapboxSourceType,
+		mapboxLayerType,
+		mapboxLayerOptions,
 		leafletOptions,
 		minZoom,
 		maxZoom,
@@ -23,6 +26,9 @@ export default class VectorSource {
 		this.filterVariables = filterVariables;
 		this.metadataVariables = metadataVariables;
 		this.leafletType = leafletType;
+		this.mapboxSourceType = mapboxSourceType;
+		this.mapboxLayerType = mapboxLayerType;
+		this.mapboxLayerOptions = mapboxLayerOptions;
 		this.leafletOptions = leafletOptions;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
@@ -84,7 +90,7 @@ export default class VectorSource {
 				for (const variable of this.metadataVariables) {
 					metadata[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
 				}
-				return { geometry, metadata };
+				return { geometry, metadata, properties: metadata };
 			});
 		return this.data;
 	};

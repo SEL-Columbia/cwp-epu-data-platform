@@ -21,6 +21,18 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 3
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 2, fill: false };
@@ -36,6 +48,19 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 3,
+				'line-dasharray': [6, 3],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
@@ -52,6 +77,19 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 2,
+				'line-dasharray': [4, 2],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
@@ -68,6 +106,19 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 2,
+				'line-dasharray': [2, 1],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
@@ -97,6 +148,18 @@ const vectors = [
 			{ name: 'CONTRACTOR' },
 		],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'rgb(32,89,255)',
+				'line-width': 2
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'rgb(32,89,255)', weight: 1 };
@@ -114,6 +177,14 @@ const vectors = [
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		leafletType: 'circleMarker',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'circle',
+		mapboxLayerOptions: {
+			paint: {
+				'circle-color': 'rgba(51,255,150,0.6)',
+				'circle-radius': 3,
+			},
+		},
 		leafletOptions: {
 			styles: (feature) => {
 				return { color: 'rgba(51,255,150,0.6)', radius: 1 }
@@ -130,6 +201,18 @@ const vectors = [
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'rgb(255,129,255)',
+				'line-width': 2
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'rgb(255,129,255)', weight: 1 };
