@@ -31,7 +31,7 @@ const vectors = [
 		name: 'Uganda Districts',
 		label: 'Uganda',
 		isDefault: true,
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_districts:9',
+		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
@@ -47,7 +47,7 @@ const vectors = [
 		name: 'Uganda Subcounties',
 		label: 'Uganda',
 		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_subcounties:11',
+		tableIdentifier: 'imathews.uganda_boundaries.uganda_subcounties',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
@@ -63,7 +63,7 @@ const vectors = [
 		name: 'Uganda Parishes',
 		label: 'Uganda',
 		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_parishes:10',
+		tableIdentifier: 'imathews.uganda_boundaries.uganda_parishes',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
@@ -116,7 +116,7 @@ const vectors = [
 		leafletType: 'circleMarker',
 		leafletOptions: {
 			styles: (feature) => {
-				return { color: 'rgba(51,255,150,0.6)', radius: 1 }
+				return { color: 'rgba(51,255,150,0.6)', radius: 1 };
 			},
 		},
 		minZoom: 9,
