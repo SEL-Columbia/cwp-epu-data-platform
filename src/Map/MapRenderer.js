@@ -48,15 +48,18 @@ export default class MapRenderer {
 	}
 
 	updateLayers = (zoom) => {
-		// for (const [layerName, layer] of this.rasterLayers) {
-		// 	if (!this.map.getLayer(layerName)){
-		// 		this.map.addLayer(layer);
-		// 	}
-		// 	if (this.minZoomByLayer.get(layerName) && zoom < this.minZoomByLayer.get(layerName)){
-		// 		this.map.removeLayer(layer);
-		// 	}
-		// }
-		console.log('--update layers--');
+		console.log('--update rasters--');
+		for (const [layerName, layer] of this.rasterLayers) {
+			if (!this.map.getLayer(layerName)){
+				this.map.addLayer(layer);
+			}
+			if (this.minZoomByLayer.get(layerName) && zoom < this.minZoomByLayer.get(layerName)){
+				this.map.removeLayer(layer);
+			}
+			console.log('source', this.map.getSource(layerName));
+			console.log('layer', this.map.getLayer(layerName));
+		}
+		console.log('--update vectors--');
 		for (const [layerName, layer] of this.vectorLayers) {
 			console.log('source', this.map.getSource(layerName));
 			console.log('layer', this.map.getLayer(layerName));
@@ -97,43 +100,49 @@ export default class MapRenderer {
 
 		if (this.map.isStyleLoaded()){
 
-			// const rasterLayerNamesSet = new Set(rasterLayers.map(({ name }) => name));
-			// for (const [layerName, layer] of this.rasterLayers){
-			// 	if (!rasterLayerNamesSet.has(layerName)){
-			// 		this.map.removeLayer(layer);
-			// 		this.rasterLayers.delete(layerName);
-			// 		this.minZoomByLayer.delete(layerName);
-			// 	}
-			// }
-			// for (const rasterLayer of rasterLayers) {
-			// 	let layer = this.rasterLayers.get(rasterLayer.name);
-			// 	if (!layer){
-			// 		// layer = {
-			// 		// 	id: rasterLayer.name,
-			// 		// 	type: 'raster',
-			// 		// 	source: {
-			// 		// 		type: 'raster',
-			// 		// 		url: `https://api.mapbox.com/v4/${rasterLayer.mapboxId}/{z}/{x}/{y}@2x.png?access_token=${mapboxgl.accessToken}`,
-			// 		// 		tileSize: 512,
-			// 		// 	},
-			// 		// }
-			// 		layer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
-			// 			id: rasterLayer.mapboxId,
-			// 			opacity: 0.8,
-			// 			tileSize: 512,
-			// 			zoomOffset: -1,
-			// 			accessToken:
-			// 				'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA',
-			// 			minNativeZoom: rasterLayer.minNativeZoom + 1,
-			// 			maxNativeZoom: rasterLayer.maxNativeZoom + 1,
-			// 			bounds: rasterLayer.bounds,
-			// 		});
-			// 		this.rasterLayers.set(rasterLayer.name, layer);
-			// 		if (rasterLayer.minZoom){
-			// 			this.minZoomByLayer.set(rasterLayer.name, rasterLayer.minZoom);
-			// 		}
-			// 	}
-			// }
+			const rasterLayerNamesSet = new Set(rasterLayers.map(({ name }) => name));
+			for (const [layerName, layer] of this.rasterLayers){
+				if (!rasterLayerNamesSet.has(layerName)){
+					this.map.removeLayer(layerName);
+					this.rasterLayers.delete(layerName);
+					this.minZoomByLayer.delete(layerName);
+				}
+			}
+			for (const rasterLayer of rasterLayers) {
+				let layer = this.rasterLayers.get(rasterLayer.name);
+				if (!layer){
+					const source = {
+						type: 'raster',
+						tiles: [`https://api.mapbox.com/v4/${rasterLayer.mapboxId}/{z}/{x}/{y}@2x.png?access_token=${mapboxgl.accessToken}`],
+						tileSize: 512,
+						minzoom: rasterLayer.minNativeZoom,
+						maxzoom: rasterLayer.maxNativeZoom,
+					}
+					this.map.addSource(rasterLayer.name, source);
+					// layer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
+					// 	id: rasterLayer.mapboxId,
+					// 	opacity: 0.8,
+					// 	tileSize: 512,
+					// 	zoomOffset: -1,
+					// 	accessToken:
+					// 		'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA',
+					// 	minNativeZoom: rasterLayer.minNativeZoom + 1,
+					// 	maxNativeZoom: rasterLayer.maxNativeZoom + 1,
+					// 	bounds: rasterLayer.bounds,
+					// });
+					layer = {
+						id: rasterLayer.name,
+						type: 'raster',
+						source: rasterLayer.name,
+						minzoom: rasterLayer.minNativeZoom,
+						maxzoom: rasterLayer.maxNativeZoom,
+					}
+					this.rasterLayers.set(rasterLayer.name, layer);
+					if (rasterLayer.minZoom){
+						this.minZoomByLayer.set(rasterLayer.name, rasterLayer.minZoom);
+					}
+				}
+			}
 
 			const vectorLayerNamesSet = new Set(vectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.vectorLayers){
