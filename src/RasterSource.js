@@ -11,10 +11,12 @@ export default class RasterSource {
 
 		if (boundingBox) {
 			boundingBox = boundingBox.split(',');
-			this.bounds = [
-				[parseInt(boundingBox[1]), parseInt(boundingBox[0])],
-				[parseInt(boundingBox[3]), parseInt(boundingBox[2])],
-			];
+			// leaflet
+			// this.bounds = [
+			// 	[parseInt(boundingBox[1]), parseInt(boundingBox[0])],
+			// 	[parseInt(boundingBox[3]), parseInt(boundingBox[2])],
+			// ];
+			this.bounds = [parseInt(boundingBox[0]), parseInt(boundingBox[1]), parseInt(boundingBox[2]), parseInt(boundingBox[3])];
 		}
 	}
 }

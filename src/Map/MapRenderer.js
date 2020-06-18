@@ -25,7 +25,6 @@ export default class MapRenderer {
 		this.baseLayers = new Map();
 		this.rasterLayers = new Map();
 		this.vectorLayers = new Map();
-		this.minZoomByLayer = new Map();
 
 		this.onZoomOrPan = props.onZoomOrPan;
 
@@ -44,33 +43,7 @@ export default class MapRenderer {
 		const zoom = this.map.getZoom();
 		const center = this.map.getCenter();
 		this.onZoomOrPan(zoom, center);
-		this.updateLayers(zoom);
 	}
-
-	updateLayers = (zoom) => {
-		console.log('--update rasters--');
-		for (const [layerName, layer] of this.rasterLayers) {
-			if (!this.map.getLayer(layerName)){
-				this.map.addLayer(layer);
-			}
-			if (this.minZoomByLayer.get(layerName) && zoom < this.minZoomByLayer.get(layerName)){
-				this.map.removeLayer(layer);
-			}
-			console.log('source', this.map.getSource(layerName));
-			console.log('layer', this.map.getLayer(layerName));
-		}
-		console.log('--update vectors--');
-		for (const [layerName, layer] of this.vectorLayers) {
-			console.log('source', this.map.getSource(layerName));
-			console.log('layer', this.map.getLayer(layerName));
-			if (!this.map.getLayer(layerName)){
-				this.map.addLayer(layer);
-			}
-			if (this.minZoomByLayer.get(layerName) && zoom < this.minZoomByLayer.get(layerName)){
-				this.map.removeLayer(layerName);
-			}
-		}
-	};
 
 	update({ baseMapLayer, rasterLayers, vectorLayers, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }, initialRender = false) {
 		if (initialRender){
@@ -80,9 +53,9 @@ export default class MapRenderer {
 		let baseLayer = this.baseLayers.get(baseMapLayer.name);
 		if (!baseLayer){
 			for (const [layerName, layer] of this.baseLayers){
-				// this.map.removeLayer(layer);
 				this.baseLayers.delete(layerName);
 			}
+			// leaflet
 			// baseLayer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
 			// 	id: baseMapLayer.mapboxId,
 			// 	opacity: 1,
@@ -93,8 +66,8 @@ export default class MapRenderer {
 
 			this.map.setStyle(baseMapLayer.mapboxStyle);
 
-			// this.map.addLayer(baseLayer);
 			this.baseLayers.set(baseMapLayer.name, baseMapLayer);
+			// TODO: baseMap toggling
 			// this.map.on('style.load', () => this.update({ baseMapLayer, rasterLayers, vectorLayers, center, zoom }))
 		}
 
@@ -105,9 +78,9 @@ export default class MapRenderer {
 				if (!rasterLayerNamesSet.has(layerName)){
 					this.map.removeLayer(layerName);
 					this.rasterLayers.delete(layerName);
-					this.minZoomByLayer.delete(layerName);
 				}
 			}
+			// TODO: raster debug (following 'source' spec from
 			for (const rasterLayer of rasterLayers) {
 				let layer = this.rasterLayers.get(rasterLayer.name);
 				if (!layer){
@@ -117,8 +90,10 @@ export default class MapRenderer {
 						tileSize: 512,
 						minzoom: rasterLayer.minNativeZoom,
 						maxzoom: rasterLayer.maxNativeZoom,
+						bounds: rasterLayer.bounds,
 					}
 					this.map.addSource(rasterLayer.name, source);
+					// leaflet
 					// layer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
 					// 	id: rasterLayer.mapboxId,
 					// 	opacity: 0.8,
@@ -137,10 +112,9 @@ export default class MapRenderer {
 						minzoom: rasterLayer.minNativeZoom,
 						maxzoom: rasterLayer.maxNativeZoom,
 					}
+					this.map.addLayer(layer);
+					console.log('add rasterLayer', rasterLayer, layer);
 					this.rasterLayers.set(rasterLayer.name, layer);
-					if (rasterLayer.minZoom){
-						this.minZoomByLayer.set(rasterLayer.name, rasterLayer.minZoom);
-					}
 				}
 			}
 
@@ -150,12 +124,12 @@ export default class MapRenderer {
 					this.map.removeLayer(layerName);
 					this.map.removeSource(layerName);
 					this.vectorLayers.delete(layerName);
-					this.minZoomByLayer.delete(layerName);
 				}
 			}
 			for (const vectorLayer of vectorLayers) {
 				let layer = this.vectorLayers.get(vectorLayer.name);
 				if (!layer) {
+					// leaflet
 					// layer = new L.FeatureGroup();
 					const source = {
 						type: vectorLayer.mapboxSourceType,
@@ -169,9 +143,16 @@ export default class MapRenderer {
 						id: vectorLayer.name,
 						type: vectorLayer.mapboxLayerType,
 						source: vectorLayer.name,
-						...vectorLayer.mapboxLayerOptions,
+						...(vectorLayer.mapboxLayerOptions || {}),
 					}
-					console.log('add layer', vectorLayer, layer);
+					if (vectorLayer.minZoom){
+						layer.minzoom = vectorLayer.minZoom;
+					}
+					if (vectorLayer.maxZoom){
+						layer.maxzoom = vectorLayer.maxZoom;
+					}
+					this.map.addLayer(layer);
+					console.log('add vectorLayer', vectorLayer, layer);
 					this.map.on('click', vectorLayer.name, (e) => {
 						const metadata = e.features[0].properties;
 
@@ -197,15 +178,13 @@ export default class MapRenderer {
 						}
 					});
 					this.vectorLayers.set(vectorLayer.name, layer);
-					if (vectorLayer.minZoom){
-						this.minZoomByLayer.set(vectorLayer.name, vectorLayer.minZoom)
-					}
 				} else {
 					this.map.getSource(vectorLayer.name).setData({
 						type: 'FeatureCollection',
 						features: vectorLayer.features,
 					})
 				}
+				// leaflet
 				// layer.clearLayers();
 				// for (const feature of vectorLayer.features) {
 				// 	const marker = L[vectorLayer.leafletType](feature.geometry, vectorLayer.leafletOptions).addTo(layer);
@@ -219,7 +198,6 @@ export default class MapRenderer {
 				// 	}
 				// }
 			}
-			this.updateLayers(this.map.getZoom());
 		}
 	}
 }
