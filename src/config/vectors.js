@@ -15,12 +15,24 @@ const vectors = [
 	new VectorSource({
 		name: 'Uganda Regions',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_regions:8',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 3
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 2, fill: false };
@@ -30,18 +42,31 @@ const vectors = [
 	new VectorSource({
 		name: 'Uganda Districts',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 3,
+				'line-dasharray': [6, 3],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Subcounties',
@@ -52,12 +77,25 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 2,
+				'line-dasharray': [4, 2],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Parishes',
@@ -68,12 +106,25 @@ const vectors = [
 		filterVariables: [],
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'black',
+				'line-width': 2,
+				'line-dasharray': [2, 1],
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Electricity Transmission Lines',
@@ -97,6 +148,18 @@ const vectors = [
 			{ name: 'CONTRACTOR' },
 		],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'rgb(32,89,255)',
+				'line-width': 3
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'rgb(32,89,255)', weight: 1 };
@@ -108,18 +171,29 @@ const vectors = [
 		label: 'Uganda',
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
 		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
-		getGeometry: (lat, lon) => {
-			return [lat, lon];
+		getGeometry: (lat, lng) => {
+			return {
+				type: 'Point',
+				coordinates: [parseFloat(lng), parseFloat(lat)],
+			};
 		},
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		leafletType: 'circleMarker',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'circle',
+		mapboxLayerOptions: {
+			paint: {
+				'circle-color': 'rgba(51,255,150,0.6)',
+				'circle-radius': 6,
+			},
+		},
 		leafletOptions: {
 			styles: (feature) => {
 				return { color: 'rgba(51,255,150,0.6)', radius: 1 };
 			},
 		},
-		minZoom: 9,
+		minZoom: 8,
 	}),
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
@@ -130,6 +204,18 @@ const vectors = [
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		leafletType: 'geoJSON',
+		mapboxSourceType: 'geojson',
+		mapboxLayerType: 'line',
+		mapboxLayerOptions: {
+			layout: {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			paint: {
+				'line-color': 'rgb(255,129,255)',
+				'line-width': 3
+			}
+		},
 		leafletOptions: {
 			style: (feature) => {
 				return { color: 'rgb(255,129,255)', weight: 1 };

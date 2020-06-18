@@ -135,7 +135,7 @@ class App extends Component {
 		} = this.props;
 		history.replace({
 			pathname,
-			search: `zoom=${zoom}&lat=${center.lat}&lng=${center.lng}`
+			search: `zoom=${zoom}&lng=${center.lng}&lat=${center.lat}`
 		});
 	}
 
@@ -153,7 +153,7 @@ class App extends Component {
 			object.zoom = parseInt(zoomMatch[1], 10);
 		}
 		if (latMatch && lngMatch){
-			object.centroid = [parseFloat(latMatch[1]), parseFloat(lngMatch[1])];
+			object.center = [parseFloat(lngMatch[1]), parseFloat(latMatch[1])];
 		}
 
 		return object;
@@ -171,7 +171,7 @@ class App extends Component {
 			isLoadingRasters,
 		} = this.state;
 
-		const { zoom, centroid } = this.getZoomAndCenter();
+		const { zoom, center } = this.getZoomAndCenter();
 
 		return (
 			<div className={styles.appWrapper}>
@@ -201,7 +201,7 @@ class App extends Component {
 						}))}
 					onZoomOrPan={this.handleZoomOrPan}
 					zoom={zoom}
-					centroid={centroid}
+					center={center}
 				/>
 			</div>
 		);
