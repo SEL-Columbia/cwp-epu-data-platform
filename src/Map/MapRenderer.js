@@ -4,21 +4,23 @@ import './styles.css';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA';
 
-const DEFAULT_CENTER = [1,33];
+const DEFAULT_CENTER = [33,1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
 
 export default class MapRenderer {
 	constructor(elem, props) {
 		this.elem = elem;
 		this.props = {};
-		this.map = new mapboxgl.Map({ container: this.elem })
+		this.map = new mapboxgl.Map({
+			container: this.elem,
+			center: DEFAULT_CENTER,
+			zoom: DEFAULT_ZOOM,
+		})
 		const scale = new mapboxgl.ScaleControl({
 			maxWidth: 100,
 			unit: 'imperial'
 		});
 		this.map.addControl(scale);
-		// this.map = L.map(elem, { preferCanvas: true });
-		// L.control.scale({ position: 'bottomright' }).addTo(this.map);
 
 		this.baseLayers = new Map();
 		this.rasterLayers = new Map();
@@ -54,6 +56,7 @@ export default class MapRenderer {
 		// 		this.map.removeLayer(layer);
 		// 	}
 		// }
+		console.log('--update layers--');
 		for (const [layerName, layer] of this.vectorLayers) {
 			console.log('source', this.map.getSource(layerName));
 			console.log('layer', this.map.getLayer(layerName));
@@ -67,7 +70,6 @@ export default class MapRenderer {
 	};
 
 	update({ baseMapLayer, rasterLayers, vectorLayers, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }, initialRender = false) {
-		console.log('mapRenderer update', this.map.isStyleLoaded());
 		if (initialRender){
 			this.map.jumpTo({ center, zoom });
 		}
@@ -90,9 +92,9 @@ export default class MapRenderer {
 
 			// this.map.addLayer(baseLayer);
 			this.baseLayers.set(baseMapLayer.name, baseMapLayer);
+			// this.map.on('style.load', () => this.update({ baseMapLayer, rasterLayers, vectorLayers, center, zoom }))
 		}
 
-		console.log('baseLayers', this.baseLayers);
 		if (this.map.isStyleLoaded()){
 
 			// const rasterLayerNamesSet = new Set(rasterLayers.map(({ name }) => name));
@@ -153,6 +155,7 @@ export default class MapRenderer {
 							features: vectorLayer.features
 						},
 					}
+					this.map.addSource(vectorLayer.name, source);
 					layer = {
 						id: vectorLayer.name,
 						type: vectorLayer.mapboxLayerType,
@@ -160,28 +163,30 @@ export default class MapRenderer {
 						...vectorLayer.mapboxLayerOptions,
 					}
 					console.log('add layer', vectorLayer, layer);
-					this.map.addSource(vectorLayer.name, source);
-					// this.map.on('click', vectorLayer.name, function(e) {
-					// 	const coordinates = e.features[0].geometry.coordinates[0][0].slice();
-					// 	const metadata = e.features[0].properties;
-					//
-					// 	console.log('clicked layer', vectorLayer.name, e.features[0], coordinates, metadata);
-					//
-					// 	// Ensure that if the map is zoomed out such that multiple
-					// 	// copies of the feature are visible, the popup appears
-					// 	// over the copy being pointed to.
-					// 	while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-					// 		coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-					// 	}
-					// 	//
-					// 	new mapboxgl.Popup()
-					// 		.setLngLat(coordinates)
-					// 		.setHTML(Object.keys(metadata)
-					// 			.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-					// 			.join('')
-					// 		)
-					// 		.addTo(this.map);
-					// });
+					this.map.on('click', vectorLayer.name, (e) => {
+						const metadata = e.features[0].properties;
+
+						if (Object.keys(metadata).length){
+							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+							// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
+
+							// Ensure that if the map is zoomed out such that multiple
+							// copies of the feature are visible, the popup appears
+							// over the copy being pointed to.
+							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+							}
+
+							new mapboxgl.Popup()
+								.setLngLat(coordinates)
+								.setHTML(
+									Object.keys(metadata)
+										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+										.join('')
+								)
+								.addTo(this.map);
+						}
+					});
 					this.vectorLayers.set(vectorLayer.name, layer);
 					if (vectorLayer.minZoom){
 						this.minZoomByLayer.set(vectorLayer.name, vectorLayer.minZoom)

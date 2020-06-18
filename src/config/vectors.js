@@ -15,7 +15,7 @@ const vectors = [
 	new VectorSource({
 		name: 'Uganda Regions',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_regions:8',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
@@ -42,7 +42,7 @@ const vectors = [
 	new VectorSource({
 		name: 'Uganda Districts',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
@@ -66,7 +66,7 @@ const vectors = [
 				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Subcounties',
@@ -95,7 +95,7 @@ const vectors = [
 				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Parishes',
@@ -124,7 +124,7 @@ const vectors = [
 				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
 			},
 		},
-		minZoom: 8,
+		minZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Electricity Transmission Lines',
@@ -157,7 +157,7 @@ const vectors = [
 			},
 			paint: {
 				'line-color': 'rgb(32,89,255)',
-				'line-width': 2
+				'line-width': 3
 			}
 		},
 		leafletOptions: {
@@ -171,8 +171,11 @@ const vectors = [
 		label: 'Uganda',
 		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
 		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
-		getGeometry: (lat, lon) => {
-			return [lat, lon];
+		getGeometry: (lat, lng) => {
+			return {
+				type: 'Point',
+				coordinates: [parseFloat(lng), parseFloat(lat)],
+			};
 		},
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
@@ -182,7 +185,7 @@ const vectors = [
 		mapboxLayerOptions: {
 			paint: {
 				'circle-color': 'rgba(51,255,150,0.6)',
-				'circle-radius': 3,
+				'circle-radius': 6,
 			},
 		},
 		leafletOptions: {
@@ -190,7 +193,7 @@ const vectors = [
 				return { color: 'rgba(51,255,150,0.6)', radius: 1 };
 			},
 		},
-		minZoom: 9,
+		minZoom: 8,
 	}),
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
@@ -210,7 +213,7 @@ const vectors = [
 			},
 			paint: {
 				'line-color': 'rgb(255,129,255)',
-				'line-width': 2
+				'line-width': 3
 			}
 		},
 		leafletOptions: {

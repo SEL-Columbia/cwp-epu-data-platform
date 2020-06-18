@@ -135,7 +135,7 @@ class App extends Component {
 		} = this.props;
 		history.replace({
 			pathname,
-			search: `zoom=${zoom}&lat=${center.lat}&lng=${center.lng}`
+			search: `zoom=${zoom}&lng=${center.lng}&lat=${center.lat}`
 		});
 	}
 
@@ -153,7 +153,7 @@ class App extends Component {
 			object.zoom = parseInt(zoomMatch[1], 10);
 		}
 		if (latMatch && lngMatch){
-			object.center = [parseFloat(latMatch[1]), parseFloat(lngMatch[1])];
+			object.center = [parseFloat(lngMatch[1]), parseFloat(latMatch[1])];
 		}
 
 		return object;
