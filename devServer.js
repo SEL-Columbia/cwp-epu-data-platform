@@ -32,7 +32,15 @@ app.use(
 	}),
 );
 
-app.use(`/`, express.static(`${__dirname}`));
+// app.use([`/map`, '/about'], (req, res, next) => {
+// 	res.sendFile(`${__dirname}/index.html`);
+// });
+app.use(`/`, (req, res, next) => {
+	res.sendFile(`${__dirname}/index.html`);
+});
+app.use(`/*`, (req, res, next) => {
+	res.sendFile(`${__dirname}/404.html`);
+});
 
 server.listen(port);
 

@@ -1,6 +1,72 @@
 import React from 'react';
 import Select from 'react-select';
 
+import { withStyles, makeStyles, useTheme } from '@material-ui/core/styles';
+import { grey } from '@material-ui/core/colors';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel'
+import Input from '@material-ui/core/Input';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import SelectUI from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import Chip from '@material-ui/core/Chip';
+
+const useStyles = makeStyles((theme) => ({
+	formControl: {
+		minWidth: 120,
+		maxWidth: 344,
+	},
+	chips: {
+		display: 'flex',
+		flexWrap: 'wrap',
+	},
+	chip: {
+		margin: 3,
+	},
+	noLabel: {
+		marginTop: theme.spacing(3),
+	},
+}));
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+		},
+	},
+};
+
+const CustomCheckbox = withStyles({
+	root: {
+		'&$checked': {
+			color: grey[500],
+		},
+	},
+	checked: {},
+})((props) => <Checkbox color="default" {...props} />);
+
+const CustomCircularProgress = withStyles({
+	root: {
+		color: grey[300],
+	}
+})((props) => <CircularProgress size={15} color="default" {...props} />);
+
+const CustomSelect = withStyles({
+	root: {
+		'&::after': {
+			borderBottomColor: 'red',
+		},
+	},
+})((props) => <SelectUI color="default" {...props} />);
+
 import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
@@ -90,6 +156,7 @@ export default function Filters({
 
 	function handleFilterChange(options, vectorName, filterName) {
 		const { action, removedValue, option } = options;
+		console.log('options', options, option);
 
 		const nextVectorFiltersByNamesMap = { ...vectorFiltersByNamesMap };
 
@@ -125,18 +192,50 @@ export default function Filters({
 	function renderFilter({ vectorName, filterName, valuesSet = new Set([]), selectedValuesSet = new Set([]) }) {
 		return (
 			<div key={`${vectorName}_${filterName}`} className={styles.filter}>
-				<div className={styles.filterName}><span>{filterName}</span></div>
-				<Select
-					options={[...valuesSet]}
-					value={[...selectedValuesSet]}
-					getOptionLabel={(value) => value}
-					isOptionSelected={(value) => selectedValuesSet.has(value)}
-					isMulti={true}
-					onChange={(selectedOption, options) => handleFilterChange(options, vectorName, filterName)}
-					hideSelectedOptions={false}
-					isDisabled={!valuesSet.size}
-					isLoading={isLoadingVectors && !valuesSet.size}
-				/>
+				<div className={styles.filterName}>
+					<span>{filterName}</span>
+				</div>
+				<FormGroup row>
+					{!valuesSet.size && isLoadingVectors &&
+						<CustomCircularProgress />
+					}
+					{[...valuesSet].map((value) => {
+						return (
+							<div className={styles.valueWrapper}>
+								<FormControlLabel
+									control={
+										<CustomCheckbox
+											icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+											checkedIcon={<CheckBoxIcon fontSize="small" />}
+											checked={selectedValuesSet.has(value)}
+											onChange={(e) => handleFilterChange(
+												{
+													action: e.target.checked ? 'select-option' : 'deselect-option',
+													option: value,
+												},
+												vectorName,
+												filterName,
+											)}
+											inputProps={{ 'aria-label': 'primary checkbox' }}
+										/>
+									}
+									label={value}
+								/>
+							</div>
+						)
+					})}
+				</FormGroup>
+				{/*<Select*/}
+				{/*	options={[...valuesSet]}*/}
+				{/*	value={[...selectedValuesSet]}*/}
+				{/*	getOptionLabel={(value) => value}*/}
+				{/*	isOptionSelected={(value) => selectedValuesSet.has(value)}*/}
+				{/*	isMulti={true}*/}
+				{/*	onChange={(selectedOption, options) => handleFilterChange(options, vectorName, filterName)}*/}
+				{/*	hideSelectedOptions={false}*/}
+				{/*	isDisabled={!valuesSet.size}*/}
+				{/*	isLoading={isLoadingVectors && !valuesSet.size}*/}
+				{/*/>*/}
 			</div>
 		);
 	}
@@ -179,6 +278,19 @@ export default function Filters({
 		textAlign: 'center',
 	};
 
+	const classes = useStyles();
+	const theme = useTheme();
+
+	function getStyles(name, personName, theme) {
+		return {
+			fontWeight:
+				personName.indexOf(name) === -1
+					? theme.typography.fontWeightRegular
+					: theme.typography.fontWeightMedium,
+		};
+	}
+
+
 	const renderGroupLabel = (data) => {
 		return (
 			<div style={groupStyles} className={styles.groupWrapper}>
@@ -190,9 +302,6 @@ export default function Filters({
 
 	return (
 		<div className={styles.sideBarWrapper}>
-			<div className={styles.headerWrapper}>
-				<h2>{'QSEL'}</h2>
-			</div>
 			<div className={styles.bodyWrapper}>
 				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Base map'}</span></div>
@@ -223,6 +332,59 @@ export default function Filters({
 				</div>
 				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Vectors'}</span></div>
+					<FormControl className={classes.formControl}>
+						<InputLabel id="demo-mutiple-chip-label">{'Vectors'}</InputLabel>
+						<CustomSelect
+							labelId="demo-mutiple-chip-label"
+							id="demo-mutiple-chip"
+							multiple
+							value={
+								vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).length ?
+								vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name) :
+								[]
+							}
+							placeholder={'Select...'}
+							onChange={
+								(e) => {
+									const selectedNames = e.target.value;
+									const options = {}
+									const newName = selectedNames.find((name) => !selectedVectorLayerNamesSet.has(name));
+									if (newName !== undefined){
+										if (newName === ''){
+											options.action = 'clear';
+										} else {
+											options.action = 'select-option';
+											options.option = { name: newName };
+										}
+									} else {
+										const selectedOptionSet = new Set(selectedNames);
+										const oldName = [...selectedVectorLayerNamesSet].find((name) => !selectedOptionSet.has(name));
+										options.action = 'deselect-option';
+										options.option = { name: oldName };
+									}
+									handleVectorLayerChange(null, options);
+								}
+							}
+							input={<Input id="select-multiple-chip" />}
+							renderValue={(selected) => (
+								<div className={classes.chips}>
+									{selected.map((name) => (
+										<Chip key={name} label={name} className={classes.chip} />
+									))}
+								</div>
+							)}
+							MenuProps={MenuProps}
+						>
+							{[
+								<MenuItem key={'none'} value={''}><em>{'None'}</em></MenuItem>,
+								...(vectorLayers.map(({ name }) => (
+									<MenuItem key={name} value={name} style={getStyles(name, vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name), theme)}>
+										{name}
+									</MenuItem>
+								)))
+							]}
+						</CustomSelect>
+					</FormControl>
 					<Select
 						options={groupOptions(vectorLayers)}
 						value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
