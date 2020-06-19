@@ -10,11 +10,11 @@ import About from '../About';
 class App extends Component {
 	constructor(props) {
 		super(props);
+		const { history } = props;
 		let path = localStorage.getItem('path');
 		if (path) {
 			localStorage.removeItem('path');
-			props.history.push([path])
-			// this.router.navigate([path]);
+			history.push([path]);
 		}
 	}
 
