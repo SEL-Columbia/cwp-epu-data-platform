@@ -57,7 +57,7 @@ const CustomCircularProgress = withStyles({
 	root: {
 		color: grey[300],
 	}
-})((props) => <CircularProgress size={15} color="default" {...props} />);
+})((props) => <CircularProgress size={15} {...props} />);
 
 const CustomSelect = withStyles({
 	root: {

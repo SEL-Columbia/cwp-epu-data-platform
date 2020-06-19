@@ -115,6 +115,9 @@ export default class MapRenderer {
 						source: rasterLayer.name,
 						minzoom: rasterLayer.minZoom,
 						maxzoom: rasterLayer.maxZoom,
+						paint: {
+							'raster-opacity': 0.8,
+						}
 					};
 					this.map.addLayer(layer);
 					console.log('add rasterLayer', rasterLayer, layer);
