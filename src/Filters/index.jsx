@@ -18,7 +18,7 @@ import Chip from '@material-ui/core/Chip';
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {
-		minWidth: 120,
+		minWidth: 344,
 		maxWidth: 344,
 	},
 	chips: {
@@ -61,7 +61,7 @@ const CustomCircularProgress = withStyles({
 
 const CustomSelect = withStyles({
 	root: {
-		'&::after': {
+		'&.focused::after': {
 			borderBottomColor: 'red',
 		},
 	},
@@ -332,59 +332,59 @@ export default function Filters({
 				</div>
 				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Vectors'}</span></div>
-					<FormControl className={classes.formControl}>
-						<InputLabel id="demo-mutiple-chip-label">{'Vectors'}</InputLabel>
-						<CustomSelect
-							labelId="demo-mutiple-chip-label"
-							id="demo-mutiple-chip"
-							multiple
-							value={
-								vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).length ?
-								vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name) :
-								[]
-							}
-							placeholder={'Select...'}
-							onChange={
-								(e) => {
-									const selectedNames = e.target.value;
-									const options = {}
-									const newName = selectedNames.find((name) => !selectedVectorLayerNamesSet.has(name));
-									if (newName !== undefined){
-										if (newName === ''){
-											options.action = 'clear';
-										} else {
-											options.action = 'select-option';
-											options.option = { name: newName };
-										}
-									} else {
-										const selectedOptionSet = new Set(selectedNames);
-										const oldName = [...selectedVectorLayerNamesSet].find((name) => !selectedOptionSet.has(name));
-										options.action = 'deselect-option';
-										options.option = { name: oldName };
-									}
-									handleVectorLayerChange(null, options);
-								}
-							}
-							input={<Input id="select-multiple-chip" />}
-							renderValue={(selected) => (
-								<div className={classes.chips}>
-									{selected.map((name) => (
-										<Chip key={name} label={name} className={classes.chip} />
-									))}
-								</div>
-							)}
-							MenuProps={MenuProps}
-						>
-							{[
-								<MenuItem key={'none'} value={''}><em>{'None'}</em></MenuItem>,
-								...(vectorLayers.map(({ name }) => (
-									<MenuItem key={name} value={name} style={getStyles(name, vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name), theme)}>
-										{name}
-									</MenuItem>
-								)))
-							]}
-						</CustomSelect>
-					</FormControl>
+					{/*<FormControl className={classes.formControl}>*/}
+					{/*	<InputLabel id="demo-mutiple-chip-label">{'Vectors'}</InputLabel>*/}
+					{/*	<CustomSelect*/}
+					{/*		labelId="demo-mutiple-chip-label"*/}
+					{/*		id="demo-mutiple-chip"*/}
+					{/*		multiple*/}
+					{/*		value={*/}
+					{/*			vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).length ?*/}
+					{/*			vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name) :*/}
+					{/*			[]*/}
+					{/*		}*/}
+					{/*		placeholder={'Select...'}*/}
+					{/*		onChange={*/}
+					{/*			(e) => {*/}
+					{/*				const selectedNames = e.target.value;*/}
+					{/*				const options = {}*/}
+					{/*				const newName = selectedNames.find((name) => !selectedVectorLayerNamesSet.has(name));*/}
+					{/*				if (newName !== undefined){*/}
+					{/*					if (newName === ''){*/}
+					{/*						options.action = 'clear';*/}
+					{/*					} else {*/}
+					{/*						options.action = 'select-option';*/}
+					{/*						options.option = { name: newName };*/}
+					{/*					}*/}
+					{/*				} else {*/}
+					{/*					const selectedOptionSet = new Set(selectedNames);*/}
+					{/*					const oldName = [...selectedVectorLayerNamesSet].find((name) => !selectedOptionSet.has(name));*/}
+					{/*					options.action = 'deselect-option';*/}
+					{/*					options.option = { name: oldName };*/}
+					{/*				}*/}
+					{/*				handleVectorLayerChange(null, options);*/}
+					{/*			}*/}
+					{/*		}*/}
+					{/*		input={<Input id="select-multiple-chip" />}*/}
+					{/*		renderValue={(selected) => (*/}
+					{/*			<div className={classes.chips}>*/}
+					{/*				{selected.map((name) => (*/}
+					{/*					<Chip key={name} label={name} className={classes.chip} />*/}
+					{/*				))}*/}
+					{/*			</div>*/}
+					{/*		)}*/}
+					{/*		MenuProps={MenuProps}*/}
+					{/*	>*/}
+					{/*		{[*/}
+					{/*			<MenuItem key={'none'} value={''}><em>{'None'}</em></MenuItem>,*/}
+					{/*			...(vectorLayers.map(({ name }) => (*/}
+					{/*				<MenuItem key={name} value={name} style={getStyles(name, vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name), theme)}>*/}
+					{/*					{name}*/}
+					{/*				</MenuItem>*/}
+					{/*			)))*/}
+					{/*		]}*/}
+					{/*	</CustomSelect>*/}
+					{/*</FormControl>*/}
 					<Select
 						options={groupOptions(vectorLayers)}
 						value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
