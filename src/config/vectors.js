@@ -26,12 +26,12 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'black',
-				'line-width': 3
-			}
+				'line-width': 3,
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {
@@ -53,13 +53,13 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'black',
 				'line-width': 3,
 				'line-dasharray': [6, 3],
-			}
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {
@@ -82,13 +82,13 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'black',
 				'line-width': 2,
 				'line-dasharray': [4, 2],
-			}
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {
@@ -111,13 +111,13 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'black',
 				'line-width': 2,
 				'line-dasharray': [2, 1],
-			}
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {
@@ -153,12 +153,12 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'rgb(32,89,255)',
-				'line-width': 3
-			}
+				'line-width': 3,
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {
@@ -198,7 +198,7 @@ const vectors = [
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: `modilab.uganda_geodata:1:v2_5.umeme_rea_power_distribution_lines_2018:7`,
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
@@ -209,12 +209,12 @@ const vectors = [
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
-				'line-cap': 'round'
+				'line-cap': 'round',
 			},
 			paint: {
 				'line-color': 'rgb(255,129,255)',
-				'line-width': 3
-			}
+				'line-width': 3,
+			},
 		},
 		leafletOptions: {
 			style: (feature) => {

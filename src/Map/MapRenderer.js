@@ -4,7 +4,7 @@ import './styles.css';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA';
 
-const DEFAULT_CENTER = [33,1]; // [lng, lat]
+const DEFAULT_CENTER = [33, 1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
 
 export default class MapRenderer {
@@ -15,10 +15,10 @@ export default class MapRenderer {
 			container: this.elem,
 			center: DEFAULT_CENTER,
 			zoom: DEFAULT_ZOOM,
-		})
+		});
 		const scale = new mapboxgl.ScaleControl({
 			maxWidth: 100,
-			unit: 'imperial'
+			unit: 'imperial',
 		});
 		this.map.addControl(scale);
 
@@ -37,22 +37,25 @@ export default class MapRenderer {
 		const zoom = this.map.getZoom();
 		const center = this.map.getCenter();
 		this.onZoomOrPan(zoom, center);
-	}
+	};
 
 	handleZoomEnd = () => {
 		const zoom = this.map.getZoom();
 		const center = this.map.getCenter();
 		this.onZoomOrPan(zoom, center);
-	}
+	};
 
-	update({ baseMapLayer, rasterLayers, vectorLayers, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }, initialRender = false) {
-		if (initialRender){
+	update(
+		{ baseMapLayer, rasterLayers, vectorLayers, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM },
+		initialRender = false,
+	) {
+		if (initialRender) {
 			this.map.jumpTo({ center, zoom });
 		}
 
 		let baseLayer = this.baseLayers.get(baseMapLayer.name);
-		if (!baseLayer){
-			for (const [layerName, layer] of this.baseLayers){
+		if (!baseLayer) {
+			for (const [layerName, layer] of this.baseLayers) {
 				this.baseLayers.delete(layerName);
 			}
 			// leaflet
@@ -71,11 +74,10 @@ export default class MapRenderer {
 			// this.map.on('style.load', () => this.update({ baseMapLayer, rasterLayers, vectorLayers, center, zoom }))
 		}
 
-		if (this.map.isStyleLoaded()){
-
+		if (this.map.isStyleLoaded()) {
 			const rasterLayerNamesSet = new Set(rasterLayers.map(({ name }) => name));
-			for (const [layerName, layer] of this.rasterLayers){
-				if (!rasterLayerNamesSet.has(layerName)){
+			for (const [layerName, layer] of this.rasterLayers) {
+				if (!rasterLayerNamesSet.has(layerName)) {
 					this.map.removeLayer(layerName);
 					this.rasterLayers.delete(layerName);
 				}
@@ -83,15 +85,17 @@ export default class MapRenderer {
 			// TODO: raster debug (following 'source' spec from
 			for (const rasterLayer of rasterLayers) {
 				let layer = this.rasterLayers.get(rasterLayer.name);
-				if (!layer){
+				if (!layer) {
 					const source = {
 						type: 'raster',
-						tiles: [`https://api.mapbox.com/v4/${rasterLayer.mapboxId}/{z}/{x}/{y}@2x.png?access_token=${mapboxgl.accessToken}`],
+						tiles: [
+							`https://api.mapbox.com/v4/${rasterLayer.mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
+						],
 						tileSize: 512,
 						minzoom: rasterLayer.minNativeZoom,
 						maxzoom: rasterLayer.maxNativeZoom,
 						bounds: rasterLayer.bounds,
-					}
+					};
 					this.map.addSource(rasterLayer.name, source);
 					// leaflet
 					// layer = L.tileLayer('https://api.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
@@ -109,9 +113,9 @@ export default class MapRenderer {
 						id: rasterLayer.name,
 						type: 'raster',
 						source: rasterLayer.name,
-						minzoom: rasterLayer.minNativeZoom,
-						maxzoom: rasterLayer.maxNativeZoom,
-					}
+						minzoom: rasterLayer.minZoom,
+						maxzoom: rasterLayer.maxZoom,
+					};
 					this.map.addLayer(layer);
 					console.log('add rasterLayer', rasterLayer, layer);
 					this.rasterLayers.set(rasterLayer.name, layer);
@@ -119,8 +123,8 @@ export default class MapRenderer {
 			}
 
 			const vectorLayerNamesSet = new Set(vectorLayers.map(({ name }) => name));
-			for (const [layerName, layer] of this.vectorLayers){
-				if (!vectorLayerNamesSet.has(layerName)){
+			for (const [layerName, layer] of this.vectorLayers) {
+				if (!vectorLayerNamesSet.has(layerName)) {
 					this.map.removeLayer(layerName);
 					this.map.removeSource(layerName);
 					this.vectorLayers.delete(layerName);
@@ -135,20 +139,20 @@ export default class MapRenderer {
 						type: vectorLayer.mapboxSourceType,
 						data: {
 							type: 'FeatureCollection',
-							features: vectorLayer.features
+							features: vectorLayer.features,
 						},
-					}
+					};
 					this.map.addSource(vectorLayer.name, source);
 					layer = {
 						id: vectorLayer.name,
 						type: vectorLayer.mapboxLayerType,
 						source: vectorLayer.name,
 						...(vectorLayer.mapboxLayerOptions || {}),
-					}
-					if (vectorLayer.minZoom){
+					};
+					if (vectorLayer.minZoom) {
 						layer.minzoom = vectorLayer.minZoom;
 					}
-					if (vectorLayer.maxZoom){
+					if (vectorLayer.maxZoom) {
 						layer.maxzoom = vectorLayer.maxZoom;
 					}
 					this.map.addLayer(layer);
@@ -156,7 +160,7 @@ export default class MapRenderer {
 					this.map.on('click', vectorLayer.name, (e) => {
 						const metadata = e.features[0].properties;
 
-						if (Object.keys(metadata).length){
+						if (Object.keys(metadata).length) {
 							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
 							// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
 
@@ -172,7 +176,7 @@ export default class MapRenderer {
 								.setHTML(
 									Object.keys(metadata)
 										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-										.join('')
+										.join(''),
 								)
 								.addTo(this.map);
 						}
@@ -182,7 +186,7 @@ export default class MapRenderer {
 					this.map.getSource(vectorLayer.name).setData({
 						type: 'FeatureCollection',
 						features: vectorLayer.features,
-					})
+					});
 				}
 				// leaflet
 				// layer.clearLayers();

@@ -1,5 +1,15 @@
 export default class RasterSource {
-	constructor({ mapboxId, isDefault, minZoom, maxZoom, minNativeZoom, maxNativeZoom, boundingBox, name, label }) {
+	constructor({
+		mapboxId,
+		isDefault,
+		minZoom = 0,
+		maxZoom = 24,
+		minNativeZoom,
+		maxNativeZoom,
+		boundingBox,
+		name,
+		label,
+	}) {
 		this.name = name;
 		this.label = label;
 		this.mapboxId = mapboxId;
@@ -16,7 +26,12 @@ export default class RasterSource {
 			// 	[parseInt(boundingBox[1]), parseInt(boundingBox[0])],
 			// 	[parseInt(boundingBox[3]), parseInt(boundingBox[2])],
 			// ];
-			this.bounds = [parseInt(boundingBox[0]), parseInt(boundingBox[1]), parseInt(boundingBox[2]), parseInt(boundingBox[3])];
+			this.bounds = [
+				parseInt(boundingBox[0]),
+				parseInt(boundingBox[1]),
+				parseInt(boundingBox[2]),
+				parseInt(boundingBox[3]),
+			];
 		}
 	}
 }
