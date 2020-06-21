@@ -3,7 +3,7 @@ export default class RasterSource {
 		mapboxId,
 		isDefault,
 		minZoom = 0,
-		maxZoom = 24,
+		maxZoom = 22,
 		minNativeZoom,
 		maxNativeZoom,
 		boundingBox,
