@@ -28,7 +28,7 @@ export default class MapRenderer {
 
 		this.onZoomOrPan = props.onZoomOrPan;
 
-		this.map.on('load', () => this.update(props, true));
+		this.map.once('load', () => this.update(props, { initialRender: true }));
 		this.map.on('zoomend', this.handleZoomEnd);
 		this.map.on('moveend', this.handleMoveEnd);
 	}
@@ -47,7 +47,7 @@ export default class MapRenderer {
 
 	update(
 		{ baseMapLayer, rasterLayers, vectorLayers, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM },
-		initialRender = false,
+		{ initialRender = false } = {},
 	) {
 		if (initialRender) {
 			this.map.jumpTo({ center, zoom });
@@ -70,8 +70,39 @@ export default class MapRenderer {
 			this.map.setStyle(baseMapLayer.mapboxStyle);
 
 			this.baseLayers.set(baseMapLayer.name, baseMapLayer);
-			// TODO: baseMap toggling
-			// this.map.on('style.load', () => this.update({ baseMapLayer, rasterLayers, vectorLayers, center, zoom }))
+
+			// TODO: isStyleLoaded() is unreliable - monitor https://github.com/mapbox/mapbox-gl-js/issues/8691
+			this.map.once('style.load', () => {
+				for (const [layerName, layer] of this.rasterLayers) {
+					if (this.map.getLayer(layerName)){
+						this.map.removeLayer(layerName);
+					}
+					if (this.map.getSource(layerName)){
+						this.map.removeSource(layerName);
+					}
+					this.rasterLayers.delete(layerName);
+				}
+				for (const [layerName, layer] of this.vectorLayers) {
+					if (this.map.getLayer(layerName)){
+						this.map.removeLayer(layerName);
+					}
+					if (this.map.getSource(layerName)){
+						this.map.removeSource(layerName);
+					}
+					this.vectorLayers.delete(layerName);
+				}
+				this.update(
+					{
+						baseMapLayer,
+						rasterLayers,
+						vectorLayers,
+						center,
+						zoom,
+					},
+					{ initialRender: true }
+				);
+			});
+			return;
 		}
 
 		if (this.map.isStyleLoaded()) {
@@ -79,10 +110,10 @@ export default class MapRenderer {
 			for (const [layerName, layer] of this.rasterLayers) {
 				if (!rasterLayerNamesSet.has(layerName)) {
 					this.map.removeLayer(layerName);
+					this.map.removeSource(layerName)
 					this.rasterLayers.delete(layerName);
 				}
 			}
-			// TODO: raster debug (following 'source' spec from
 			for (const rasterLayer of rasterLayers) {
 				let layer = this.rasterLayers.get(rasterLayer.name);
 				if (!layer) {
@@ -120,7 +151,6 @@ export default class MapRenderer {
 						}
 					};
 					this.map.addLayer(layer);
-					console.log('add rasterLayer', rasterLayer, layer);
 					this.rasterLayers.set(rasterLayer.name, layer);
 				}
 			}
@@ -136,8 +166,6 @@ export default class MapRenderer {
 			for (const vectorLayer of vectorLayers) {
 				let layer = this.vectorLayers.get(vectorLayer.name);
 				if (!layer) {
-					// leaflet
-					// layer = new L.FeatureGroup();
 					const source = {
 						type: vectorLayer.mapboxSourceType,
 						data: {
@@ -146,6 +174,8 @@ export default class MapRenderer {
 						},
 					};
 					this.map.addSource(vectorLayer.name, source);
+					// leaflet
+					// layer = new L.FeatureGroup();
 					layer = {
 						id: vectorLayer.name,
 						type: vectorLayer.mapboxLayerType,
@@ -159,7 +189,6 @@ export default class MapRenderer {
 						layer.maxzoom = vectorLayer.maxZoom;
 					}
 					this.map.addLayer(layer);
-					console.log('add vectorLayer', vectorLayer, layer);
 					this.map.on('click', vectorLayer.name, (e) => {
 						const metadata = e.features[0].properties;
 

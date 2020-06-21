@@ -198,7 +198,7 @@ const vectors = [
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
 		label: 'Uganda',
-		isDefault: false,
+		isDefault: true,
 		tableIdentifier: `modilab.uganda_geodata:1:v2_5.umeme_rea_power_distribution_lines_2018:7`,
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
