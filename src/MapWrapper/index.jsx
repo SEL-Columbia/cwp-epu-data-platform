@@ -8,6 +8,7 @@ import Map from '../Map';
 import baseMaps from '../config/baseMaps';
 import rasterGroups from '../config/rasterGroups';
 import vectors from '../config/vectors';
+import adminVectors from '../config/adminVectors';
 
 const METADATA_NULL_VALUE = '(null)'
 
@@ -36,28 +37,48 @@ class MapWrapper extends Component {
 	constructor(props) {
 		super(props);
 		const currentVectorLayers = vectors.filter(({ isDefault }) => isDefault);
+		const currentAdminVectorLayers = adminVectors.filter(({ isDefault }) => isDefault);
 		const vectorFeaturesByNamesMap = {};
 		const vectorFiltersByNamesMap = {};
+		const adminVectorFeaturesByNamesMap = {};
 		for (const vector of currentVectorLayers) {
 			vectorFeaturesByNamesMap[vector.name] = [];
 			vectorFiltersByNamesMap[vector.name] = {};
+		}
+		for (const vector of currentAdminVectorLayers) {
+			adminVectorFeaturesByNamesMap[vector.name] = [];
 		}
 		this.state = {
 			currentBaseMapLayerName: baseMaps.find(({ isDefault }) => isDefault).name,
 			currentRasterLayerName: null,
 			currentVectorLayerNamesSet: new Set(currentVectorLayers.map(({ name }) => name)),
+			currentAdminVectorLayerNamesSet: new Set(currentAdminVectorLayers.map(({ name }) => name)),
 			rasters: [],
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
-			isLoadingVectors: false,
+			adminVectorFeaturesByNamesMap,
 			isLoadingRasters: false,
+			isLoadingVectors: false,
+			isLoadingAdminVectors: false,
 		};
 	}
 
 	componentDidMount() {
-		this.loadVectors();
 		this.loadRasters();
+		this.loadVectors();
+		this.loadAdminVectors();
 	}
+
+	loadRasters = async () => {
+		this.setState({ isLoadingRasters: true });
+		const rasterSourceGroups = await Promise.all(
+			rasterGroups.map(async (rasterGroup) => {
+				return await rasterGroup.fetchData();
+			}),
+		);
+		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
+		this.setState({ rasters, isLoadingRasters: false });
+	};
 
 	loadVectors = async () => {
 		this.setState({ isLoadingVectors: true });
@@ -82,15 +103,21 @@ class MapWrapper extends Component {
 		});
 	};
 
-	loadRasters = async () => {
-		this.setState({ isLoadingRasters: true });
-		const rasterSourceGroups = await Promise.all(
-			rasterGroups.map(async (rasterGroup) => {
-				return await rasterGroup.fetchData();
+	loadAdminVectors = async () => {
+		this.setState({ isLoadingAdminVectors: true });
+		const { currentAdminVectorLayerNamesSet } = this.state;
+		const vectorsToFetch = adminVectors.filter(({ name }) => currentAdminVectorLayerNamesSet.has(name));
+		const nextAdminVectorFeaturesByNamesMap = {};
+		await Promise.all(
+			vectorsToFetch.map(async (vector) => {
+				const features = await vector.fetchData();
+				nextAdminVectorFeaturesByNamesMap[vector.name] = features;
 			}),
 		);
-		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-		this.setState({ rasters, isLoadingRasters: false });
+		this.setState({
+			adminVectorFeaturesByNamesMap: nextAdminVectorFeaturesByNamesMap,
+			isLoadingAdminVectors: false,
+		});
 	};
 
 	handleUpdateBaseMapLayer = (currentBaseMapLayerName) => {
@@ -163,12 +190,15 @@ class MapWrapper extends Component {
 		const {
 			vectorFiltersByNamesMap,
 			vectorFeaturesByNamesMap,
+			adminVectorFeaturesByNamesMap,
 			currentRasterLayerName,
 			currentVectorLayerNamesSet,
+			currentAdminVectorLayerNamesSet,
 			currentBaseMapLayerName,
 			rasters,
-			isLoadingVectors,
 			isLoadingRasters,
+			isLoadingVectors,
+			isLoadingAdminVectors,
 		} = this.state;
 
 		const { zoom, center } = this.getZoomAndCenter();
@@ -180,6 +210,8 @@ class MapWrapper extends Component {
 						baseMapLayers={baseMaps}
 						rasterLayers={rasters}
 						vectorLayers={vectors}
+						adminVectorLayers={adminVectors}
+						selectedAdminVectorLayerNamesSet={currentAdminVectorLayerNamesSet}
 						vectorFiltersByNamesMap={vectorFiltersByNamesMap}
 						selectedBaseMapLayerName={currentBaseMapLayerName}
 						selectedRasterLayerName={currentRasterLayerName}
@@ -188,8 +220,9 @@ class MapWrapper extends Component {
 						onUpdateRasterLayer={this.handleUpdateRasterLayer}
 						onUpdateVectorLayers={this.handleUpdateVectorLayers}
 						onUpdateVectorFilters={this.handleUpdateVectorFilters}
-						isLoadingVectors={isLoadingVectors}
 						isLoadingRasters={isLoadingRasters}
+						isLoadingVectors={isLoadingVectors}
+						isLoadingAdminVectors={isLoadingAdminVectors}
 					/>
 				</div>
 				<div className={styles.map}>
@@ -201,7 +234,15 @@ class MapWrapper extends Component {
 							.map((vector) => ({
 								...vector,
 								features: this.filterFeatures(vector.name, vectorFeaturesByNamesMap[vector.name] || []),
-							}))}
+							}))
+						}
+						adminVectorLayers={adminVectors
+							.filter(({ name }) => currentAdminVectorLayerNamesSet.has(name))
+							.map((vector) => ({
+								...vector,
+								features: adminVectorFeaturesByNamesMap[vector.name] || [],
+							}))
+						}
 						onZoomOrPan={this.handleZoomOrPan}
 						zoom={zoom}
 						center={center}
