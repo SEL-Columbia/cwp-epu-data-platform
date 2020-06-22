@@ -1,12 +1,12 @@
 .sideBarWrapper{
-    width: 500px;
     overflow: auto;
     padding: 30px;
     border-radius: 0 3px 3px 0;
+    min-height: 100%;
 }
 
 .bodyWrapper{
-    margin-top: 20px;
+
 }
 
 .vectorFiltersWrapper{
@@ -14,7 +14,10 @@
 }
 
 .sectionWrapper{
-    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.sectionWrapper:last-child{
+    margin-bottom: 0;
 }
 .sectionHeader{
     font-weight: bold;
@@ -38,8 +41,8 @@
 }
 
 .filterName{
-    font-style: italic;
     margin-bottom: 5px;
+    border-bottom: 1px solid hsl(0, 0%, 80%);
 }
 
 .empty{
