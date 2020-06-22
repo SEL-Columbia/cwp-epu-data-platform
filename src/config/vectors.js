@@ -10,122 +10,15 @@ import VectorSource from '../VectorSource';
  * leafletOptions
  * */
 
+import adminVectors from './adminVectors';
+
+const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
+	'Uganda Electricity Transmission Lines': 0,
+	'UMEME REA power distribution lines 2018': 1,
+	'Uganda Geosurvey Results': 2,
+}
+
 const vectors = [
-	// Regions
-	new VectorSource({
-		name: 'Uganda Regions',
-		label: 'Uganda',
-		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_regions:8',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
-		leafletType: 'geoJSON',
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
-		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-			},
-			paint: {
-				'line-color': 'black',
-				'line-width': 3,
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 2, fill: false };
-			},
-		},
-	}),
-	new VectorSource({
-		name: 'Uganda Districts',
-		label: 'Uganda',
-		isDefault: false,
-		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
-		leafletType: 'geoJSON',
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
-		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-			},
-			paint: {
-				'line-color': 'black',
-				'line-width': 3,
-				'line-dasharray': [6, 3],
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
-			},
-		},
-		minZoom: 7,
-	}),
-	new VectorSource({
-		name: 'Uganda Subcounties',
-		label: 'Uganda',
-		isDefault: false,
-		tableIdentifier: 'imathews.uganda_boundaries.uganda_subcounties',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
-		leafletType: 'geoJSON',
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
-		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-			},
-			paint: {
-				'line-color': 'black',
-				'line-width': 2,
-				'line-dasharray': [4, 2],
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
-			},
-		},
-		minZoom: 7,
-	}),
-	new VectorSource({
-		name: 'Uganda Parishes',
-		label: 'Uganda',
-		isDefault: false,
-		tableIdentifier: 'imathews.uganda_boundaries.uganda_parishes',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
-		leafletType: 'geoJSON',
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
-		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-			},
-			paint: {
-				'line-color': 'black',
-				'line-width': 2,
-				'line-dasharray': [2, 1],
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
-			},
-		},
-		minZoom: 7,
-	}),
 	new VectorSource({
 		name: 'Uganda Electricity Transmission Lines',
 		label: 'Uganda',
@@ -154,10 +47,37 @@ const vectors = [
 			layout: {
 				'line-join': 'round',
 				'line-cap': 'round',
+				'line-sort-key': adminVectors.length + vectorPriorityByNameMap['Uganda Electricity Transmission Lines'],
 			},
 			paint: {
-				'line-color': 'rgb(32,89,255)',
-				'line-width': 3,
+				// 'line-color': 'rgb(32,89,255)',
+				// conditional styling with 'match' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#match
+				'line-color': [
+					'match',
+					['get', 'VOLTAGE_KV'],
+					'400',
+					'#e55e5e',
+					'220',
+					'#fbb03b',
+					'132',
+					'rgb(32,89,255)',
+					'66',
+					'rgb(51,255,150)',
+					'#ccc', /* other */
+				],
+				'line-width': 4,
+				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
+				// 'line-dasharray':[
+				// 	'match',
+				// 	['get', 'STATUS'],
+				// 	'Operational',
+				// 	['literal', [10, 0]],
+				// 	'At Planning Stage',
+				// 	['literal', [2, 2, 6, 2]],
+				// 	'Under Construction',
+				// 	['literal', [2, 2, 6, 2]],
+				// 	['literal', [2, 2, 6, 2]], /* other */
+				// ],
 			},
 		},
 		leafletOptions: {
@@ -183,6 +103,9 @@ const vectors = [
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'circle',
 		mapboxLayerOptions: {
+			layout: {
+				'circle-sort-key': adminVectors.length + vectorPriorityByNameMap['Uganda Geosurvey Results'],
+			},
 			paint: {
 				'circle-color': 'rgba(51,255,150,0.6)',
 				'circle-radius': 6,
@@ -210,10 +133,33 @@ const vectors = [
 			layout: {
 				'line-join': 'round',
 				'line-cap': 'round',
+				'line-sort-key': adminVectors.length + vectorPriorityByNameMap['UMEME REA power distribution lines 2018'],
 			},
 			paint: {
-				'line-color': 'rgb(255,129,255)',
-				'line-width': 3,
+				// 'line-color': 'rgb(255,129,255)',
+				// conditional styling with 'match' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#match
+				'line-color': [
+					'match',
+					['get', 'Voltage'],
+					'33 kV',
+					'#e55e5e',
+					'11 kV',
+					'#fbb03b',
+					'#ccc', /* other */
+				],
+				'line-width': 2,
+				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
+				// 'line-dasharray':[
+				// 	'match',
+				// 	['get', 'Status'],
+				// 	'Existing',
+				// 	['literal', [10, 0]],
+				// 	'Proposed',
+				// 	['literal', [2, 2, 6, 2]],
+				// 	'Under construction',
+				// 	['literal', [2, 2, 6, 2]],
+				// 	['literal', [2, 2, 6, 2]], /* other */
+				// ],
 			},
 		},
 		leafletOptions: {

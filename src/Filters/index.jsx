@@ -67,6 +67,23 @@ const CustomSelect = withStyles({
 	},
 })((props) => <SelectUI color="default" {...props} />);
 
+const selectStyles = {
+	multiValue: (base, state) => ({
+		...base,
+		backgroundColor: 'gray',
+	}),
+	multiValueLabel: (base, state) => ({
+		...base,
+		fontWeight: 'bold',
+		color: 'white',
+		paddingRight: 6,
+	}),
+	multiValueRemove: (base, state) => ({
+		...base,
+		display: 'none',
+	}),
+};
+
 import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
@@ -90,6 +107,8 @@ export default function Filters({
 	baseMapLayers,
 	rasterLayers,
 	vectorLayers,
+	adminVectorLayers,
+	selectedAdminVectorLayerNamesSet,
 	vectorFiltersByNamesMap,
 	selectedBaseMapLayerName,
 	selectedRasterLayerName,
@@ -98,8 +117,9 @@ export default function Filters({
 	onUpdateRasterLayer,
 	onUpdateVectorLayers,
 	onUpdateVectorFilters,
-	isLoadingVectors,
 	isLoadingRasters,
+	isLoadingVectors,
+	isLoadingAdminVectors,
 }) {
 
 	function handleBaseMapLayerChange(selectedOption, options){
@@ -156,7 +176,6 @@ export default function Filters({
 
 	function handleFilterChange(options, vectorName, filterName) {
 		const { action, removedValue, option } = options;
-		console.log('options', options, option);
 
 		const nextVectorFiltersByNamesMap = { ...vectorFiltersByNamesMap };
 
@@ -405,6 +424,20 @@ export default function Filters({
 						}
 						{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}
 					</div>
+				</div>
+				<div className={styles.sectionWrapper}>
+					<div className={styles.sectionHeader}><span>{'Administrative vectors'}</span></div>
+					<Select
+						options={adminVectorLayers}
+						value={adminVectorLayers.filter(({ name }) => selectedAdminVectorLayerNamesSet.has(name))}
+						getOptionLabel={({ name }) => name}
+						isOptionSelected={({ name }) => selectedAdminVectorLayerNamesSet.has(name)}
+						isMulti={true}
+						isClearable={false}
+						styles={selectStyles}
+						isLoading={isLoadingAdminVectors}
+						isDisabled={true}
+					/>
 				</div>
 			</div>
 		</div>
