@@ -7,11 +7,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c
 const DEFAULT_CENTER = [33, 1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA';
-
-const DEFAULT_CENTER = [33, 1]; // [lng, lat]
-const DEFAULT_ZOOM = 7;
-
 export default class MapRenderer {
 	constructor(elem, props) {
 		this.elem = elem;
