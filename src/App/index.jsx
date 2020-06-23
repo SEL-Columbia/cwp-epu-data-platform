@@ -25,7 +25,7 @@ class App extends Component {
 					<h2>{'QSEL Map'}</h2>
 				</div>
 				<div className={styles.navigation}>
-					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/'}>{'Explore data'}</NavLink>
+					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/cwp-epu-data-platform'}>{'Explore data'}</NavLink>
 					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/map'}>{'Map'}</NavLink>
 					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/about'}>{'About'}</NavLink>
 				</div>
@@ -37,9 +37,9 @@ class App extends Component {
 		return (
 			<div className={styles.bodyWrapper}>
 				<Switch>
-					<Route exact={true} path={'/'} component={Explore} />
 					<Route exact={true} path={'/map'} component={MapWrapper} />
 					<Route exact={true} path={'/about'} component={About} />
+					<Route component={Explore} />
 				</Switch>
 			</div>
 		)
