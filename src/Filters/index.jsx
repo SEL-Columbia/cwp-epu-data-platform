@@ -265,7 +265,7 @@ export default function Filters({
 					}
 					{[...valuesSet].map((value) => {
 						return (
-							<div className={styles.valueWrapper}>
+							<div key={value} className={styles.valueWrapper}>
 								<FormControlLabel
 									control={
 										<CustomCheckbox
@@ -379,7 +379,7 @@ export default function Filters({
 					/>
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Rasters'}</span></div>
+					<div className={styles.sectionHeader}><span>{'Landscape predictions'}</span></div>
 					<Select
 						options={groupOptions(rasterLayers)}
 						value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}
@@ -396,7 +396,7 @@ export default function Filters({
 					/>
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Vectors'}</span></div>
+					<div className={styles.sectionHeader}><span>{'Pre-existing maps & data'}</span></div>
 					{/*<FormControl className={classes.formControl}>*/}
 					{/*	<InputLabel id="demo-mutiple-chip-label">{'Vectors'}</InputLabel>*/}
 					{/*	<CustomSelect*/}
@@ -472,7 +472,7 @@ export default function Filters({
 					</div>
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Observation vectors'}</span></div>
+					<div className={styles.sectionHeader}><span>{'Landscape observations'}</span></div>
 					<Select
 						options={groupOptions(observationVectorLayers)}
 						value={observationVectorLayers.filter(({ name }) => selectedObservationVectorLayerNamesSet.has(name))}
@@ -488,15 +488,16 @@ export default function Filters({
 					/>
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Administrative vectors'}</span></div>
+					<div className={styles.sectionHeader}><span>{'Admin polygons'}</span></div>
 					<Select
-						options={adminVectorLayers}
+						options={groupOptions(adminVectorLayers)}
 						value={adminVectorLayers.filter(({ name }) => name === selectedAdminVectorLayerName)}
 						getOptionLabel={({ name }) => name}
 						isOptionSelected={({ name }) => name === selectedAdminVectorLayerName}
 						onChange={handleAdminVectorLayerChange}
 						hideSelectedOptions={false}
 						isLoading={isLoadingAdminVectors}
+						formatGroupLabel={renderGroupLabel}
 					/>
 				</div>
 			</div>

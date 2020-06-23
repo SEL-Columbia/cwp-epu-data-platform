@@ -70,14 +70,19 @@ export default class MapRenderer {
 		waiting();
 	}
 
-	removeLayerFromMap = (layerName) => {
-		if (this.map.getLayer(layerName)) {
-			// remove layer from map;
-			this.map.removeLayer(layerName);
+	removeLayerFromMap = (layer) => {
+		const name = layer.id;
+		const mapboxLayerTypes = layer.type instanceof Array ? layer.type : [layer.type];
+		for (const type of mapboxLayerTypes){
+			const id = `${name}_${type}`;
+			if (this.map.getLayer(id)) {
+				// remove layer from map;
+				this.map.removeLayer(id);
+			}
 		}
-		if (this.map.getSource(layerName)){
+		if (this.map.getSource(name)){
 			// remove source from map;
-			this.map.removeSource(layerName);
+			this.map.removeSource(name);
 		}
 	};
 
@@ -109,39 +114,51 @@ export default class MapRenderer {
 			source: name,
 			...mapboxLayerOptions,
 		};
-		if (minZoom) {
-			layer.minzoom = minZoom;
-		}
-		if (maxZoom) {
-			layer.maxzoom = maxZoom;
-		}
-		// add layer to map
-		this.map.addLayer(layer);
-		// set tooltip listener
-		this.map.on('click', name, (e) => {
-			const metadata = e.features[0].properties;
-
-			if (Object.keys(metadata).length) {
-				const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-				// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
-
-				// Ensure that if the map is zoomed out such that multiple
-				// copies of the feature are visible, the popup appears
-				// over the copy being pointed to.
-				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-				}
-
-				new mapboxgl.Popup()
-					.setLngLat(coordinates)
-					.setHTML(
-						Object.keys(metadata)
-							.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-							.join(''),
-					)
-					.addTo(this.map);
+		const mapboxLayerTypes = mapboxLayerType instanceof Array ? mapboxLayerType : [mapboxLayerType];
+		for (const type of mapboxLayerTypes){
+			const id = `${name}_${type}`;
+			const mapLayer = {
+				id,
+				type,
+				source: name,
+				...(mapboxLayerType instanceof Array ? mapboxLayerOptions[type] : mapboxLayerOptions),
+			};
+			if (minZoom) {
+				mapLayer.minzoom = minZoom;
 			}
-		});
+			if (maxZoom) {
+				mapLayer.maxzoom = maxZoom;
+			}
+			// add layer to map
+			this.map.addLayer(mapLayer);
+			// set tooltip listener
+			this.map.on('click', id, (e) => {
+				let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
+				// const metadata = e.features[0].properties;
+				const metadata = features[0].properties;
+
+				if (Object.keys(metadata).length) {
+					const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+					// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
+
+					// Ensure that if the map is zoomed out such that multiple
+					// copies of the feature are visible, the popup appears
+					// over the copy being pointed to.
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+
+					new mapboxgl.Popup()
+						.setLngLat(coordinates)
+						.setHTML(
+							Object.keys(metadata)
+								.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+								.join(''),
+						)
+						.addTo(this.map);
+				}
+			});
+		}
 
 		return layer;
 	};
@@ -162,7 +179,7 @@ export default class MapRenderer {
 				`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
 			],
 			tileSize: 512,
-			minzoom: minNativeZoom,
+			minzoom: mapboxId === 'droquo.5oq6wrb6' ? 4 : minNativeZoom,
 			maxzoom: maxNativeZoom,
 			bounds,
 		};
@@ -256,7 +273,7 @@ export default class MapRenderer {
 			const adminVectorLayerNamesSet = new Set(adminVectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.adminVectorLayers) {
 				if (!adminVectorLayerNamesSet.has(layerName)) {
-					this.removeLayerFromMap(layerName);
+					this.removeLayerFromMap(layer);
 					this.adminVectorLayers.delete(layerName);
 				}
 			}
@@ -291,7 +308,14 @@ export default class MapRenderer {
 				let layer = this.rasterLayers.get(rasterLayer.name);
 				if (!layer) {
 					layer = this.addRasterLayerToMap(rasterLayer);
-					this.map.moveLayer(rasterLayer.name, adminVectorLayers[0].name); // place raster underneath first admin layer
+					this.map.moveLayer(
+						rasterLayer.name,
+						`${adminVectorLayers[0].name}_${
+							adminVectorLayers[0].mapboxLayerType instanceof Array ?
+								adminVectorLayers[0].mapboxLayerType[0] :
+								adminVectorLayers[0].mapboxLayerType
+						}`,
+					); // place raster underneath first admin layer
 					this.rasterLayers.set(rasterLayer.name, layer);
 				}
 			}
@@ -299,7 +323,7 @@ export default class MapRenderer {
 			const vectorLayerNamesSet = new Set(vectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.vectorLayers) {
 				if (!vectorLayerNamesSet.has(layerName)) {
-					this.removeLayerFromMap(layerName);
+					this.removeLayerFromMap(layer);
 					this.vectorLayers.delete(layerName);
 				}
 			}
@@ -322,7 +346,7 @@ export default class MapRenderer {
 			const observationVectorLayerNamesSet = new Set(observationVectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.observationVectorLayers) {
 				if (!observationVectorLayerNamesSet.has(layerName)) {
-					this.removeLayerFromMap(layerName);
+					this.removeLayerFromMap(layer);
 					this.observationVectorLayers.delete(layerName);
 				}
 			}
