@@ -70,6 +70,118 @@ export default class MapRenderer {
 		waiting();
 	}
 
+	removeLayerFromMap = (layerName) => {
+		if (this.map.getLayer(layerName)) {
+			// remove layer from map;
+			this.map.removeLayer(layerName);
+		}
+		if (this.map.getSource(layerName)){
+			// remove source from map;
+			this.map.removeSource(layerName);
+		}
+	};
+
+	addVectorLayerToMap = (vectorLayer) => {
+		const {
+			name,
+			mapboxSourceType,
+			mapboxLayerType,
+			mapboxLayerOptions = {},
+			features,
+			minZoom,
+			maxZoom,
+		} = vectorLayer;
+
+		// define source
+		const source = {
+			type: mapboxSourceType,
+			data: {
+				type: 'FeatureCollection',
+				features,
+			},
+		};
+		// add source to map
+		this.map.addSource(name, source);
+		// define layer
+		const layer = {
+			id: name,
+			type: mapboxLayerType,
+			source: name,
+			...mapboxLayerOptions,
+		};
+		if (minZoom) {
+			layer.minzoom = minZoom;
+		}
+		if (maxZoom) {
+			layer.maxzoom = maxZoom;
+		}
+		// add layer to map
+		this.map.addLayer(layer);
+		// set tooltip listener
+		this.map.on('click', name, (e) => {
+			const metadata = e.features[0].properties;
+
+			if (Object.keys(metadata).length) {
+				const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+				// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
+
+				// Ensure that if the map is zoomed out such that multiple
+				// copies of the feature are visible, the popup appears
+				// over the copy being pointed to.
+				while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+					coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+				}
+
+				new mapboxgl.Popup()
+					.setLngLat(coordinates)
+					.setHTML(
+						Object.keys(metadata)
+							.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+							.join(''),
+					)
+					.addTo(this.map);
+			}
+		});
+
+		return layer;
+	};
+
+	addRasterLayerToMap = (rasterLayer) => {
+		const {
+			name,
+			mapboxId,
+			minNativeZoom,
+			maxNativeZoom,
+			bounds,
+			minZoom,
+			maxZoom,
+		} = rasterLayer;
+		const source = {
+			type: 'raster',
+			tiles: [
+				`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
+			],
+			tileSize: 512,
+			minzoom: minNativeZoom,
+			maxzoom: maxNativeZoom,
+			bounds,
+		};
+		this.map.addSource(name, source);
+		const layer = {
+			id: name,
+			type: 'raster',
+			source: name,
+			minzoom: minZoom,
+			maxzoom: maxZoom,
+			paint: {
+				'raster-opacity': 0.8,
+			}
+		};
+		this.map.addLayer(layer);
+
+		return layer;
+	};
+
 	update(
 		{
 			baseMapLayer,
@@ -91,7 +203,6 @@ export default class MapRenderer {
 			for (const [layerName, layer] of this.baseLayers) {
 				this.baseLayers.delete(layerName);
 			}
-
 			this.baseLayers.set(baseMapLayer.name, baseMapLayer);
 
 			this.map.setStyle(baseMapLayer.mapboxStyle);
@@ -145,63 +256,14 @@ export default class MapRenderer {
 			const adminVectorLayerNamesSet = new Set(adminVectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.adminVectorLayers) {
 				if (!adminVectorLayerNamesSet.has(layerName)) {
-					if (this.map.getLayer(layerName)) {
-						this.map.removeLayer(layerName);
-					}
-					if (this.map.getSource(layerName)){
-						this.map.removeSource(layerName);
-					}
+					this.removeLayerFromMap(layerName);
 					this.adminVectorLayers.delete(layerName);
 				}
 			}
 			for (const vectorLayer of adminVectorLayers) {
 				let layer = this.adminVectorLayers.get(vectorLayer.name);
 				if (!layer) {
-					const source = {
-						type: vectorLayer.mapboxSourceType,
-						data: {
-							type: 'FeatureCollection',
-							features: vectorLayer.features,
-						},
-					};
-					this.map.addSource(vectorLayer.name, source);
-					layer = {
-						id: vectorLayer.name,
-						type: vectorLayer.mapboxLayerType,
-						source: vectorLayer.name,
-						...(vectorLayer.mapboxLayerOptions || {}),
-					};
-					if (vectorLayer.minZoom) {
-						layer.minzoom = vectorLayer.minZoom;
-					}
-					if (vectorLayer.maxZoom) {
-						layer.maxzoom = vectorLayer.maxZoom;
-					}
-					this.map.addLayer(layer);
-					this.map.on('click', vectorLayer.name, (e) => {
-						const metadata = e.features[0].properties;
-
-						if (Object.keys(metadata).length) {
-							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-							// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
-
-							// Ensure that if the map is zoomed out such that multiple
-							// copies of the feature are visible, the popup appears
-							// over the copy being pointed to.
-							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-							}
-
-							new mapboxgl.Popup()
-								.setLngLat(coordinates)
-								.setHTML(
-									Object.keys(metadata)
-										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-										.join(''),
-								)
-								.addTo(this.map);
-						}
-					});
+					layer = this.addVectorLayerToMap(vectorLayer)
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
 					if (this.map.getSource(vectorLayer.name)){
@@ -228,28 +290,7 @@ export default class MapRenderer {
 			for (const rasterLayer of rasterLayers) {
 				let layer = this.rasterLayers.get(rasterLayer.name);
 				if (!layer) {
-					const source = {
-						type: 'raster',
-						tiles: [
-							`https://api.mapbox.com/v4/${rasterLayer.mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
-						],
-						tileSize: 512,
-						minzoom: rasterLayer.minNativeZoom,
-						maxzoom: rasterLayer.maxNativeZoom,
-						bounds: rasterLayer.bounds,
-					};
-					this.map.addSource(rasterLayer.name, source);
-					layer = {
-						id: rasterLayer.name,
-						type: 'raster',
-						source: rasterLayer.name,
-						minzoom: rasterLayer.minZoom,
-						maxzoom: rasterLayer.maxZoom,
-						paint: {
-							'raster-opacity': 0.8,
-						}
-					};
-					this.map.addLayer(layer);
+					layer = this.addRasterLayerToMap(rasterLayer);
 					this.map.moveLayer(rasterLayer.name, adminVectorLayers[0].name); // place raster underneath first admin layer
 					this.rasterLayers.set(rasterLayer.name, layer);
 				}
@@ -258,63 +299,14 @@ export default class MapRenderer {
 			const vectorLayerNamesSet = new Set(vectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.vectorLayers) {
 				if (!vectorLayerNamesSet.has(layerName)) {
-					if (this.map.getLayer(layerName)) {
-						this.map.removeLayer(layerName);
-					}
-					if (this.map.getSource(layerName)){
-						this.map.removeSource(layerName);
-					}
+					this.removeLayerFromMap(layerName);
 					this.vectorLayers.delete(layerName);
 				}
 			}
 			for (const vectorLayer of vectorLayers) {
 				let layer = this.vectorLayers.get(vectorLayer.name);
 				if (!layer) {
-					const source = {
-						type: vectorLayer.mapboxSourceType,
-						data: {
-							type: 'FeatureCollection',
-							features: vectorLayer.features,
-						},
-					};
-					this.map.addSource(vectorLayer.name, source);
-					layer = {
-						id: vectorLayer.name,
-						type: vectorLayer.mapboxLayerType,
-						source: vectorLayer.name,
-						...(vectorLayer.mapboxLayerOptions || {}),
-					};
-					if (vectorLayer.minZoom) {
-						layer.minzoom = vectorLayer.minZoom;
-					}
-					if (vectorLayer.maxZoom) {
-						layer.maxzoom = vectorLayer.maxZoom;
-					}
-					this.map.addLayer(layer);
-					this.map.on('click', vectorLayer.name, (e) => {
-						const metadata = e.features[0].properties;
-
-						if (Object.keys(metadata).length) {
-							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-							// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
-
-							// Ensure that if the map is zoomed out such that multiple
-							// copies of the feature are visible, the popup appears
-							// over the copy being pointed to.
-							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-							}
-
-							new mapboxgl.Popup()
-								.setLngLat(coordinates)
-								.setHTML(
-									Object.keys(metadata)
-										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-										.join(''),
-								)
-								.addTo(this.map);
-						}
-					});
+					layer = this.addVectorLayerToMap(vectorLayer);
 					this.vectorLayers.set(vectorLayer.name, layer);
 				} else {
 					if (this.map.getSource(vectorLayer.name)){
@@ -330,63 +322,14 @@ export default class MapRenderer {
 			const observationVectorLayerNamesSet = new Set(observationVectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.observationVectorLayers) {
 				if (!observationVectorLayerNamesSet.has(layerName)) {
-					if (this.map.getLayer(layerName)) {
-						this.map.removeLayer(layerName);
-					}
-					if (this.map.getSource(layerName)){
-						this.map.removeSource(layerName);
-					}
+					this.removeLayerFromMap(layerName);
 					this.observationVectorLayers.delete(layerName);
 				}
 			}
 			for (const vectorLayer of observationVectorLayers) {
 				let layer = this.observationVectorLayers.get(vectorLayer.name);
 				if (!layer) {
-					const source = {
-						type: vectorLayer.mapboxSourceType,
-						data: {
-							type: 'FeatureCollection',
-							features: vectorLayer.features,
-						},
-					};
-					this.map.addSource(vectorLayer.name, source);
-					layer = {
-						id: vectorLayer.name,
-						type: vectorLayer.mapboxLayerType,
-						source: vectorLayer.name,
-						...(vectorLayer.mapboxLayerOptions || {}),
-					};
-					if (vectorLayer.minZoom) {
-						layer.minzoom = vectorLayer.minZoom;
-					}
-					if (vectorLayer.maxZoom) {
-						layer.maxzoom = vectorLayer.maxZoom;
-					}
-					this.map.addLayer(layer);
-					this.map.on('click', vectorLayer.name, (e) => {
-						const metadata = e.features[0].properties;
-
-						if (Object.keys(metadata).length) {
-							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-							// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
-
-							// Ensure that if the map is zoomed out such that multiple
-							// copies of the feature are visible, the popup appears
-							// over the copy being pointed to.
-							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-							}
-
-							new mapboxgl.Popup()
-								.setLngLat(coordinates)
-								.setHTML(
-									Object.keys(metadata)
-										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-										.join(''),
-								)
-								.addTo(this.map);
-						}
-					});
+					layer = this.addVectorLayerToMap(vectorLayer);
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
 					if (this.map.getSource(vectorLayer.name)){
