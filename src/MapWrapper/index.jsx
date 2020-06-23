@@ -149,7 +149,7 @@ class MapWrapper extends Component {
 
 	handleUpdateBaseMapLayer = (currentBaseMapLayerName) => {
 		this.setState({ currentBaseMapLayerName });
-	}
+	};
 
 	handleUpdateRasterLayers = (currentRasterLayerNamesSet) => {
 		this.setState({ currentRasterLayerNamesSet });
@@ -165,7 +165,7 @@ class MapWrapper extends Component {
 
 	handleUpdateAdminVectorLayer = (currentAdminVectorLayerName) => {
 		this.setState({ currentAdminVectorLayerName }, this.loadAdminVectors)
-	}
+	};
 
 	handleUpdateVectorFilters = (vectorFiltersByNamesMap) => {
 		this.setState({ vectorFiltersByNamesMap });

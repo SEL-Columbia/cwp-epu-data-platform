@@ -79,11 +79,6 @@ const vectors = [
 				// ],
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'rgb(32,89,255)', weight: 1 };
-			},
-		},
 	}),
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
@@ -127,11 +122,6 @@ const vectors = [
 				// 	['literal', [2, 2, 6, 2]],
 				// 	['literal', [2, 2, 6, 2]], /* other */
 				// ],
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'rgb(255,129,255)', weight: 1 };
 			},
 		},
 	}),
