@@ -107,18 +107,23 @@ export default function Filters({
 	baseMapLayers,
 	rasterLayers,
 	vectorLayers,
+	observationVectorLayers,
 	adminVectorLayers,
-	selectedAdminVectorLayerNamesSet,
+	selectedAdminVectorLayerName,
 	vectorFiltersByNamesMap,
 	selectedBaseMapLayerName,
-	selectedRasterLayerName,
+	selectedRasterLayerNamesSet,
 	selectedVectorLayerNamesSet,
+	selectedObservationVectorLayerNamesSet,
 	onUpdateBaseMapLayer,
-	onUpdateRasterLayer,
+	onUpdateRasterLayers,
 	onUpdateVectorLayers,
+	onUpdateObservationVectorLayers,
+	onUpdateAdminVectorLayer,
 	onUpdateVectorFilters,
 	isLoadingRasters,
 	isLoadingVectors,
+	isLoadingObservationVectors,
 	isLoadingAdminVectors,
 }) {
 
@@ -138,20 +143,24 @@ export default function Filters({
 		onUpdateBaseMapLayer(nextSelectedBaseMapLayerName);
 	}
 
-	function handleRasterLayerChange(selectedOption, options) {
-		const { action } = options;
-		let nextSelectedRasterLayerName;
+	function handleRasterLayerChange(selectedOptions, options) {
+		const { action, removedValue, option } = options;
+		let nextSelectedRasterLayerNamesSet = new Set([...selectedRasterLayerNamesSet]);
 		switch (action) {
-			case 'select-option':
-				nextSelectedRasterLayerName = selectedOption.name;
-				break;
 			case 'remove-value':
+				nextSelectedRasterLayerNamesSet.delete(removedValue.name);
+				break;
 			case 'deselect-option':
+				nextSelectedRasterLayerNamesSet.delete(option.name);
+				break;
+			case 'select-option':
+				nextSelectedRasterLayerNamesSet.add(option.name);
+				break;
 			case 'clear':
-				nextSelectedRasterLayerName = null;
+				nextSelectedRasterLayerNamesSet.clear();
 				break;
 		}
-		onUpdateRasterLayer(nextSelectedRasterLayerName);
+		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
 	}
 
 	function handleVectorLayerChange(selectedOptions, options) {
@@ -172,6 +181,42 @@ export default function Filters({
 				break;
 		}
 		onUpdateVectorLayers(nextSelectedVectorLayerNamesSet);
+	};
+
+	function handleObservationVectorLayerChange(selectedOptions, options) {
+		const { action, removedValue, option } = options;
+		const nextSelectedObservationVectorLayerNamesSet = new Set([...selectedObservationVectorLayerNamesSet]);
+		switch (action) {
+			case 'remove-value':
+				nextSelectedObservationVectorLayerNamesSet.delete(removedValue.name);
+				break;
+			case 'deselect-option':
+				nextSelectedObservationVectorLayerNamesSet.delete(option.name);
+				break;
+			case 'select-option':
+				nextSelectedObservationVectorLayerNamesSet.add(option.name);
+				break;
+			case 'clear':
+				nextSelectedObservationVectorLayerNamesSet.clear();
+				break;
+		}
+		onUpdateObservationVectorLayers(nextSelectedObservationVectorLayerNamesSet);
+	};
+
+	function handleAdminVectorLayerChange(selectedOption, options){
+		const { action } = options;
+		let nextSelectedAdminVectorLayerName;
+		switch (action) {
+			case 'select-option':
+				nextSelectedAdminVectorLayerName = selectedOption.name;
+				break;
+			case 'remove-value':
+			case 'deselect-option':
+			case 'clear':
+				nextSelectedAdminVectorLayerName = baseMapLayers[0].name;
+				break;
+		}
+		onUpdateAdminVectorLayer(nextSelectedAdminVectorLayerName);
 	}
 
 	function handleFilterChange(options, vectorName, filterName) {
@@ -337,13 +382,14 @@ export default function Filters({
 					<div className={styles.sectionHeader}><span>{'Rasters'}</span></div>
 					<Select
 						options={groupOptions(rasterLayers)}
-						value={rasterLayers.find(({ name }) => name === selectedRasterLayerName)}
+						value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}
 						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => name === selectedRasterLayerName}
+						isOptionSelected={({ name }) => selectedRasterLayerNamesSet.has(name)}
+						isMulti={true}
 						onChange={handleRasterLayerChange}
 						hideSelectedOptions={false}
 						isClearable={true}
-						placeholder={'Select raster...'}
+						placeholder={'Select rasters...'}
 						isLoading={isLoadingRasters}
 						isDisabled={!rasterLayers.length}
 						formatGroupLabel={renderGroupLabel}
@@ -426,17 +472,31 @@ export default function Filters({
 					</div>
 				</div>
 				<div className={styles.sectionWrapper}>
+					<div className={styles.sectionHeader}><span>{'Observation vectors'}</span></div>
+					<Select
+						options={groupOptions(observationVectorLayers)}
+						value={observationVectorLayers.filter(({ name }) => selectedObservationVectorLayerNamesSet.has(name))}
+						getOptionLabel={({ name }) => name}
+						isOptionSelected={({ name }) => selectedObservationVectorLayerNamesSet.has(name)}
+						isMulti={true}
+						onChange={handleObservationVectorLayerChange}
+						hideSelectedOptions={false}
+						// styles={vectorStyles}
+						isLoading={isLoadingObservationVectors}
+						isDisabled={!observationVectorLayers.length}
+						formatGroupLabel={renderGroupLabel}
+					/>
+				</div>
+				<div className={styles.sectionWrapper}>
 					<div className={styles.sectionHeader}><span>{'Administrative vectors'}</span></div>
 					<Select
 						options={adminVectorLayers}
-						value={adminVectorLayers.filter(({ name }) => selectedAdminVectorLayerNamesSet.has(name))}
+						value={adminVectorLayers.filter(({ name }) => name === selectedAdminVectorLayerName)}
 						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => selectedAdminVectorLayerNamesSet.has(name)}
-						isMulti={true}
-						isClearable={false}
-						styles={selectStyles}
+						isOptionSelected={({ name }) => name === selectedAdminVectorLayerName}
+						onChange={handleAdminVectorLayerChange}
+						hideSelectedOptions={false}
 						isLoading={isLoadingAdminVectors}
-						isDisabled={true}
 					/>
 				</div>
 			</div>

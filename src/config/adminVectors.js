@@ -54,12 +54,11 @@ const adminVectors = [
 				return { color: 'white', weight: 2, fill: false };
 			},
 		},
-		maxZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Districts',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
@@ -98,13 +97,11 @@ const adminVectors = [
 				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
 			},
 		},
-		minZoom: 7,
-		maxZoom: 8,
 	}),
 	new VectorSource({
 		name: 'Uganda Subcounties',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_subcounties',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
@@ -143,13 +140,11 @@ const adminVectors = [
 				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
 			},
 		},
-		minZoom: 8,
-		maxZoom: 9,
 	}),
 	new VectorSource({
 		name: 'Uganda Parishes',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_parishes',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
@@ -188,7 +183,6 @@ const adminVectors = [
 				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
 			},
 		},
-		minZoom: 9,
 	}),
 ];
 
