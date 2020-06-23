@@ -17,6 +17,8 @@ const vectorPriorityByNameMap = { // higher numbers will be rendered on top of l
 	'Uganda Parishes': 3,
 }
 
+// TODO: monitor https://github.com/mapbox/mapbox-gl-js/issues/4087 for fill layers with outlines
+
 const adminVectors = [
 	new VectorSource({
 		name: 'Uganda Regions',
@@ -26,169 +28,183 @@ const adminVectors = [
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
+		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-				'line-sort-key': vectorPriorityByNameMap['Uganda Regions'],
+			fill: {
+				layout: {
+					'fill-sort-key': vectorPriorityByNameMap['Uganda Regions'],
+				},
+				paint: {
+					'fill-opacity': 0.1,
+					'fill-color': '#787b8c',
+				},
 			},
-			paint: {
-				'line-color': '#787b8c',
-				'line-width': [
-					'interpolate',
-					['linear'],
-					['zoom'],
-					3,
-					0.5,
-					10,
-					2,
-				],
-				'line-dasharray': [10, 0],
+			line: {
+				layout: {
+					'line-join': 'round',
+					'line-cap': 'round',
+					'line-sort-key': vectorPriorityByNameMap['Uganda Regions'],
+				},
+				paint: {
+					'line-color': '#787b8c',
+					'line-width': [
+						'interpolate',
+						['linear'],
+						['zoom'],
+						3,
+						0.5,
+						10,
+						2,
+					],
+					'line-dasharray': [10, 0],
+				},
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 2, fill: false };
-			},
-		},
-		maxZoom: 7,
 	}),
 	new VectorSource({
 		name: 'Uganda Districts',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_districts',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
+		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-				'line-sort-key': vectorPriorityByNameMap['Uganda Districts'],
+			fill: {
+				layout: {
+					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
+				},
+				paint: {
+					'fill-opacity': 0.1,
+					'fill-color': '#9699a6',
+				},
 			},
-			paint: {
-				'line-color': '#9699a6',
-				'line-width': [
-					"interpolate",
-					["linear"],
-					["zoom"],
-					7,
-					0.75,
-					12,
-					1.5
-				],
-				'line-dasharray': [
-					"step",
-					["zoom"],
-					["literal", [2, 0]],
-					7,
-					["literal", [2, 2, 6, 2]],
-				],
+			line: {
+				layout: {
+					'line-join': 'round',
+					'line-cap': 'round',
+					'line-sort-key': vectorPriorityByNameMap['Uganda Districts'],
+				},
+				paint: {
+					'line-color': '#9699a6',
+					'line-width': [
+						"interpolate",
+						["linear"],
+						["zoom"],
+						7,
+						0.75,
+						12,
+						1.5
+					],
+					'line-dasharray': [
+						"step",
+						["zoom"],
+						["literal", [2, 0]],
+						7,
+						["literal", [2, 2, 6, 2]],
+					],
+				},
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 2, fill: false, dashArray: '4' };
-			},
-		},
-		minZoom: 7,
-		maxZoom: 8,
 	}),
 	new VectorSource({
 		name: 'Uganda Subcounties',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_subcounties',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
+		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-				'line-sort-key': vectorPriorityByNameMap['Uganda Subcounties'],
+			fill: {
+				layout: {
+					'fill-sort-key': vectorPriorityByNameMap['Uganda Subcounties'],
+				},
+				paint: {
+					'fill-opacity': 0.1,
+					'fill-color': '#9699a6',
+				},
 			},
-			paint: {
-				'line-color': '#9699a6',
-				'line-width': [
-					"interpolate",
-					["linear"],
-					["zoom"],
-					7,
-					0.75,
-					12,
-					1.5
-				],
-				'line-dasharray': [
-					"step",
-					["zoom"],
-					["literal", [2, 0]],
-					7,
-					["literal", [2, 2, 6, 2]],
-				],
+			line: {
+				layout: {
+					'line-join': 'round',
+					'line-cap': 'round',
+					'line-sort-key': vectorPriorityByNameMap['Uganda Subcounties'],
+				},
+				paint: {
+					'line-color': '#9699a6',
+					'line-width': [
+						"interpolate",
+						["linear"],
+						["zoom"],
+						7,
+						0.75,
+						12,
+						1.5
+					],
+					'line-dasharray': [
+						"step",
+						["zoom"],
+						["literal", [2, 0]],
+						7,
+						["literal", [2, 2, 6, 2]],
+					],
+				},
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 1, fill: false, dashArray: '2' };
-			},
-		},
-		minZoom: 8,
-		maxZoom: 9,
 	}),
 	new VectorSource({
 		name: 'Uganda Parishes',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: 'imathews.uganda_boundaries.uganda_parishes',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'line',
+		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
-			layout: {
-				'line-join': 'round',
-				'line-cap': 'round',
-				'line-sort-key': vectorPriorityByNameMap['Uganda Parishes'],
+			fill: {
+				layout: {
+					'fill-sort-key': vectorPriorityByNameMap['Uganda Parishes'],
+				},
+				paint: {
+					'fill-opacity': 0.1,
+					'fill-color': '#9699a6',
+				},
 			},
-			paint: {
-				'line-color': '#9699a6',
-				'line-width': [
-					"interpolate",
-					["linear"],
-					["zoom"],
-					7,
-					0.75,
-					12,
-					1.5
-				],
-				'line-dasharray': [
-					"step",
-					["zoom"],
-					["literal", [2, 0]],
-					7,
-					["literal", [2, 2, 6, 2]],
-				],
+			line: {
+				layout: {
+					'line-join': 'round',
+					'line-cap': 'round',
+					'line-sort-key': vectorPriorityByNameMap['Uganda Parishes'],
+				},
+				paint: {
+					'line-color': '#9699a6',
+					'line-width': [
+						"interpolate",
+						["linear"],
+						["zoom"],
+						7,
+						0.75,
+						12,
+						1.5
+					],
+					'line-dasharray': [
+						"step",
+						["zoom"],
+						["literal", [2, 0]],
+						7,
+						["literal", [2, 2, 6, 2]],
+					],
+				},
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'white', weight: 1, fill: false, dashArray: '1' };
-			},
-		},
-		minZoom: 9,
 	}),
 ];
 
