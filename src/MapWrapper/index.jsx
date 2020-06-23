@@ -8,6 +8,7 @@ import Map from '../Map';
 import baseMaps from '../config/baseMaps';
 import rasterGroups from '../config/rasterGroups';
 import vectors from '../config/vectors';
+import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
 const METADATA_NULL_VALUE = '(null)'
@@ -37,28 +38,36 @@ class MapWrapper extends Component {
 	constructor(props) {
 		super(props);
 		const currentVectorLayers = vectors.filter(({ isDefault }) => isDefault);
+		const currentObservationVectorLayers = observationVectors.filter(({ isDefault }) => isDefault);
 		const currentAdminVectorLayers = adminVectors.filter(({ isDefault }) => isDefault);
 		const vectorFeaturesByNamesMap = {};
 		const vectorFiltersByNamesMap = {};
+		const observationVectorFeaturesByNamesMap = {};
 		const adminVectorFeaturesByNamesMap = {};
 		for (const vector of currentVectorLayers) {
 			vectorFeaturesByNamesMap[vector.name] = [];
 			vectorFiltersByNamesMap[vector.name] = {};
+		}
+		for (const vector of currentObservationVectorLayers) {
+			observationVectorFeaturesByNamesMap[vector.name] = [];
 		}
 		for (const vector of currentAdminVectorLayers) {
 			adminVectorFeaturesByNamesMap[vector.name] = [];
 		}
 		this.state = {
 			currentBaseMapLayerName: baseMaps.find(({ isDefault }) => isDefault).name,
-			currentRasterLayerName: null,
+			currentRasterLayerNamesSet: new Set([]),
 			currentVectorLayerNamesSet: new Set(currentVectorLayers.map(({ name }) => name)),
-			currentAdminVectorLayerNamesSet: new Set(currentAdminVectorLayers.map(({ name }) => name)),
+			currentAdminVectorLayerName: adminVectors.find(({ isDefault }) => isDefault).name,
+			currentObservationVectorLayerNamesSet: new Set(currentObservationVectorLayers.map(({ name }) => name)),
 			rasters: [],
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
 			adminVectorFeaturesByNamesMap,
+			observationVectorFeaturesByNamesMap,
 			isLoadingRasters: false,
 			isLoadingVectors: false,
+			isLoadingObservationVectors: false,
 			isLoadingAdminVectors: false,
 		};
 	}
@@ -66,6 +75,7 @@ class MapWrapper extends Component {
 	componentDidMount() {
 		this.loadRasters();
 		this.loadVectors();
+		this.loadObservationVectors();
 		this.loadAdminVectors();
 	}
 
@@ -103,10 +113,27 @@ class MapWrapper extends Component {
 		});
 	};
 
+	loadObservationVectors = async () => {
+		this.setState({ isLoadingObservationVectors: true });
+		const { currentObservationVectorLayerNamesSet } = this.state;
+		const vectorsToFetch = observationVectors.filter(({ name }) => currentObservationVectorLayerNamesSet.has(name));
+		const nextObservationVectorFeaturesByNamesMap = {};
+		await Promise.all(
+			vectorsToFetch.map(async (vector) => {
+				const features = await vector.fetchData();
+				nextObservationVectorFeaturesByNamesMap[vector.name] = features;
+			}),
+		);
+		this.setState({
+			observationVectorFeaturesByNamesMap: nextObservationVectorFeaturesByNamesMap,
+			isLoadingObservationVectors: false,
+		});
+	};
+
 	loadAdminVectors = async () => {
 		this.setState({ isLoadingAdminVectors: true });
-		const { currentAdminVectorLayerNamesSet } = this.state;
-		const vectorsToFetch = adminVectors.filter(({ name }) => currentAdminVectorLayerNamesSet.has(name));
+		const { currentAdminVectorLayerName } = this.state;
+		const vectorsToFetch = adminVectors.filter(({ name }) => currentAdminVectorLayerName === name);
 		const nextAdminVectorFeaturesByNamesMap = {};
 		await Promise.all(
 			vectorsToFetch.map(async (vector) => {
@@ -122,14 +149,22 @@ class MapWrapper extends Component {
 
 	handleUpdateBaseMapLayer = (currentBaseMapLayerName) => {
 		this.setState({ currentBaseMapLayerName });
-	}
+	};
 
-	handleUpdateRasterLayer = (currentRasterLayerName) => {
-		this.setState({ currentRasterLayerName });
+	handleUpdateRasterLayers = (currentRasterLayerNamesSet) => {
+		this.setState({ currentRasterLayerNamesSet });
 	};
 
 	handleUpdateVectorLayers = (currentVectorLayerNamesSet) => {
 		this.setState({ currentVectorLayerNamesSet }, this.loadVectors);
+	};
+
+	handleUpdateObservationVectorLayers = (currentObservationVectorLayerNamesSet) => {
+		this.setState({ currentObservationVectorLayerNamesSet }, this.loadObservationVectors);
+	};
+
+	handleUpdateAdminVectorLayer = (currentAdminVectorLayerName) => {
+		this.setState({ currentAdminVectorLayerName }, this.loadAdminVectors)
 	};
 
 	handleUpdateVectorFilters = (vectorFiltersByNamesMap) => {
@@ -191,13 +226,16 @@ class MapWrapper extends Component {
 			vectorFiltersByNamesMap,
 			vectorFeaturesByNamesMap,
 			adminVectorFeaturesByNamesMap,
-			currentRasterLayerName,
+			observationVectorFeaturesByNamesMap,
+			currentRasterLayerNamesSet,
 			currentVectorLayerNamesSet,
-			currentAdminVectorLayerNamesSet,
+			currentAdminVectorLayerName,
+			currentObservationVectorLayerNamesSet,
 			currentBaseMapLayerName,
 			rasters,
 			isLoadingRasters,
 			isLoadingVectors,
+			isLoadingObservationVectors,
 			isLoadingAdminVectors,
 		} = this.state;
 
@@ -211,24 +249,29 @@ class MapWrapper extends Component {
 						rasterLayers={rasters}
 						vectorLayers={vectors}
 						adminVectorLayers={adminVectors}
-						selectedAdminVectorLayerNamesSet={currentAdminVectorLayerNamesSet}
+						observationVectorLayers={observationVectors}
+						selectedAdminVectorLayerName={currentAdminVectorLayerName}
 						vectorFiltersByNamesMap={vectorFiltersByNamesMap}
 						selectedBaseMapLayerName={currentBaseMapLayerName}
-						selectedRasterLayerName={currentRasterLayerName}
+						selectedRasterLayerNamesSet={currentRasterLayerNamesSet}
 						selectedVectorLayerNamesSet={currentVectorLayerNamesSet}
+						selectedObservationVectorLayerNamesSet={currentObservationVectorLayerNamesSet}
 						onUpdateBaseMapLayer={this.handleUpdateBaseMapLayer}
-						onUpdateRasterLayer={this.handleUpdateRasterLayer}
+						onUpdateRasterLayers={this.handleUpdateRasterLayers}
 						onUpdateVectorLayers={this.handleUpdateVectorLayers}
+						onUpdateAdminVectorLayer={this.handleUpdateAdminVectorLayer}
+						onUpdateObservationVectorLayers={this.handleUpdateObservationVectorLayers}
 						onUpdateVectorFilters={this.handleUpdateVectorFilters}
 						isLoadingRasters={isLoadingRasters}
 						isLoadingVectors={isLoadingVectors}
+						isLoadingObservationVectors={isLoadingObservationVectors}
 						isLoadingAdminVectors={isLoadingAdminVectors}
 					/>
 				</div>
 				<div className={styles.map}>
 					<Map
 						baseMapLayer={baseMaps.find(({ name }) => name === currentBaseMapLayerName)}
-						rasterLayers={rasters.filter(({ name }) => name === currentRasterLayerName)}
+						rasterLayers={rasters.filter(({ name }) => currentRasterLayerNamesSet.has(name))}
 						vectorLayers={vectors
 							.filter(({ name }) => currentVectorLayerNamesSet.has(name))
 							.map((vector) => ({
@@ -236,8 +279,15 @@ class MapWrapper extends Component {
 								features: this.filterFeatures(vector.name, vectorFeaturesByNamesMap[vector.name] || []),
 							}))
 						}
+						observationVectorLayers={observationVectors
+							.filter(({ name }) => currentObservationVectorLayerNamesSet.has(name))
+							.map((vector) => ({
+								...vector,
+								features: observationVectorFeaturesByNamesMap[vector.name] || [],
+							}))
+						}
 						adminVectorLayers={adminVectors
-							.filter(({ name }) => currentAdminVectorLayerNamesSet.has(name))
+							.filter(({ name }) => name === currentAdminVectorLayerName)
 							.map((vector) => ({
 								...vector,
 								features: adminVectorFeaturesByNamesMap[vector.name] || [],

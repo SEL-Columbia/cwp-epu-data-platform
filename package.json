@@ -21,7 +21,6 @@
     "build"
   ],
   "dependencies": {
-    "leaflet": "1.6.0",
     "papaparse": "5.2.0"
   },
   "devDependencies": {

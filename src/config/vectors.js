@@ -15,7 +15,6 @@ import adminVectors from './adminVectors';
 const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
 	'Uganda Electricity Transmission Lines': 0,
 	'UMEME REA power distribution lines 2018': 1,
-	'Uganda Geosurvey Results': 2,
 }
 
 const vectors = [
@@ -80,43 +79,6 @@ const vectors = [
 				// ],
 			},
 		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'rgb(32,89,255)', weight: 1 };
-			},
-		},
-	}),
-	new VectorSource({
-		name: 'Uganda Geosurvey Results',
-		label: 'Uganda',
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
-		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
-		getGeometry: (lat, lng) => {
-			return {
-				type: 'Point',
-				coordinates: [parseFloat(lng), parseFloat(lat)],
-			};
-		},
-		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
-		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
-		leafletType: 'circleMarker',
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: 'circle',
-		mapboxLayerOptions: {
-			layout: {
-				'circle-sort-key': adminVectors.length + vectorPriorityByNameMap['Uganda Geosurvey Results'],
-			},
-			paint: {
-				'circle-color': 'rgba(51,255,150,0.6)',
-				'circle-radius': 6,
-			},
-		},
-		leafletOptions: {
-			styles: (feature) => {
-				return { color: 'rgba(51,255,150,0.6)', radius: 1 };
-			},
-		},
-		minZoom: 8,
 	}),
 	new VectorSource({
 		name: 'UMEME REA power distribution lines 2018',
@@ -160,11 +122,6 @@ const vectors = [
 				// 	['literal', [2, 2, 6, 2]],
 				// 	['literal', [2, 2, 6, 2]], /* other */
 				// ],
-			},
-		},
-		leafletOptions: {
-			style: (feature) => {
-				return { color: 'rgb(255,129,255)', weight: 1 };
 			},
 		},
 	}),

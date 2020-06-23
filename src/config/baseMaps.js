@@ -1,28 +1,12 @@
-import RasterSource from '../RasterSource';
+// default 'Streets' for testing:
+// mapboxStyle: 'mapbox://styles/mapbox/streets-v11',
+
 
 const baseMaps = [
-	// new RasterSource({
-	// 	name: 'Satellite',
-	// 	mapboxId: 'mapbox.satellite',
-	// 	isDefault: true,
-	// }),
-	// new RasterSource({
-	// 	name: 'Terrain',
-	// 	mapboxId: 'mapbox.mapbox-terrain-v2',
-	// }),
-	// new RasterSource({
-	// 	name: 'Streets',
-	// 	mapboxId: 'mapbox.mapbox-streets-v8',
-	// }),
-	// {
-	// 	name: 'Streets',
-	// 	mapboxStyle: 'mapbox://styles/mapbox/streets-v11',
-	// 	isDefault: true,
-	// },
 	{
 		name: 'Streets',
 		mapboxStyle: 'mapbox://styles/imathews/ckbpms3l74h4e1ipbxbhqivs4',
-		isDefault: true,
+		isDefault: true, // must have one default: true map
 	},
 	{
 		name: 'BasemapSatellite',
