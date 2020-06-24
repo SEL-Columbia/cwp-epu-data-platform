@@ -29,6 +29,7 @@ module.exports = function ({ env } = {}) {
 		plugins: [
 			new webpack.DefinePlugin({
 				'process.env.REDIVIS_API_TOKEN': JSON.stringify('AAAAXtGcJ4BCOmXb3OT+XuGr1C5NuWyX'),
+				'process.env.ROOT_PATH': JSON.stringify('/cwp-epu-data-platform'),
 			}),
 		],
 		module: {

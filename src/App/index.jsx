@@ -29,7 +29,7 @@ class App extends Component {
 						exact={true}
 						className={styles.link}
 						activeClassName={styles.active}
-						to={'/cwp-epu-data-platform'}
+						to={process.env.ROOT_PATH}
 					>
 						{'Explore data'}
 					</NavLink>
@@ -37,7 +37,7 @@ class App extends Component {
 						exact={true}
 						className={styles.link}
 						activeClassName={styles.active}
-						to={'/cwp-epu-data-platform/map'}
+						to={`${process.env.ROOT_PATH}/map`}
 					>
 						{'Map'}
 					</NavLink>
@@ -45,7 +45,7 @@ class App extends Component {
 						exact={true}
 						className={styles.link}
 						activeClassName={styles.active}
-						to={'/cwp-epu-data-platform/about'}
+						to={`${process.env.ROOT_PATH}/about`}
 					>
 						{'About'}
 					</NavLink>
@@ -58,8 +58,8 @@ class App extends Component {
 		return (
 			<div className={styles.bodyWrapper}>
 				<Switch>
-					<Route exact={true} path={'/cwp-epu-data-platform/map'} component={MapWrapper} />
-					<Route exact={true} path={'/cwp-epu-data-platform/about'} component={About} />
+					<Route exact={true} path={`${process.env.ROOT_PATH}/map`} component={MapWrapper} />
+					<Route exact={true} path={`${process.env.ROOT_PATH}/about`} component={About} />
 					<Route component={Explore} />
 				</Switch>
 			</div>
