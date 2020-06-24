@@ -16,6 +16,7 @@ const METADATA_NULL_VALUE = '(null)'
 const ZOOM_REGEX = /zoom=([\d+\.]+)/;
 const LAT_REGEX = /lat=(-?[\d+\.]+)/;
 const LNG_REGEX = /lng=(-?[\d+\.]+)/;
+const BBOX_REGEX = /bbox=(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+)/;
 
 
 function getFiltersMap(features, whitelist) {
@@ -73,10 +74,20 @@ class MapWrapper extends Component {
 	}
 
 	componentDidMount() {
+		const {
+			location: { search },
+			history,
+		} = this.props;
+
 		this.loadRasters();
 		this.loadVectors();
 		this.loadObservationVectors();
 		this.loadAdminVectors();
+
+		const bbox = search.match(BBOX_REGEX);
+		if (bbox){
+			history.replace({ search: '' });
+		}
 	}
 
 	loadRasters = async () => {
@@ -210,12 +221,16 @@ class MapWrapper extends Component {
 		const zoomMatch = search.match(ZOOM_REGEX);
 		const latMatch = search.match(LAT_REGEX);
 		const lngMatch = search.match(LNG_REGEX);
+		const bbox = search.match(BBOX_REGEX);
 		const object = {};
 		if (zoomMatch){
 			object.zoom = parseInt(zoomMatch[1], 10);
 		}
 		if (latMatch && lngMatch){
 			object.center = [parseFloat(lngMatch[1]), parseFloat(latMatch[1])];
+		}
+		if (bbox){
+			object.boundingBox = [[parseFloat(bbox[1]), parseFloat(bbox[3])], [parseFloat(bbox[2]), parseFloat(bbox[4])]]
 		}
 
 		return object;
@@ -239,7 +254,7 @@ class MapWrapper extends Component {
 			isLoadingAdminVectors,
 		} = this.state;
 
-		const { zoom, center } = this.getZoomAndCenter();
+		const { zoom, center, boundingBox } = this.getZoomAndCenter();
 
 		return (
 			<div className={styles.mapWrapper}>
@@ -296,6 +311,7 @@ class MapWrapper extends Component {
 						onZoomOrPan={this.handleZoomOrPan}
 						zoom={zoom}
 						center={center}
+						boundingBox={boundingBox}
 					/>
 				</div>
 			</div>
