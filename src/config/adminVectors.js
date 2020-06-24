@@ -10,17 +10,18 @@ import VectorSource from '../VectorSource';
  * leafletOptions
  * */
 
-const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
+const vectorPriorityByNameMap = {
+	// higher numbers will be rendered on top of lower numbers
 	'Uganda Regions': 0,
 	'Uganda Districts': 1,
 	'Uganda Subcounties': 2,
 	'Uganda Parishes': 3,
-}
+};
 
 // TODO: monitor https://github.com/mapbox/mapbox-gl-js/issues/4087 for fill layers with outlines
 
-const adminVectors = [
-	new VectorSource({
+const adminVectorSpecs = [
+	{
 		name: 'Uganda Regions',
 		label: 'Uganda',
 		isDefault: true,
@@ -52,21 +53,13 @@ const adminVectors = [
 				},
 				paint: {
 					'line-color': '#787b8c',
-					'line-width': [
-						'interpolate',
-						['linear'],
-						['zoom'],
-						3,
-						0.5,
-						10,
-						2,
-					],
+					'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 10, 2],
 					'line-dasharray': [10, 0],
 				},
 			},
 		},
-	}),
-	new VectorSource({
+	},
+	{
 		name: 'Uganda Districts',
 		label: 'Uganda',
 		isDefault: false,
@@ -98,27 +91,13 @@ const adminVectors = [
 				},
 				paint: {
 					'line-color': '#9699a6',
-					'line-width': [
-						"interpolate",
-						["linear"],
-						["zoom"],
-						7,
-						0.75,
-						12,
-						1.5
-					],
-					'line-dasharray': [
-						"step",
-						["zoom"],
-						["literal", [2, 0]],
-						7,
-						["literal", [2, 2, 6, 2]],
-					],
+					'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.75, 12, 1.5],
+					'line-dasharray': ['step', ['zoom'], ['literal', [2, 0]], 7, ['literal', [2, 2, 6, 2]]],
 				},
 			},
 		},
-	}),
-	new VectorSource({
+	},
+	{
 		name: 'Uganda Subcounties',
 		label: 'Uganda',
 		isDefault: false,
@@ -149,28 +128,14 @@ const adminVectors = [
 				},
 				paint: {
 					'line-color': '#9699a6',
-					'line-width': [
-						"interpolate",
-						["linear"],
-						["zoom"],
-						7,
-						0.75,
-						12,
-						1.5
-					],
-					'line-dasharray': [
-						"step",
-						["zoom"],
-						["literal", [2, 0]],
-						7,
-						["literal", [2, 2, 6, 2]],
-					],
+					'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.75, 12, 1.5],
+					'line-dasharray': ['step', ['zoom'], ['literal', [2, 0]], 7, ['literal', [2, 2, 6, 2]]],
 				},
 			},
 		},
-	}),
-	new VectorSource({
-		name: 'Uganda Parishes',
+	},
+	{
+		name: 'Uganda Parishes (full res, 74MB)',
 		label: 'Uganda',
 		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:next.uganda_parishes:10',
@@ -200,26 +165,44 @@ const adminVectors = [
 				},
 				paint: {
 					'line-color': '#9699a6',
-					'line-width': [
-						"interpolate",
-						["linear"],
-						["zoom"],
-						7,
-						0.75,
-						12,
-						1.5
-					],
-					'line-dasharray': [
-						"step",
-						["zoom"],
-						["literal", [2, 0]],
-						7,
-						["literal", [2, 2, 6, 2]],
-					],
+					'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.75, 12, 1.5],
+					'line-dasharray': ['step', ['zoom'], ['literal', [2, 0]], 7, ['literal', [2, 2, 6, 2]]],
 				},
 			},
 		},
-	}),
+	},
 ];
 
-export default adminVectors;
+const simplificationTables = [
+	{
+		name: 'Parishes (10m, 32MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_5:5',
+		level: 3,
+	},
+	{
+		name: 'Parishes (50m, 13MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.uganda_parishes:3',
+		level: 3,
+	},
+	{
+		name: 'Parishes (100m, 9MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_6:6',
+		level: 3,
+	},
+	{
+		name: 'Parishes (250m, 5MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_7:7',
+		level: 3,
+	},
+	{
+		name: 'Parishes (500m, 4MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_8:8',
+		level: 3,
+	},
+];
+
+for (const table of simplificationTables) {
+	adminVectorSpecs.push({ ...adminVectorSpecs[table.level], ...table });
+}
+
+export default adminVectorSpecs.map((obj) => new VectorSource(obj));

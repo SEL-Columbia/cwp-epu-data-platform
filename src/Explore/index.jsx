@@ -3,9 +3,9 @@ import * as styles from './styles.css';
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import adminVectors from '../config/adminVectors';
-import { withStyles } from "@material-ui/core/styles";
-import { grey } from "@material-ui/core/colors";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import { withStyles } from '@material-ui/core/styles';
+import { grey } from '@material-ui/core/colors';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 const MAX_RESULTS = 10000;
@@ -13,11 +13,11 @@ const MAX_RESULTS = 10000;
 const CustomCircularProgress = withStyles({
 	root: {
 		color: grey[300],
-	}
+	},
 })((props) => <CircularProgress size={30} {...props} />);
 
 class Explore extends Component {
-	constructor(props){
+	constructor(props) {
 		super(props);
 		this.state = {
 			isLoading: false,
@@ -35,8 +35,16 @@ class Explore extends Component {
 			adminVectors
 				.filter(({ showOnHome }) => showOnHome)
 				.map(async (vector) => {
-					const { name, tableIdentifier, regionNameVariable, regionParentVariable, regionBboxVariable } = vector;
-					const variablesToFetch = [regionNameVariable, regionParentVariable, regionBboxVariable].filter((variable) => !!variable).map(({ name }) => name.toLowerCase());
+					const {
+						name,
+						tableIdentifier,
+						regionNameVariable,
+						regionParentVariable,
+						regionBboxVariable,
+					} = vector;
+					const variablesToFetch = [regionNameVariable, regionParentVariable, regionBboxVariable]
+						.filter((variable) => !!variable)
+						.map(({ name }) => name.toLowerCase());
 
 					const response = await fetch(
 						`https://redivis.com/api/v1/tables/${tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
@@ -77,7 +85,7 @@ class Explore extends Component {
 			adminRegions,
 			isLoading: false,
 		});
-	}
+	};
 
 	renderAdminRegion = (region) => {
 		const { name, parent, bbox } = region;
@@ -87,12 +95,12 @@ class Explore extends Component {
 					<span>{name}</span>
 				</Link>
 			</div>
-		)
-	}
+		);
+	};
 
 	renderAdminRegions = () => {
 		const { adminRegions, isLoading } = this.state;
-		if (isLoading){
+		if (isLoading) {
 			return (
 				<div className={styles.regionWrapper}>
 					<CustomCircularProgress />
@@ -106,17 +114,22 @@ class Explore extends Component {
 					<div className={styles.regionName}>
 						<span className={styles.header}>{regionLevel}</span>
 					</div>
-					<div className={styles.itemsWrapper}>
-						{regions.map(this.renderAdminRegion)}
-					</div>
+					<div className={styles.itemsWrapper}>{regions.map(this.renderAdminRegion)}</div>
 				</div>
 			);
 		});
-	}
+	};
 
 	render() {
+		// TODO: add ethiopia, tanzania
 		return (
 			<div className={styles.exploreWrapper}>
+				<img
+					width={200}
+					height={200}
+					src={'/cwp-epu-data-platform/assets/uganda_outline.png'}
+					alt={'Uganda outline'}
+				/>
 				<span className={styles.header}>{'Explore regions'}</span>
 				{this.renderAdminRegions()}
 			</div>

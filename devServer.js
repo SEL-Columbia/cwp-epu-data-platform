@@ -23,7 +23,7 @@ app.use((req, res, next) => {
 
 app.use(
 	webpackMiddleware(compiler, {
-		publicPath: `/dist/`,
+		publicPath: `/cwp-epu-data-platform/dist/`,
 		headers: {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -35,8 +35,13 @@ app.use(
 // app.use([`/map`, '/about'], (req, res, next) => {
 // 	res.sendFile(`${__dirname}/index.html`);
 // });
-app.use(`/`, (req, res, next) => {
+app.use('/cwp-epu-data-platform/assets', express.static(`${__dirname}/assets`));
+app.use(`/cwp-epu-data-platform/`, (req, res, next) => {
 	res.sendFile(`${__dirname}/index.html`);
+});
+
+app.use('/', (req, res) => {
+	res.redirect('/cwp-epu-data-platform');
 });
 app.use(`/*`, (req, res, next) => {
 	res.sendFile(`${__dirname}/404.html`);
