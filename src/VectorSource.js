@@ -1,6 +1,10 @@
+import * as pako from 'pako';
+import * as localforage from 'localforage';
+
+localforage.config({});
+
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 const MAX_RESULTS = 10000;
-
 export default class VectorSource {
 	constructor({
 		name,
@@ -9,8 +13,12 @@ export default class VectorSource {
 		geoVariables,
 		getGeometry,
 		isDefault,
+		showOnHome,
 		filterVariables,
 		metadataVariables,
+		regionNameVariable,
+		regionParentVariable,
+		regionBboxVariable,
 		leafletType,
 		mapboxSourceType,
 		mapboxLayerType,
@@ -25,6 +33,9 @@ export default class VectorSource {
 		this.geoVariables = geoVariables;
 		this.filterVariables = filterVariables;
 		this.metadataVariables = metadataVariables;
+		this.regionNameVariable = regionNameVariable;
+		this.regionParentVariable = regionParentVariable;
+		this.regionBboxVariable = regionBboxVariable;
 		this.leafletType = leafletType;
 		this.mapboxSourceType = mapboxSourceType;
 		this.mapboxLayerType = mapboxLayerType;
@@ -33,6 +44,7 @@ export default class VectorSource {
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
 		this.isDefault = isDefault;
+		this.showOnHome = showOnHome;
 		this.getGeometry = getGeometry;
 	}
 
@@ -53,45 +65,89 @@ export default class VectorSource {
 			variableToFetchedIndexMap.set(variablesToFetch[i], i);
 		}
 
-		const response = await fetch(
-			`https://redivis.com/api/v1/tables/${this.tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
-				',',
-			)}&maxResults=${MAX_RESULTS}`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${ACCESS_TOKEN}`,
-				},
-			},
-		);
-		if (!response.ok) {
-			const text = await response.text();
-			alert(text);
+		const apiEndpoint = `https://redivis.com/api/v1/tables/${
+			this.tableIdentifier
+		}/rows?selectedVariables=${variablesToFetch.join(',')}&maxResults=${MAX_RESULTS}`;
+		try {
+			let responseText;
+			const currentTableVersion = await getTableVersion(this.tableIdentifier);
+			try {
+				const cachedVersion = await localforage.getItem(`version_${apiEndpoint}`);
+				if (cachedVersion === currentTableVersion) {
+					const cachedText = await localforage.getItem(`response_${apiEndpoint}`);
+					responseText = pako.inflate(cachedText, { to: 'string' });
+				}
+			} catch (e) {
+				console.error(e);
+				await localforage.removeItem(`version_${apiEndpoint}`);
+				await localforage.removeItem(`response_${apiEndpoint}`);
+			}
+
+			if (!responseText) {
+				const response = await fetch(apiEndpoint, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${ACCESS_TOKEN}`,
+					},
+				});
+				if (!response.ok) {
+					const text = await response.text();
+					throw new Error(text);
+				}
+
+				responseText = await response.text();
+				try {
+					await localforage.setItem(`version_${apiEndpoint}`, currentTableVersion);
+					await localforage.setItem(`response_${apiEndpoint}`, pako.deflate(responseText));
+				} catch (e) {
+					console.error(e);
+					await localforage.removeItem(`version_${apiEndpoint}`);
+					await localforage.removeItem(`response_${apiEndpoint}`);
+				}
+			}
+
+			this.data = responseText
+				.split('\n')
+				.map((row, i) => {
+					return JSON.parse(row);
+				})
+				.filter((row) => row[0])
+				.map((row) => {
+					const geometry = this.getGeometry
+						? this.getGeometry(
+								...this.geoVariables.map(
+									(geoVariable) => row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
+								),
+						  )
+						: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
+
+					const metadata = {};
+					for (const variable of this.metadataVariables) {
+						metadata[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
+					}
+					return { geometry, metadata, properties: metadata };
+				});
+			return this.data;
+		} catch (e) {
+			await localforage.removeItem(`version_${apiEndpoint}`);
+			await localforage.removeItem(`response_${apiEndpoint}`);
+			alert(`An error occurred when fetching data from ${this.tableIdentifier}: ${e.message}`);
 			return [];
 		}
-
-		const text = await response.text();
-		this.data = text
-			.split('\n')
-			.map((row, i) => {
-				return JSON.parse(row);
-			})
-			.filter((row) => row[0])
-			.map((row) => {
-				const geometry = this.getGeometry
-					? this.getGeometry(
-							...this.geoVariables.map(
-								(geoVariable) => row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
-							),
-					  )
-					: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
-
-				const metadata = {};
-				for (const variable of this.metadataVariables) {
-					metadata[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
-				}
-				return { geometry, metadata, properties: metadata };
-			});
-		return this.data;
 	};
+}
+
+async function getTableVersion(identifier) {
+	const response = await fetch(`https://redivis.com/api/v1/tables/${identifier}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${ACCESS_TOKEN}`,
+		},
+	});
+	if (!response.ok) {
+		const text = await response.text();
+		throw new Error(text);
+	}
+	const table = await response.json();
+	return table.hash;
 }
