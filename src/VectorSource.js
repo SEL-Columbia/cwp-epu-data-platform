@@ -75,7 +75,7 @@ export default class VectorSource {
 				const cachedVersion = await localforage.getItem(`version_${apiEndpoint}`);
 				if (cachedVersion === currentTableVersion) {
 					const cachedText = await localforage.getItem(`response_${apiEndpoint}`);
-					responseText = pako.inflate(atob(cachedText), { to: 'string' });
+					responseText = pako.inflate(cachedText, { to: 'string' });
 				}
 			} catch (e) {
 				console.error(e);
@@ -98,10 +98,7 @@ export default class VectorSource {
 				responseText = await response.text();
 				try {
 					await localforage.setItem(`version_${apiEndpoint}`, currentTableVersion);
-					await localforage.setItem(
-						`response_${apiEndpoint}`,
-						btoa(pako.deflate(responseText, { to: 'string' })),
-					);
+					await localforage.setItem(`response_${apiEndpoint}`, pako.deflate(responseText));
 				} catch (e) {
 					console.error(e);
 					await localforage.removeItem(`version_${apiEndpoint}`);
@@ -152,6 +149,5 @@ async function getTableVersion(identifier) {
 		throw new Error(text);
 	}
 	const table = await response.json();
-	return 'asdf';
 	return table.hash;
 }
