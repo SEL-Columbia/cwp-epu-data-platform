@@ -130,7 +130,6 @@ class Explore extends Component {
 					src={'/cwp-epu-data-platform/assets/uganda_outline.png'}
 					alt={'Uganda outline'}
 				/>
-				<img width={200} height={200} src={'/assets/uganda_outline.png'} alt={'Uganda outline'} />
 				<span className={styles.header}>{'Explore regions'}</span>
 				{this.renderAdminRegions()}
 			</div>

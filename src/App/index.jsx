@@ -25,25 +25,46 @@ class App extends Component {
 					<h2>{'QSEL Map'}</h2>
 				</div>
 				<div className={styles.navigation}>
-					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/cwp-epu-data-platform'}>{'Explore data'}</NavLink>
-					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/map'}>{'Map'}</NavLink>
-					<NavLink exact={true} className={styles.link} activeClassName={styles.active} to={'/about'}>{'About'}</NavLink>
+					<NavLink
+						exact={true}
+						className={styles.link}
+						activeClassName={styles.active}
+						to={'/cwp-epu-data-platform'}
+					>
+						{'Explore data'}
+					</NavLink>
+					<NavLink
+						exact={true}
+						className={styles.link}
+						activeClassName={styles.active}
+						to={'/cwp-epu-data-platform/map'}
+					>
+						{'Map'}
+					</NavLink>
+					<NavLink
+						exact={true}
+						className={styles.link}
+						activeClassName={styles.active}
+						to={'/cwp-epu-data-platform/about'}
+					>
+						{'About'}
+					</NavLink>
 				</div>
 			</div>
-		)
-	}
+		);
+	};
 
 	renderBody = () => {
 		return (
 			<div className={styles.bodyWrapper}>
 				<Switch>
-					<Route exact={true} path={'/map'} component={MapWrapper} />
-					<Route exact={true} path={'/about'} component={About} />
+					<Route exact={true} path={'/cwp-epu-data-platform/map'} component={MapWrapper} />
+					<Route exact={true} path={'/cwp-epu-data-platform/about'} component={About} />
 					<Route component={Explore} />
 				</Switch>
 			</div>
-		)
-	}
+		);
+	};
 
 	render() {
 		return (
