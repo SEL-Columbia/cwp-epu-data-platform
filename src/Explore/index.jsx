@@ -91,7 +91,7 @@ class Explore extends Component {
 		const { name, parent, bbox } = region;
 		return (
 			<div key={`${parent}_${name}`}>
-				<Link to={`/map?bbox=${bbox}`}>
+				<Link to={`${process.env.ROOT_PATH}/map?bbox=${bbox}`}>
 					<span>{name}</span>
 				</Link>
 			</div>
@@ -127,7 +127,7 @@ class Explore extends Component {
 				<img
 					width={200}
 					height={200}
-					src={'/cwp-epu-data-platform/assets/uganda_outline.png'}
+					src={`${process.env.ROOT_PATH}/assets/uganda_outline.png`}
 					alt={'Uganda outline'}
 				/>
 				<span className={styles.header}>{'Explore regions'}</span>
