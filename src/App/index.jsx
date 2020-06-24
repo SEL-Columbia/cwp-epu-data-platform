@@ -14,7 +14,7 @@ class App extends Component {
 		let path = localStorage.getItem('path');
 		if (path) {
 			localStorage.removeItem('path');
-			history.push([path]);
+			history.replace(`/${path}`);
 		}
 	}
 
