@@ -35,9 +35,11 @@ app.use(
 // app.use([`/map`, '/about'], (req, res, next) => {
 // 	res.sendFile(`${__dirname}/index.html`);
 // });
+app.use('/assets', express.static(`${__dirname}/assets`));
 app.use(`/`, (req, res, next) => {
 	res.sendFile(`${__dirname}/index.html`);
 });
+
 app.use(`/*`, (req, res, next) => {
 	res.sendFile(`${__dirname}/404.html`);
 });
