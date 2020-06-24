@@ -208,11 +208,15 @@ export default class MapRenderer {
 			adminVectorLayers,
 			center = DEFAULT_CENTER,
 			zoom = DEFAULT_ZOOM,
+			boundingBox,
 		},
 		{ initialRender = false } = {},
 	) {
 		if (initialRender) {
 			this.map.jumpTo({ center, zoom });
+		}
+		if (boundingBox){
+			this.map.fitBounds(boundingBox);
 		}
 
 		let baseLayer = this.baseLayers.get(baseMapLayer.name);

@@ -13,8 +13,12 @@ export default class VectorSource {
 		geoVariables,
 		getGeometry,
 		isDefault,
+		showOnHome,
 		filterVariables,
 		metadataVariables,
+		regionNameVariable,
+		regionParentVariable,
+		regionBboxVariable,
 		leafletType,
 		mapboxSourceType,
 		mapboxLayerType,
@@ -29,6 +33,9 @@ export default class VectorSource {
 		this.geoVariables = geoVariables;
 		this.filterVariables = filterVariables;
 		this.metadataVariables = metadataVariables;
+		this.regionNameVariable = regionNameVariable;
+		this.regionParentVariable = regionParentVariable;
+		this.regionBboxVariable = regionBboxVariable;
 		this.leafletType = leafletType;
 		this.mapboxSourceType = mapboxSourceType;
 		this.mapboxLayerType = mapboxLayerType;
@@ -37,6 +44,7 @@ export default class VectorSource {
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
 		this.isDefault = isDefault;
+		this.showOnHome = showOnHome;
 		this.getGeometry = getGeometry;
 	}
 
