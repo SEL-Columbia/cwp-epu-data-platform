@@ -135,7 +135,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Uganda Parishes',
+		name: 'Uganda Parishes (full res, 74MB)',
 		label: 'Uganda',
 		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:1:next.uganda_parishes:10',
@@ -175,8 +175,28 @@ const adminVectorSpecs = [
 
 const simplificationTables = [
 	{
+		name: 'Parishes (10m, 32MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_5:5',
+		level: 3,
+	},
+	{
 		name: 'Parishes (50m, 13MB)',
 		tableIdentifier: 'imathews.uganda_boundaries:68.uganda_parishes:3',
+		level: 3,
+	},
+	{
+		name: 'Parishes (100m, 9MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_6:6',
+		level: 3,
+	},
+	{
+		name: 'Parishes (250m, 5MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_7:7',
+		level: 3,
+	},
+	{
+		name: 'Parishes (500m, 4MB)',
+		tableIdentifier: 'imathews.uganda_boundaries:68.table_8:8',
 		level: 3,
 	},
 ];
