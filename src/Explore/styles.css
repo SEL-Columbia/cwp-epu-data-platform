@@ -1,8 +1,16 @@
 .exploreWrapper{
     display: flex;
     height: 100%;
-    padding: 30px;
+    padding: 20px 20px 20px 5px;
     margin-left: 400px;
+}
+
+.loadingWrapper{
+    margin-left: 15px;
+}
+
+.imageWrapper{
+    padding-left: 16px;
 }
 
 .header{
@@ -11,6 +19,6 @@
 }
 
 .regionWrapper{
-    padding: 0 20px;
+    padding-right: 20px;
 }
 

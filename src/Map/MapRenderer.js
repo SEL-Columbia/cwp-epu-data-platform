@@ -31,9 +31,13 @@ export default class MapRenderer {
 		});
 		const scale = new mapboxgl.ScaleControl({
 			maxWidth: 100,
-			unit: 'imperial',
+			unit: 'metric',
 		});
 		this.map.addControl(scale);
+		const nav = new mapboxgl.NavigationControl({
+			showCompass: false,
+		});
+		this.map.addControl(nav, 'top-left');
 
 		this.onZoomOrPan = props.onZoomOrPan;
 		this.map.on('zoomend', this.handleZoomEnd);
@@ -95,6 +99,7 @@ export default class MapRenderer {
 			features,
 			minZoom,
 			maxZoom,
+			onFeatureClick,
 		} = vectorLayer;
 
 		// define source
@@ -136,6 +141,11 @@ export default class MapRenderer {
 				let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
 				// const metadata = e.features[0].properties;
 				const metadata = features[0].properties;
+
+				if (onFeatureClick){
+					onFeatureClick(metadata);
+					return;
+				}
 
 				if (Object.keys(metadata).length) {
 					const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
