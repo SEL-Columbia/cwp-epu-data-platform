@@ -9,6 +9,7 @@ export default class VectorSource {
 	constructor({
 		name,
 		label,
+		hierarchyIndex,
 		tableIdentifier,
 		geoVariables,
 		getGeometry,
@@ -29,6 +30,7 @@ export default class VectorSource {
 	}) {
 		this.name = name;
 		this.label = label;
+		this.hierarchyIndex = hierarchyIndex;
 		this.tableIdentifier = tableIdentifier;
 		this.geoVariables = geoVariables;
 		this.filterVariables = filterVariables;
