@@ -44,17 +44,17 @@ function getRegionLink(bbox) {
 	return `${process.env.ROOT_PATH}/map?bbox=${bbox}`;
 }
 
-const CustomNestedList = withStyles({
+const CustomNestedList = withStyles((theme) => ({
 	root: {
 		width: '100%',
 		maxWidth: 400,
-		// backgroundColor: theme.palette.background.paper,
+		backgroundColor: theme.palette.background.paper,
 	},
 	nested: {
-		paddingLeft: 30,
-		// paddingLeft: theme.spacing(4),
+		// paddingLeft: 30,
+		paddingLeft: theme.spacing(4),
 	},
-})((props) => {
+}))((props) => {
 	const {
 		group: { regionGroup, regions },
 		onToggleRegionIsCollapsed,
@@ -261,7 +261,12 @@ function nestRegions(parentRegions) {
 			);
 			return;
 		}
-		higherLevelRegion.regions[parentRegionIndexesByName[parent]].regions.push(region);
+		higherLevelRegion.regions[parentRegionIndexesByName[parent]].regions.push({
+			...region,
+			regionLevel: higherLevelRegion.regionLevel,
+			hierarchyIndex: higherLevelRegion.hierarchyIndex,
+			regionGroup: higherLevelRegion.regionGroup,
+		});
 	});
 
 	parentRegions.splice(0, 1);
@@ -352,7 +357,7 @@ class Explore extends Component {
 				}),
 		);
 		const regionGroups = formatData(adminRegions);
-
+		
 		const regionIsCollapsed = {};
 		for (const regionGroup of regionGroups) {
 			regionIsCollapsed[regionGroup.regionGroup] = {};
