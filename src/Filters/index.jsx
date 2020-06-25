@@ -8,11 +8,16 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel'
 import Input from '@material-ui/core/Input';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormLabel from '@material-ui/core/FormLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import SelectUI from '@material-ui/core/Select';
+import Switch from '@material-ui/core/Switch';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import MenuItem from '@material-ui/core/MenuItem';
 import Chip from '@material-ui/core/Chip';
 
@@ -44,6 +49,32 @@ const MenuProps = {
 	},
 };
 
+const CustomSwitch = withStyles({
+	switchBase: {
+		color: grey[200],
+		'&$checked': {
+			color: grey[500],
+		},
+		'&$checked + $track': {
+			backgroundColor: grey[500],
+		},
+	},
+	checked: {},
+	track: {
+		backgroundColor: grey[300],
+	},
+})(Switch);
+
+const CustomRadio = withStyles({
+	root: {
+		color: grey[300],
+		'&$checked': {
+			color: grey[500],
+		},
+	},
+	checked: {},
+})((props) => <Radio color="default" {...props} />);
+
 const CustomCheckbox = withStyles({
 	root: {
 		'&$checked': {
@@ -58,6 +89,38 @@ const CustomCircularProgress = withStyles({
 		color: grey[300],
 	}
 })((props) => <CircularProgress size={15} {...props} />);
+
+const CustomFormControlLabel = withStyles({
+	root: {
+		whiteSpace: 'nowrap',
+	},
+})(FormControlLabel);
+
+
+const CustomFormLabel = withStyles({
+	root: {
+		color: grey[900],
+		fontWeight: 'bold',
+		marginBottom: 10,
+		'&$focused': {
+			color: grey[900],
+		},
+	},
+	focused: {
+		color: grey[900],
+	}
+})(FormLabel);
+
+const CustomFormHelperText = withStyles({
+	root: {
+		color: grey[500],
+		paddingLeft: 20,
+		marginBottom: 0,
+		'&:not(:last-of-type)': {
+			marginBottom: 0,
+		},
+	},
+})(FormHelperText);
 
 const CustomSelect = withStyles({
 	root: {
@@ -126,6 +189,9 @@ export default function Filters({
 	isLoadingObservationVectors,
 	isLoadingAdminVectors,
 }) {
+	function handleSelectBaseMapLayer(selectedBaseMapLayerName){
+		onUpdateBaseMapLayer(selectedBaseMapLayerName);
+	}
 
 	function handleBaseMapLayerChange(selectedOption, options){
 		const { action } = options;
@@ -141,6 +207,16 @@ export default function Filters({
 				break;
 		}
 		onUpdateBaseMapLayer(nextSelectedBaseMapLayerName);
+	}
+
+	function handleToggleVectorLayer(name, checked){
+		let nextSelectedVectorLayerNamesSet = new Set([...selectedVectorLayerNamesSet]);
+		if (checked){
+			nextSelectedVectorLayerNamesSet.add(name);
+		} else {
+			nextSelectedVectorLayerNamesSet.delete(name);
+		}
+		onUpdateVectorLayers(nextSelectedVectorLayerNamesSet);
 	}
 
 	function handleRasterLayerChange(selectedOptions, options) {
@@ -159,6 +235,16 @@ export default function Filters({
 			case 'clear':
 				nextSelectedRasterLayerNamesSet.clear();
 				break;
+		}
+		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
+	}
+
+	function handleToggleRasterLayer(name, checked){
+		let nextSelectedRasterLayerNamesSet = new Set([...selectedRasterLayerNamesSet]);
+		if (checked){
+			nextSelectedRasterLayerNamesSet.add(name);
+		} else {
+			nextSelectedRasterLayerNamesSet.delete(name);
 		}
 		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
 	}
@@ -183,6 +269,16 @@ export default function Filters({
 		onUpdateVectorLayers(nextSelectedVectorLayerNamesSet);
 	};
 
+	function handleToggleObservationVectorLayer(name, checked){
+		let nextSelectedObservationVectorLayerNamesSet = new Set([...selectedObservationVectorLayerNamesSet]);
+		if (checked){
+			nextSelectedObservationVectorLayerNamesSet.add(name);
+		} else {
+			nextSelectedObservationVectorLayerNamesSet.delete(name);
+		}
+		onUpdateObservationVectorLayers(nextSelectedObservationVectorLayerNamesSet);
+	};
+
 	function handleObservationVectorLayerChange(selectedOptions, options) {
 		const { action, removedValue, option } = options;
 		const nextSelectedObservationVectorLayerNamesSet = new Set([...selectedObservationVectorLayerNamesSet]);
@@ -202,6 +298,10 @@ export default function Filters({
 		}
 		onUpdateObservationVectorLayers(nextSelectedObservationVectorLayerNamesSet);
 	};
+
+	function handleSelectAdminVectorLayer(selectedAdminVectorLayerName){
+		onUpdateAdminVectorLayer(selectedAdminVectorLayerName);
+	}
 
 	function handleAdminVectorLayerChange(selectedOption, options){
 		const { action } = options;
@@ -266,7 +366,7 @@ export default function Filters({
 					{[...valuesSet].map((value) => {
 						return (
 							<div key={value} className={styles.valueWrapper}>
-								<FormControlLabel
+								<CustomFormControlLabel
 									control={
 										<CustomCheckbox
 											icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
@@ -368,137 +468,208 @@ export default function Filters({
 		<div className={styles.sideBarWrapper}>
 			<div className={styles.bodyWrapper}>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Base map'}</span></div>
-					<Select
-						options={baseMapLayers}
-						value={baseMapLayers.find(({ name }) => name === selectedBaseMapLayerName)}
-						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => name === selectedBaseMapLayerName}
-						onChange={handleBaseMapLayerChange}
-						hideSelectedOptions={false}
-					/>
+					{/*<div className={styles.sectionHeader}><span>{'Base map'}</span></div>*/}
+					<FormControl component="fieldset">
+						<CustomFormLabel component="legend">{'Base map'}</CustomFormLabel>
+						<RadioGroup
+							aria-label="Base map"
+							name="Base map"
+							value={selectedBaseMapLayerName}
+							onChange={(e) => handleSelectBaseMapLayer(e.target.value)}
+						>
+							{baseMapLayers.map((layer) => {
+								const { name } = layer;
+								return (
+									<CustomFormControlLabel key={name} value={name} control={<CustomRadio />} label={name} />
+								);
+							})}
+						</RadioGroup>
+					</FormControl>
+					{/*<Select*/}
+					{/*	options={baseMapLayers}*/}
+					{/*	value={baseMapLayers.find(({ name }) => name === selectedBaseMapLayerName)}*/}
+					{/*	getOptionLabel={({ name }) => name}*/}
+					{/*	isOptionSelected={({ name }) => name === selectedBaseMapLayerName}*/}
+					{/*	onChange={handleBaseMapLayerChange}*/}
+					{/*	hideSelectedOptions={false}*/}
+					{/*/>*/}
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Landscape predictions'}</span></div>
-					<Select
-						options={groupOptions(rasterLayers)}
-						value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}
-						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => selectedRasterLayerNamesSet.has(name)}
-						isMulti={true}
-						onChange={handleRasterLayerChange}
-						hideSelectedOptions={false}
-						isClearable={true}
-						placeholder={'Select rasters...'}
-						isLoading={isLoadingRasters}
-						isDisabled={!rasterLayers.length}
-						formatGroupLabel={renderGroupLabel}
-					/>
+					{/*<div className={styles.sectionHeader}><span>{'Landscape predictions'}</span></div>*/}
+					<FormControl component="fieldset">
+						<CustomFormLabel component="legend">{'Landscape predictions'}</CustomFormLabel>
+						{groupOptions(rasterLayers).map((group) => {
+							const { label, options } = group;
+							return (
+								<React.Fragment key={label}>
+									<CustomFormHelperText>{label}</CustomFormHelperText>
+									<FormGroup>
+										{options.map((option) => {
+											const { name } = option;
+											return (
+												<CustomFormControlLabel
+													control={
+														<CustomSwitch
+															checked={selectedRasterLayerNamesSet.has(name)}
+															onChange={(e) => handleToggleRasterLayer(name, e.target.checked)}
+															name={name}
+														/>
+													}
+													label={name}
+												/>
+											)
+										})}
+									</FormGroup>
+								</React.Fragment>
+							);
+						})}
+					</FormControl>
+					{/*<Select*/}
+					{/*	options={groupOptions(rasterLayers)}*/}
+					{/*	value={rasterLayers.filter(({ name }) => selectedRasterLayerNamesSet.has(name))}*/}
+					{/*	getOptionLabel={({ name }) => name}*/}
+					{/*	isOptionSelected={({ name }) => selectedRasterLayerNamesSet.has(name)}*/}
+					{/*	isMulti={true}*/}
+					{/*	onChange={handleRasterLayerChange}*/}
+					{/*	hideSelectedOptions={false}*/}
+					{/*	isClearable={true}*/}
+					{/*	placeholder={'Select rasters...'}*/}
+					{/*	isLoading={isLoadingRasters}*/}
+					{/*	isDisabled={!rasterLayers.length}*/}
+					{/*	formatGroupLabel={renderGroupLabel}*/}
+					{/*/>*/}
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Pre-existing maps & data'}</span></div>
-					{/*<FormControl className={classes.formControl}>*/}
-					{/*	<InputLabel id="demo-mutiple-chip-label">{'Vectors'}</InputLabel>*/}
-					{/*	<CustomSelect*/}
-					{/*		labelId="demo-mutiple-chip-label"*/}
-					{/*		id="demo-mutiple-chip"*/}
-					{/*		multiple*/}
-					{/*		value={*/}
-					{/*			vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).length ?*/}
-					{/*			vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name) :*/}
-					{/*			[]*/}
-					{/*		}*/}
-					{/*		placeholder={'Select...'}*/}
-					{/*		onChange={*/}
-					{/*			(e) => {*/}
-					{/*				const selectedNames = e.target.value;*/}
-					{/*				const options = {}*/}
-					{/*				const newName = selectedNames.find((name) => !selectedVectorLayerNamesSet.has(name));*/}
-					{/*				if (newName !== undefined){*/}
-					{/*					if (newName === ''){*/}
-					{/*						options.action = 'clear';*/}
-					{/*					} else {*/}
-					{/*						options.action = 'select-option';*/}
-					{/*						options.option = { name: newName };*/}
-					{/*					}*/}
-					{/*				} else {*/}
-					{/*					const selectedOptionSet = new Set(selectedNames);*/}
-					{/*					const oldName = [...selectedVectorLayerNamesSet].find((name) => !selectedOptionSet.has(name));*/}
-					{/*					options.action = 'deselect-option';*/}
-					{/*					options.option = { name: oldName };*/}
-					{/*				}*/}
-					{/*				handleVectorLayerChange(null, options);*/}
-					{/*			}*/}
-					{/*		}*/}
-					{/*		input={<Input id="select-multiple-chip" />}*/}
-					{/*		renderValue={(selected) => (*/}
-					{/*			<div className={classes.chips}>*/}
-					{/*				{selected.map((name) => (*/}
-					{/*					<Chip key={name} label={name} className={classes.chip} />*/}
-					{/*				))}*/}
-					{/*			</div>*/}
-					{/*		)}*/}
-					{/*		MenuProps={MenuProps}*/}
-					{/*	>*/}
-					{/*		{[*/}
-					{/*			<MenuItem key={'none'} value={''}><em>{'None'}</em></MenuItem>,*/}
-					{/*			...(vectorLayers.map(({ name }) => (*/}
-					{/*				<MenuItem key={name} value={name} style={getStyles(name, vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(({ name }) => name), theme)}>*/}
-					{/*					{name}*/}
-					{/*				</MenuItem>*/}
-					{/*			)))*/}
-					{/*		]}*/}
-					{/*	</CustomSelect>*/}
-					{/*</FormControl>*/}
-					<Select
-						options={groupOptions(vectorLayers)}
-						value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}
-						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => selectedVectorLayerNamesSet.has(name)}
-						isMulti={true}
-						onChange={handleVectorLayerChange}
-						hideSelectedOptions={false}
-						// styles={vectorStyles}
-						isLoading={isLoadingVectors}
-						isDisabled={!vectorLayers.length}
-						formatGroupLabel={renderGroupLabel}
-					/>
-					<div className={styles.vectorFiltersWrapper}>
-						<div className={styles.sectionHeader}><span>{'Filter by vector values'}</span></div>
-						{!vectorLayers.filter(({ name, filterVariables = [] }) => selectedVectorLayerNamesSet.has(name) && filterVariables.length).length &&
-							<span className={styles.empty}>{'No filterable vectors selected'}</span>
-						}
-						{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}
-					</div>
+					{/*<div className={styles.sectionHeader}><span>{'Pre-existing maps & data'}</span></div>*/}
+					<FormControl component="fieldset">
+						<CustomFormLabel component="legend">{'Pre-existing maps & data'}</CustomFormLabel>
+						{groupOptions(vectorLayers).map((group) => {
+							const { label, options } = group;
+							return (
+								<React.Fragment key={label}>
+									<CustomFormHelperText>{label}</CustomFormHelperText>
+									<FormGroup>
+										{options.map((option) => {
+											const { name } = option;
+											return (
+												<CustomFormControlLabel
+													control={
+														<CustomSwitch
+															checked={selectedVectorLayerNamesSet.has(name)}
+															onChange={(e) => handleToggleVectorLayer(name, e.target.checked)}
+															name={name}
+														/>
+													}
+													label={name}
+												/>
+											)
+										})}
+									</FormGroup>
+								</React.Fragment>
+							);
+						})}
+					</FormControl>
+					{/*<Select*/}
+					{/*	options={groupOptions(vectorLayers)}*/}
+					{/*	value={vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name))}*/}
+					{/*	getOptionLabel={({ name }) => name}*/}
+					{/*	isOptionSelected={({ name }) => selectedVectorLayerNamesSet.has(name)}*/}
+					{/*	isMulti={true}*/}
+					{/*	onChange={handleVectorLayerChange}*/}
+					{/*	hideSelectedOptions={false}*/}
+					{/*	// styles={vectorStyles}*/}
+					{/*	isLoading={isLoadingVectors}*/}
+					{/*	isDisabled={!vectorLayers.length}*/}
+					{/*	formatGroupLabel={renderGroupLabel}*/}
+					{/*/>*/}
+					{/*<div className={styles.vectorFiltersWrapper}>*/}
+					{/*	<div className={styles.sectionHeader}><span>{'Filter by vector values'}</span></div>*/}
+					{/*	{!vectorLayers.filter(({ name, filterVariables = [] }) => selectedVectorLayerNamesSet.has(name) && filterVariables.length).length &&*/}
+					{/*		<span className={styles.empty}>{'No filterable vectors selected'}</span>*/}
+					{/*	}*/}
+					{/*	{vectorLayers.filter(({ name }) => selectedVectorLayerNamesSet.has(name)).map(renderFilters)}*/}
+					{/*</div>*/}
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Landscape observations'}</span></div>
-					<Select
-						options={groupOptions(observationVectorLayers)}
-						value={observationVectorLayers.filter(({ name }) => selectedObservationVectorLayerNamesSet.has(name))}
-						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => selectedObservationVectorLayerNamesSet.has(name)}
-						isMulti={true}
-						onChange={handleObservationVectorLayerChange}
-						hideSelectedOptions={false}
-						// styles={vectorStyles}
-						isLoading={isLoadingObservationVectors}
-						isDisabled={!observationVectorLayers.length}
-						formatGroupLabel={renderGroupLabel}
-					/>
+					{/*<div className={styles.sectionHeader}><span>{'Landscape observations'}</span></div>*/}
+					<FormControl component="fieldset">
+						<CustomFormLabel component="legend">{'Landscape observations'}</CustomFormLabel>
+						{groupOptions(observationVectorLayers).map((group) => {
+							const { label, options } = group;
+							return (
+								<React.Fragment key={label}>
+									<CustomFormHelperText>{label}</CustomFormHelperText>
+									<FormGroup>
+										{options.map((option) => {
+											const { name } = option;
+											return (
+												<CustomFormControlLabel
+													control={
+														<CustomSwitch
+															checked={selectedObservationVectorLayerNamesSet.has(name)}
+															onChange={(e) => handleToggleObservationVectorLayer(name, e.target.checked)}
+															name={name}
+														/>
+													}
+													label={name}
+												/>
+											)
+										})}
+									</FormGroup>
+								</React.Fragment>
+							);
+						})}
+					</FormControl>
+					{/*<Select*/}
+					{/*	options={groupOptions(observationVectorLayers)}*/}
+					{/*	value={observationVectorLayers.filter(({ name }) => selectedObservationVectorLayerNamesSet.has(name))}*/}
+					{/*	getOptionLabel={({ name }) => name}*/}
+					{/*	isOptionSelected={({ name }) => selectedObservationVectorLayerNamesSet.has(name)}*/}
+					{/*	isMulti={true}*/}
+					{/*	onChange={handleObservationVectorLayerChange}*/}
+					{/*	hideSelectedOptions={false}*/}
+					{/*	// styles={vectorStyles}*/}
+					{/*	isLoading={isLoadingObservationVectors}*/}
+					{/*	isDisabled={!observationVectorLayers.length}*/}
+					{/*	formatGroupLabel={renderGroupLabel}*/}
+					{/*/>*/}
 				</div>
 				<div className={styles.sectionWrapper}>
-					<div className={styles.sectionHeader}><span>{'Admin polygons'}</span></div>
-					<Select
-						options={groupOptions(adminVectorLayers)}
-						value={adminVectorLayers.filter(({ name }) => name === selectedAdminVectorLayerName)}
-						getOptionLabel={({ name }) => name}
-						isOptionSelected={({ name }) => name === selectedAdminVectorLayerName}
-						onChange={handleAdminVectorLayerChange}
-						hideSelectedOptions={false}
-						isLoading={isLoadingAdminVectors}
-						formatGroupLabel={renderGroupLabel}
-					/>
+					{/*<div className={styles.sectionHeader}><span>{'Admin polygons'}</span></div>*/}
+					<FormControl component="fieldset">
+						<CustomFormLabel component="legend">{'Admin polygons'}</CustomFormLabel>
+						<RadioGroup
+							aria-label="Admin polygons"
+							name="Admin polygons"
+							value={selectedAdminVectorLayerName}
+							onChange={(e) => handleSelectAdminVectorLayer(e.target.value)}
+						>
+							{groupOptions(adminVectorLayers).map((group) => {
+								const { label, options } = group;
+								return (
+									<React.Fragment key={label}>
+										<CustomFormHelperText>{label}</CustomFormHelperText>
+										{options.map((option) => {
+											const { name } = option;
+											return (
+												<CustomFormControlLabel value={name} control={<CustomRadio />} label={name} />
+											);
+										})}
+									</React.Fragment>
+								);
+							})}
+						</RadioGroup>
+					</FormControl>
+					{/*<Select*/}
+					{/*	options={groupOptions(adminVectorLayers)}*/}
+					{/*	value={adminVectorLayers.filter(({ name }) => name === selectedAdminVectorLayerName)}*/}
+					{/*	getOptionLabel={({ name }) => name}*/}
+					{/*	isOptionSelected={({ name }) => name === selectedAdminVectorLayerName}*/}
+					{/*	onChange={handleAdminVectorLayerChange}*/}
+					{/*	hideSelectedOptions={false}*/}
+					{/*	isLoading={isLoadingAdminVectors}*/}
+					{/*	formatGroupLabel={renderGroupLabel}*/}
+					{/*/>*/}
 				</div>
 			</div>
 		</div>
