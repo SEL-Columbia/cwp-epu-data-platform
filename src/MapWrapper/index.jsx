@@ -324,7 +324,7 @@ class MapWrapper extends Component {
 						{Object.keys(region.metadata)
 							.filter((key) => key !== 'regionName')
 							.map((key) => (
-								<p>
+								<p key={key}>
 									<b>{key}</b>
 									<br/>
 									<span>{region.metadata[key]}</span>
