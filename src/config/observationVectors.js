@@ -6,16 +6,16 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletType
  * leafletOptions
  * */
 
 import adminVectors from './adminVectors';
 import vectors from './vectors';
 
-const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
+const vectorPriorityByNameMap = {
+	// higher numbers will be rendered on top of lower numbers
 	'Uganda Geosurvey Results': 0,
-}
+};
 
 const observationVectors = [
 	new VectorSource({
@@ -32,12 +32,12 @@ const observationVectors = [
 		},
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
-		leafletType: 'circleMarker',
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'circle',
 		mapboxLayerOptions: {
 			layout: {
-				'circle-sort-key': adminVectors.length + vectors.length + vectorPriorityByNameMap['Uganda Geosurvey Results'],
+				'circle-sort-key':
+					adminVectors.length + vectors.length + vectorPriorityByNameMap['Uganda Geosurvey Results'],
 			},
 			paint: {
 				'circle-color': 'rgba(51,255,150,0.6)',

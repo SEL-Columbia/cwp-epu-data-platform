@@ -1,0 +1,9 @@
+.wrapper {
+	display: flex;
+	height: 100%;
+	padding: 30px;
+}
+
+.header {
+	font-weight: bold;
+}

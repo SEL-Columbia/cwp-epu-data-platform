@@ -6,16 +6,16 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletType
  * leafletOptions
  * */
 
 import adminVectors from './adminVectors';
 
-const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
+const vectorPriorityByNameMap = {
+	// higher numbers will be rendered on top of lower numbers
 	'Uganda Electricity Transmission Lines': 0,
 	'UMEME REA power distribution lines 2018': 1,
-}
+};
 
 const vectors = [
 	new VectorSource({
@@ -39,7 +39,6 @@ const vectors = [
 			{ name: 'FINANCIER' },
 			{ name: 'CONTRACTOR' },
 		],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
@@ -62,7 +61,7 @@ const vectors = [
 					'rgb(32,89,255)',
 					'66',
 					'rgb(51,255,150)',
-					'#ccc', /* other */
+					'#ccc' /* other */,
 				],
 				'line-width': 4,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
@@ -88,27 +87,19 @@ const vectors = [
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
-		leafletType: 'geoJSON',
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
 			layout: {
 				'line-join': 'round',
 				'line-cap': 'round',
-				'line-sort-key': adminVectors.length + vectorPriorityByNameMap['UMEME REA power distribution lines 2018'],
+				'line-sort-key':
+					adminVectors.length + vectorPriorityByNameMap['UMEME REA power distribution lines 2018'],
 			},
 			paint: {
 				// 'line-color': 'rgb(255,129,255)',
 				// conditional styling with 'match' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#match
-				'line-color': [
-					'match',
-					['get', 'Voltage'],
-					'33 kV',
-					'#e55e5e',
-					'11 kV',
-					'#fbb03b',
-					'#ccc', /* other */
-				],
+				'line-color': ['match', ['get', 'Voltage'], '33 kV', '#e55e5e', '11 kV', '#fbb03b', '#ccc' /* other */],
 				'line-width': 2,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
 				// 'line-dasharray':[

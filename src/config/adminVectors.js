@@ -7,7 +7,6 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletType
  * leafletOptions
  * */
 
@@ -23,7 +22,7 @@ const vectorPriorityByNameMap = {
 
 const adminVectorSpecs = [
 	{
-		name: 'Uganda Regions',
+		name: 'Regions',
 		label: 'Uganda',
 		hierarchyIndex: 0,
 		isDefault: true,
@@ -62,15 +61,19 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Uganda Districts',
+		name: 'Districts',
 		label: 'Uganda',
 		hierarchyIndex: 1,
 		isDefault: false,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_districts:9',
+		tableIdentifier: 'modilab.uganda_geodata:1:next.uganda_districts:9',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
-		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
+		metadataVariables: [
+			{ name: 'AREA_SQKM', label: 'Area (km^2)' },
+			{ name: 'POPPERSQKM', label: 'Population per km^2' },
+			{ name: 'CAPTION', label: 'Region' },
+		],
 		regionNameVariable: { name: 'DNAME2019' },
 		regionParentVariable: { name: 'CAPTION' },
 		regionBboxVariable: { name: 'BBOX' },
@@ -101,7 +104,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Uganda Subcounties',
+		name: 'Subcounties',
 		label: 'Uganda',
 		hierarchyIndex: 2,
 		isDefault: false,
@@ -139,7 +142,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Uganda Parishes (full res, 74MB)',
+		name: 'Parishes (full res, 74MB)',
 		label: 'Uganda',
 		hierarchyIndex: 3,
 		isDefault: false,
@@ -337,23 +340,8 @@ const adminVectorSpecs = [
 
 const simplificationTables = [
 	{
-		name: 'Parishes (10m, 32MB)',
-		tableIdentifier: 'imathews.uganda_boundaries:68.table_5:5',
-		level: 3,
-	},
-	{
-		name: 'Parishes (50m, 13MB)',
-		tableIdentifier: 'imathews.uganda_boundaries:68.uganda_parishes:3',
-		level: 3,
-	},
-	{
 		name: 'Parishes (100m, 9MB)',
 		tableIdentifier: 'imathews.uganda_boundaries:68.table_6:6',
-		level: 3,
-	},
-	{
-		name: 'Parishes (250m, 5MB)',
-		tableIdentifier: 'imathews.uganda_boundaries:68.table_7:7',
 		level: 3,
 	},
 	{

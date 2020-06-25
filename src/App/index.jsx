@@ -6,6 +6,7 @@ import { withRouter, NavLink, Route, Switch } from 'react-router-dom';
 import Explore from '../Explore';
 import MapWrapper from '../MapWrapper';
 import About from '../About';
+import Download from '../Download';
 
 class App extends Component {
 	constructor(props) {
@@ -22,7 +23,7 @@ class App extends Component {
 		return (
 			<div className={styles.headerWrapper}>
 				<div className={styles.header}>
-					<h2>{'QSEL Map'}</h2>
+					<h2>{'Columbia World Projects Energy for Productive Use Data Platform'}</h2>
 				</div>
 				<div className={styles.navigation}>
 					<NavLink
@@ -45,6 +46,14 @@ class App extends Component {
 						exact={true}
 						className={styles.link}
 						activeClassName={styles.active}
+						to={`${process.env.ROOT_PATH}/download`}
+					>
+						{'Download'}
+					</NavLink>
+					<NavLink
+						exact={true}
+						className={styles.link}
+						activeClassName={styles.active}
 						to={`${process.env.ROOT_PATH}/about`}
 					>
 						{'About'}
@@ -59,6 +68,7 @@ class App extends Component {
 			<div className={styles.bodyWrapper}>
 				<Switch>
 					<Route exact={true} path={`${process.env.ROOT_PATH}/map`} component={MapWrapper} />
+					<Route exact={true} path={`${process.env.ROOT_PATH}/download`} component={Download} />
 					<Route exact={true} path={`${process.env.ROOT_PATH}/about`} component={About} />
 					<Route component={Explore} />
 				</Switch>
