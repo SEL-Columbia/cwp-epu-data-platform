@@ -31,12 +31,16 @@ const imagesByRegionGroup = {
 		alt: 'Uganda outline',
 	},
 	Ethiopia: {
-		src: `/assets/uganda_outline.png`, // TODO: sub image
+		src: `/assets/ethiopia_outline.png`, // TODO: sub image
 		alt: 'Ethiopia outline',
+	},
+	Tanzania: {
+		src: `/assets/tanzania_outline.png`, // TODO: sub image
+		alt: 'Tanzania outline',
 	},
 };
 
-function getRegionLink(bbox){
+function getRegionLink(bbox) {
 	return `${process.env.ROOT_PATH}/map?bbox=${bbox}`;
 }
 
@@ -52,10 +56,7 @@ const CustomNestedList = withStyles({
 	},
 })((props) => {
 	const {
-		group: {
-			regionGroup,
-			regions,
-		},
+		group: { regionGroup, regions },
 		onToggleRegionIsCollapsed,
 		onSelectRegion,
 		regionIsCollapsed,
@@ -84,7 +85,11 @@ const CustomNestedList = withStyles({
 							{/*</ListItemIcon>*/}
 							<ListItemText primary={name} />
 							<ListItemSecondaryAction>
-								<IconButton edge="end" aria-label="comments" onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}>
+								<IconButton
+									edge="end"
+									aria-label="comments"
+									onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
+								>
 									{isCollapsed ? <ExpandLess /> : <ExpandMore />}
 								</IconButton>
 							</ListItemSecondaryAction>
@@ -95,15 +100,16 @@ const CustomNestedList = withStyles({
 									return (
 										<ListItem
 											key={`region_${name}_${region.name}`}
-											button className={classes.nested}
+											button
+											className={classes.nested}
 											onClick={() => onSelectRegion(region)}
 										>
 											{/*<ListItemIcon>*/}
 											{/*	<StarBorder />*/}
 											{/*</ListItemIcon>*/}
-												<ListItemText primary={region.name} />
+											<ListItemText primary={region.name} />
 										</ListItem>
-									)
+									);
 								})}
 							</List>
 						</Collapse>
@@ -223,11 +229,11 @@ const CustomCircularProgress = withStyles({
 	},
 })((props) => <CircularProgress size={30} {...props} />);
 
-function nestRegions(parentRegions){
+function nestRegions(parentRegions) {
 	const lowerLevelRegion = parentRegions[0];
 	const higherLevelRegion = parentRegions[1];
 
-	if (parentRegions.length < 2){
+	if (parentRegions.length < 2) {
 		return lowerLevelRegion;
 	}
 
@@ -242,39 +248,41 @@ function nestRegions(parentRegions){
 	const parentRegionIndexesByName = {};
 	higherLevelRegion.regions.forEach((region, index) => {
 		const name = region.name.toLowerCase();
-		if (!parentRegionIndexesByName[name]){
+		if (!parentRegionIndexesByName[name]) {
 			parentRegionIndexesByName[name] = index;
 		}
-	})
+	});
 
 	lowerLevelRegion.regions.forEach((region) => {
 		const parent = region.parent.toLowerCase();
-		if (!parent || parentRegionIndexesByName[parent] === undefined){
-			console.error(`Region (${region.name}) does not have a parent or parent (${parent}) was not found in higher level regions`);
+		if (!parent || parentRegionIndexesByName[parent] === undefined) {
+			console.error(
+				`Region (${region.name}) does not have a parent or parent (${parent}) was not found in higher level regions`,
+			);
 			return;
 		}
 		higherLevelRegion.regions[parentRegionIndexesByName[parent]].regions.push(region);
-	})
+	});
 
 	parentRegions.splice(0, 1);
 
 	return nestRegions(parentRegions);
 }
 
-function formatData(adminRegions){
+function formatData(adminRegions) {
 	const groups = [];
 	let indexByRegionGroup = {};
-	for (const adminRegion of adminRegions){
+	for (const adminRegion of adminRegions) {
 		const { regionGroup } = adminRegion;
-		if (indexByRegionGroup[regionGroup] === undefined){
+		if (indexByRegionGroup[regionGroup] === undefined) {
 			indexByRegionGroup[regionGroup] = groups.length;
 			groups.push([]);
 		}
-		groups[indexByRegionGroup[regionGroup]].push(adminRegion)
+		groups[indexByRegionGroup[regionGroup]].push(adminRegion);
 	}
 
 	return groups.map((group) => {
-		group.sort((a,b) => b.hierarchyIndex - a.hierarchyIndex);
+		group.sort((a, b) => b.hierarchyIndex - a.hierarchyIndex);
 		return nestRegions(group);
 	});
 }
@@ -346,9 +354,9 @@ class Explore extends Component {
 		const regionGroups = formatData(adminRegions);
 
 		const regionIsCollapsed = {};
-		for (const regionGroup of regionGroups){
+		for (const regionGroup of regionGroups) {
 			regionIsCollapsed[regionGroup.regionGroup] = {};
-			for (const region of regionGroup.regions){
+			for (const region of regionGroup.regions) {
 				regionIsCollapsed[regionGroup.regionGroup][region.name] = false;
 			}
 		}
@@ -379,24 +387,22 @@ class Explore extends Component {
 			[regionGroup]: {
 				...regionIsCollapsed[regionGroup],
 				[regionName]: !isCollapsed,
-			}
-		}
+			},
+		};
 		this.setState({ regionIsCollapsed: nextRegionIsCollapsed });
-	}
+	};
 
 	handleSelectRegion = (region) => {
 		const { history } = this.props;
 		const { regionGroup, regionLevel, name, bbox } = region;
-		const path = `${process.env.ROOT_PATH}/map?&bbox=${bbox}&region=${encodeURIComponent(name)}&adminLayer=${encodeURIComponent(regionLevel)}`
+		const path = `${process.env.ROOT_PATH}/map?&bbox=${bbox}&region=${encodeURIComponent(
+			name,
+		)}&adminLayer=${encodeURIComponent(regionLevel)}`;
 		history.push(path);
-	}
+	};
 
 	renderAdminRegions = () => {
-		const {
-			regionGroups,
-			regionIsCollapsed,
-			isLoading,
-		} = this.state;
+		const { regionGroups, regionIsCollapsed, isLoading } = this.state;
 		if (isLoading) {
 			return (
 				<div className={styles.loadingWrapper}>
@@ -447,11 +453,7 @@ class Explore extends Component {
 
 	render() {
 		// TODO: add ethiopia, tanzania
-		return (
-			<div className={styles.exploreWrapper}>
-				{this.renderAdminRegions()}
-			</div>
-		);
+		return <div className={styles.exploreWrapper}>{this.renderAdminRegions()}</div>;
 	}
 }
 
