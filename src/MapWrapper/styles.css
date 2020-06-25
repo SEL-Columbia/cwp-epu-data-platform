@@ -23,4 +23,17 @@
     width: calc(100% - 400px);
 }
 
+.regionTileWrapper{
+    position: absolute;
+    right: 0px;
+    z-index: 1;
+    padding: 20px;
+    background: white;
+    border-radius: 0 0 0 4px;
+}
+
+.regionHeader{
+    margin-bottom: 20px;
+}
+
 

@@ -2,6 +2,7 @@ import VectorSource from '../VectorSource';
 
 /*
  * name: display name, required. Must be unique.
+ * label: to assign a grouping to the layer
  * tableIdentifier: The fully qualified Redivis table identifier. Make sure to point to the current version
  * geoVariables:
  * filterVariables
@@ -177,7 +178,7 @@ const adminVectorSpecs = [
 	},
 	// TODO replace duplicate Uganda levels below for actual Ethiopia/Tanzania levels
 	{
-		name: 'Uganda Regions',
+		name: 'Ethiopia Regions',
 		label: 'Ethiopia',
 		hierarchyIndex: 0,
 		isDefault: true,
@@ -216,7 +217,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Uganda Districts',
+		name: 'Ethiopia Districts',
 		label: 'Ethiopia',
 		hierarchyIndex: 1,
 		isDefault: false,

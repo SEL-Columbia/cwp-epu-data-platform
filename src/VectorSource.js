@@ -54,12 +54,16 @@ export default class VectorSource {
 		if (this.data) {
 			return this.data;
 		}
+		const variablesSet = new Set([
+			...this.geoVariables.map(({ name }) => name.toLowerCase()),
+			...this.filterVariables.map(({ name }) => name.toLowerCase()),
+			...this.metadataVariables.map(({ name }) => name.toLowerCase()),
+		]);
+		if (this.regionNameVariable){
+			variablesSet.add(this.regionNameVariable.name.toLowerCase());
+		}
 		const variablesToFetch = [
-			...new Set([
-				...this.geoVariables.map(({ name }) => name.toLowerCase()),
-				...this.filterVariables.map(({ name }) => name.toLowerCase()),
-				...this.metadataVariables.map(({ name }) => name.toLowerCase()),
-			]),
+			...variablesSet,
 		];
 		const variableToFetchedIndexMap = new Map();
 
@@ -126,6 +130,9 @@ export default class VectorSource {
 					const metadata = {};
 					for (const variable of this.metadataVariables) {
 						metadata[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
+					}
+					if (this.regionNameVariable){
+						metadata.regionName = row[variableToFetchedIndexMap.get(this.regionNameVariable.name.toLowerCase())];
 					}
 					return { geometry, metadata, properties: metadata };
 				});

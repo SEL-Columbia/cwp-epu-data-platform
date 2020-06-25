@@ -31,7 +31,7 @@ const imagesByRegionGroup = {
 		alt: 'Uganda outline',
 	},
 	Ethiopia: {
-		src: `/assets/uganda_outline.png`, // sub image
+		src: `/assets/uganda_outline.png`, // TODO: sub image
 		alt: 'Ethiopia outline',
 	},
 };
@@ -233,6 +233,9 @@ function nestRegions(parentRegions){
 
 	higherLevelRegion.regions = higherLevelRegion.regions.map((region) => ({
 		...region,
+		regionLevel: higherLevelRegion.regionLevel,
+		hierarchyIndex: higherLevelRegion.hierarchyIndex,
+		regionGroup: higherLevelRegion.regionGroup,
 		regions: [],
 	}));
 
@@ -265,14 +268,14 @@ function formatData(adminRegions){
 		const { regionGroup } = adminRegion;
 		if (indexByRegionGroup[regionGroup] === undefined){
 			indexByRegionGroup[regionGroup] = groups.length;
-			groups.push({ name: regionGroup, regions: [] });
+			groups.push([]);
 		}
-		groups[indexByRegionGroup[regionGroup]].regions.push(adminRegion)
+		groups[indexByRegionGroup[regionGroup]].push(adminRegion)
 	}
 
 	return groups.map((group) => {
-		group.regions.sort((a,b) => b.hierarchyIndex - a.hierarchyIndex);
-		return nestRegions(group.regions);
+		group.sort((a,b) => b.hierarchyIndex - a.hierarchyIndex);
+		return nestRegions(group);
 	});
 }
 
@@ -342,8 +345,6 @@ class Explore extends Component {
 		);
 		const regionGroups = formatData(adminRegions);
 
-		console.log('regionGroups', regionGroups);
-
 		const regionIsCollapsed = {};
 		for (const regionGroup of regionGroups){
 			regionIsCollapsed[regionGroup.regionGroup] = {};
@@ -359,16 +360,16 @@ class Explore extends Component {
 		});
 	};
 
-	renderAdminRegion = (region) => {
-		const { name, parent, bbox } = region;
-		return (
-			<div key={`${parent}_${name}`}>
-				<Link to={`${process.env.ROOT_PATH}/map?bbox=${bbox}`}>
-					<span>{name}</span>
-				</Link>
-			</div>
-		);
-	};
+	// renderAdminRegion = (region) => {
+	// 	const { name, parent, bbox } = region;
+	// 	return (
+	// 		<div key={`${parent}_${name}`}>
+	// 			<Link to={`${process.env.ROOT_PATH}/map?&bbox=${bbox}`}>
+	// 				<span>{name}</span>
+	// 			</Link>
+	// 		</div>
+	// 	);
+	// };
 
 	handleToggleRegionIsCollapsed = (regionGroup, regionName) => {
 		const { regionIsCollapsed } = this.state;
@@ -385,8 +386,9 @@ class Explore extends Component {
 
 	handleSelectRegion = (region) => {
 		const { history } = this.props;
-		const { bbox } = region;
-		history.push(getRegionLink(bbox));
+		const { regionGroup, regionLevel, name, bbox } = region;
+		const path = `${process.env.ROOT_PATH}/map?&bbox=${bbox}&region=${encodeURIComponent(name)}&adminLayer=${encodeURIComponent(regionLevel)}`
+		history.push(path);
 	}
 
 	renderAdminRegions = () => {
@@ -430,17 +432,17 @@ class Explore extends Component {
 			</div>
 		));
 
-		return adminRegions.map((region) => {
-			const { regionLevel, regions = [] } = region;
-			return (
-				<div key={regionLevel} className={styles.regionWrapper}>
-					<div className={styles.regionName}>
-						<span className={styles.header}>{regionLevel}</span>
-					</div>
-					<div className={styles.itemsWrapper}>{regions.map(this.renderAdminRegion)}</div>
-				</div>
-			);
-		});
+		// return adminRegions.map((region) => {
+		// 	const { regionLevel, regions = [] } = region;
+		// 	return (
+		// 		<div key={regionLevel} className={styles.regionWrapper}>
+		// 			<div className={styles.regionName}>
+		// 				<span className={styles.header}>{regionLevel}</span>
+		// 			</div>
+		// 			<div className={styles.itemsWrapper}>{regions.map(this.renderAdminRegion)}</div>
+		// 		</div>
+		// 	);
+		// });
 	};
 
 	render() {
