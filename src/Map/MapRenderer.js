@@ -31,9 +31,13 @@ export default class MapRenderer {
 		});
 		const scale = new mapboxgl.ScaleControl({
 			maxWidth: 100,
-			unit: 'imperial',
+			unit: 'metric',
 		});
 		this.map.addControl(scale);
+		const nav = new mapboxgl.NavigationControl({
+			showCompass: false,
+		});
+		this.map.addControl(nav, 'top-left');
 
 		this.onZoomOrPan = props.onZoomOrPan;
 		this.map.on('zoomend', this.handleZoomEnd);
