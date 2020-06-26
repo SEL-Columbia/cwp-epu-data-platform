@@ -6,7 +6,6 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletOptions
  * */
 
 import adminVectors from './adminVectors';
@@ -32,6 +31,7 @@ const observationVectors = [
 		},
 		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
 		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
+		legend: { mapboxPaintProperty: 'circle-color' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'circle',
 		mapboxLayerOptions: {
@@ -42,11 +42,6 @@ const observationVectors = [
 			paint: {
 				'circle-color': 'rgba(51,255,150,0.6)',
 				'circle-radius': 6,
-			},
-		},
-		leafletOptions: {
-			styles: (feature) => {
-				return { color: 'rgba(51,255,150,0.6)', radius: 1 };
 			},
 		},
 	}),

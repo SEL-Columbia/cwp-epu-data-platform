@@ -7,7 +7,6 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletOptions
  * */
 
 const vectorPriorityByNameMap = {

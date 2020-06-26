@@ -114,13 +114,20 @@ const CustomFormLabel = withStyles({
 const CustomFormHelperText = withStyles({
 	root: {
 		color: grey[500],
-		paddingLeft: 20,
 		marginBottom: 0,
 		'&:not(:last-of-type)': {
 			marginBottom: 0,
 		},
 	},
 })(FormHelperText);
+
+const LegendList = withStyles({
+	root: {
+		paddingLeft: 20,
+		paddingBottom: 10,
+		marginRight: 16,
+	}
+})(List);
 
 const CustomSelect = withStyles({
 	root: {
@@ -150,6 +157,15 @@ const selectStyles = {
 import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
+import ListSubheader from "@material-ui/core/ListSubheader";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import IconButton from "@material-ui/core/IconButton";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import Collapse from "@material-ui/core/Collapse";
+import List from "@material-ui/core/List";
 
 function groupOptions(options){
 	const groupLabelsSet = new Set([]);
@@ -164,6 +180,14 @@ function groupOptions(options){
 		group.options.push(option);
 	}
 	return groups;
+}
+
+function sortValues(a, b) {
+	if (!isNaN(a) && !isNaN(b)){
+		return parseInt(b, 10) - parseInt(a, 10);
+	} else {
+		return b.localeCompare(a);
+	}
 }
 
 export default function Filters({
@@ -319,6 +343,31 @@ export default function Filters({
 		onUpdateAdminVectorLayer(nextSelectedAdminVectorLayerName);
 	}
 
+	function handleToggleFilter(checked, value, filterName, vectorName){
+		const nextVectorFiltersByNamesMap = { ...vectorFiltersByNamesMap };
+
+		const nextSelectedValuesSet = new Set([
+			...nextVectorFiltersByNamesMap[vectorName][filterName].selectedValuesSet,
+		]);
+
+		if (checked){
+			nextSelectedValuesSet.add(value);
+		} else {
+			nextSelectedValuesSet.delete(value);
+		}
+
+		onUpdateVectorFilters({
+			...vectorFiltersByNamesMap,
+			[vectorName]: {
+				...vectorFiltersByNamesMap[vectorName],
+				[filterName]: {
+					...vectorFiltersByNamesMap[vectorName][filterName],
+					selectedValuesSet: nextSelectedValuesSet,
+				},
+			},
+		});
+	}
+
 	function handleFilterChange(options, vectorName, filterName) {
 		const { action, removedValue, option } = options;
 
@@ -351,6 +400,108 @@ export default function Filters({
 				},
 			},
 		});
+	}
+
+	function renderLegend(checked, option){
+		const { name, mapboxLayerOptions, legendVariable, legend } = option;
+
+		if (legendVariable){
+			const filtersMap = vectorFiltersByNamesMap[name];
+
+			const legendFilter = {
+				vectorName: name,
+				filterName: legendVariable.name,
+				valuesSet: ((filtersMap || {})[legendVariable.name] || {}).valuesSet,
+				selectedValuesSet: ((filtersMap || {})[legendVariable.name] || {}).selectedValuesSet,
+			}
+
+			const {
+				vectorName,
+				filterName,
+				valuesSet = new Set([]),
+				selectedValuesSet = new Set([]),
+			} = legendFilter;
+			const values = [...valuesSet];
+
+			const colorsByValue = {};
+			const mapboxColorConfig = mapboxLayerOptions.paint[legendVariable.mapboxPaintProperty].slice(2);
+			for (let i = 0; i < mapboxColorConfig.length; i += 2){
+				if (i === mapboxColorConfig.length - 1){
+					colorsByValue.default = mapboxColorConfig[i];
+				} else {
+					colorsByValue[mapboxColorConfig[i]] = mapboxColorConfig[i+1];
+				}
+			}
+
+			return (
+				<Collapse in={checked} timeout="auto" unmountOnExit>
+					<LegendList component="div" disablePadding dense={true}>
+						<CustomFormHelperText>{`${legendVariable.name} (${legendVariable.mapboxPaintProperty})`}</CustomFormHelperText>
+						{values.sort(sortValues).map((value) => {
+							const checked = selectedValuesSet.has(value);
+							const LegendListItem = withStyles({
+								root: {
+									backgroundColor: checked ? colorsByValue[value] : grey[200],
+								},
+							})(ListItem);
+
+							const LegendSwitch = withStyles({
+								switchBase: {
+									color: grey[200],
+									'&$checked': {
+										color: colorsByValue[value],
+									},
+									'&$checked + $track': {
+										backgroundColor: grey[300],
+									},
+								},
+								checked: {},
+								track: {
+									backgroundColor: grey[300],
+								},
+							})(Switch);
+
+							return (
+								<LegendListItem
+									key={value}
+									className={classes.nested}
+								>
+									<ListItemText primary={value} />
+									<ListItemSecondaryAction>
+										<LegendSwitch
+											edge="end"
+											onChange={(e) => handleToggleFilter(e.target.checked, value, filterName, vectorName)}
+											checked={checked}
+										/>
+									</ListItemSecondaryAction>
+								</LegendListItem>
+							);
+						})}
+					</LegendList>
+				</Collapse>
+			);
+		} else if (legend){
+			const LegendListItem = withStyles({
+				root: {
+					backgroundColor: checked ? mapboxLayerOptions.paint[legend.mapboxPaintProperty] : grey[200],
+				},
+			})(ListItem);
+
+			return (
+				<Collapse in={checked} timeout="auto" unmountOnExit>
+					<LegendList component="div" disablePadding dense={true}>
+						<LegendListItem
+							key={'legend'}
+							className={classes.nested}
+						>
+							<ListItemText primary={legend.mapboxPaintProperty} />
+						</LegendListItem>
+					</LegendList>
+				</Collapse>
+			)
+		} else {
+			return null;
+		}
 	}
 
 	function renderFilter({ vectorName, filterName, valuesSet = new Set([]), selectedValuesSet = new Set([]) }) {
@@ -507,16 +658,16 @@ export default function Filters({
 										{options.map((option) => {
 											const { name } = option;
 											return (
-												<CustomFormControlLabel
-													control={
-														<CustomSwitch
-															checked={selectedRasterLayerNamesSet.has(name)}
-															onChange={(e) => handleToggleRasterLayer(name, e.target.checked)}
-															name={name}
-														/>
-													}
-													label={name}
-												/>
+													<CustomFormControlLabel
+														control={
+															<CustomSwitch
+																checked={selectedRasterLayerNamesSet.has(name)}
+																onChange={(e) => handleToggleRasterLayer(name, e.target.checked)}
+																name={name}
+															/>
+														}
+														label={name}
+													/>
 											)
 										})}
 									</FormGroup>
@@ -551,17 +702,21 @@ export default function Filters({
 									<FormGroup>
 										{options.map((option) => {
 											const { name } = option;
+											const checked = selectedVectorLayerNamesSet.has(name);
 											return (
-												<CustomFormControlLabel
-													control={
-														<CustomSwitch
-															checked={selectedVectorLayerNamesSet.has(name)}
-															onChange={(e) => handleToggleVectorLayer(name, e.target.checked)}
-															name={name}
-														/>
-													}
-													label={name}
-												/>
+												<React.Fragment>
+													<CustomFormControlLabel
+														control={
+															<CustomSwitch
+																checked={checked}
+																onChange={(e) => handleToggleVectorLayer(name, e.target.checked)}
+																name={name}
+															/>
+														}
+														label={name}
+													/>
+													{renderLegend(checked, option)}
+												</React.Fragment>
 											)
 										})}
 									</FormGroup>
@@ -602,17 +757,21 @@ export default function Filters({
 									<FormGroup>
 										{options.map((option) => {
 											const { name } = option;
+											const checked = selectedObservationVectorLayerNamesSet.has(name);
 											return (
-												<CustomFormControlLabel
-													control={
-														<CustomSwitch
-															checked={selectedObservationVectorLayerNamesSet.has(name)}
-															onChange={(e) => handleToggleObservationVectorLayer(name, e.target.checked)}
-															name={name}
-														/>
-													}
-													label={name}
-												/>
+												<React.Fragment>
+													<CustomFormControlLabel
+														control={
+															<CustomSwitch
+																checked={checked}
+																onChange={(e) => handleToggleObservationVectorLayer(name, e.target.checked)}
+																name={name}
+															/>
+														}
+														label={name}
+													/>
+													{renderLegend(checked, option)}
+												</React.Fragment>
 											)
 										})}
 									</FormGroup>
