@@ -4,24 +4,24 @@
 const baseMaps = [
 	{
 		name: 'Topo',
-		mapboxStyle: 'mapbox://styles/imathews/ckbk71nle03i41il6uorr1jpz',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbva72vc19hi1ipk8im36in5',
 		isDefault: true, // must have one default: true map
 	},
 	{
 		name: 'Satellite',
-		mapboxStyle: 'mapbox://styles/imathews/ckbjw25s806j01ipj5fjyi9f4',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbva7yuu19hj1iob2pocca04',
 	},
 	{
 		name: 'Streets',
-		mapboxStyle: 'mapbox://styles/imathews/ckbpms3l74h4e1ipbxbhqivs4',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbvor8tn0coz1htdjabo8h49',
 	},
 	{
 		name: 'Dark',
-		mapboxStyle: 'mapbox://styles/imathews/ckbl1ek0e00g51ipskyv1xtpb',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbvas4jd0zlm1jo7v7k9p76t',
 	},
 	{
-		name: 'Simple',
-		mapboxStyle: 'mapbox://styles/imathews/ckbjwv03707b21ipjjukqohfw',
+		name: 'Light',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbvofjle0cbj1ipjnzb8nhxr',
 	},
 ];
 

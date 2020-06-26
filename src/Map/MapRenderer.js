@@ -2,7 +2,8 @@ import mapboxgl from 'mapbox-gl';
 import './styles.css';
 import baseMaps from '../config/baseMaps';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA';
+mapboxgl.accessToken =
+	'pk.eyJ1IjoiY29sdW1iaWEtZGF0YXBsYXRmb3JtIiwiYSI6ImNrYXpxbml5bDAwMzEycm11NGpqd2l3b2cifQ.-ql-7fIcoPv0c-m6ezRwjw';
 
 const DEFAULT_CENTER = [33, 1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
@@ -47,7 +48,7 @@ export default class MapRenderer {
 			this.waitForStyleLoad(() => {
 				this.update(props, { initialRender: true });
 			});
-		})
+		});
 	}
 
 	handleMoveEnd = () => {
@@ -72,19 +73,19 @@ export default class MapRenderer {
 			}
 		};
 		waiting();
-	}
+	};
 
 	removeLayerFromMap = (layer) => {
 		const name = layer.id;
 		const mapboxLayerTypes = layer.type instanceof Array ? layer.type : [layer.type];
-		for (const type of mapboxLayerTypes){
+		for (const type of mapboxLayerTypes) {
 			const id = `${name}_${type}`;
 			if (this.map.getLayer(id)) {
 				// remove layer from map;
 				this.map.removeLayer(id);
 			}
 		}
-		if (this.map.getSource(name)){
+		if (this.map.getSource(name)) {
 			// remove source from map;
 			this.map.removeSource(name);
 		}
@@ -120,7 +121,7 @@ export default class MapRenderer {
 			...mapboxLayerOptions,
 		};
 		const mapboxLayerTypes = mapboxLayerType instanceof Array ? mapboxLayerType : [mapboxLayerType];
-		for (const type of mapboxLayerTypes){
+		for (const type of mapboxLayerTypes) {
 			const id = `${name}_${type}`;
 			const mapLayer = {
 				id,
@@ -142,7 +143,7 @@ export default class MapRenderer {
 				// const metadata = e.features[0].properties;
 				const metadata = features[0].properties;
 
-				if (onFeatureClick){
+				if (onFeatureClick) {
 					onFeatureClick(metadata);
 					return;
 				}
@@ -174,22 +175,12 @@ export default class MapRenderer {
 	};
 
 	addRasterLayerToMap = (rasterLayer) => {
-		const {
-			name,
-			mapboxId,
-			minNativeZoom,
-			maxNativeZoom,
-			bounds,
-			minZoom,
-			maxZoom,
-		} = rasterLayer;
+		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom } = rasterLayer;
 		const source = {
 			type: 'raster',
-			tiles: [
-				`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
-			],
+			tiles: [`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`],
 			tileSize: 512,
-			minzoom: mapboxId === 'droquo.5oq6wrb6' ? 4 : minNativeZoom,
+			minzoom: minNativeZoom,
 			maxzoom: maxNativeZoom,
 			bounds,
 		};
@@ -202,7 +193,7 @@ export default class MapRenderer {
 			maxzoom: maxZoom,
 			paint: {
 				'raster-opacity': 0.8,
-			}
+			},
 		};
 		this.map.addLayer(layer);
 
@@ -225,7 +216,7 @@ export default class MapRenderer {
 		if (initialRender) {
 			this.map.jumpTo({ center, zoom });
 		}
-		if (boundingBox){
+		if (boundingBox) {
 			this.map.fitBounds(boundingBox);
 		}
 
@@ -240,28 +231,28 @@ export default class MapRenderer {
 			this.map.once('style.load', () => {
 				this.waitForStyleLoad(() => {
 					for (const [layerName, layer] of this.adminVectorLayers) {
-						if (this.map.getLayer(layerName)){
+						if (this.map.getLayer(layerName)) {
 							this.map.removeLayer(layerName);
 						}
-						if (this.map.getSource(layerName)){
+						if (this.map.getSource(layerName)) {
 							this.map.removeSource(layerName);
 						}
 						this.adminVectorLayers.delete(layerName);
 					}
 					for (const [layerName, layer] of this.rasterLayers) {
-						if (this.map.getLayer(layerName)){
+						if (this.map.getLayer(layerName)) {
 							this.map.removeLayer(layerName);
 						}
-						if (this.map.getSource(layerName)){
+						if (this.map.getSource(layerName)) {
 							this.map.removeSource(layerName);
 						}
 						this.rasterLayers.delete(layerName);
 					}
 					for (const [layerName, layer] of this.vectorLayers) {
-						if (this.map.getLayer(layerName)){
+						if (this.map.getLayer(layerName)) {
 							this.map.removeLayer(layerName);
 						}
-						if (this.map.getSource(layerName)){
+						if (this.map.getSource(layerName)) {
 							this.map.removeSource(layerName);
 						}
 						this.vectorLayers.delete(layerName);
@@ -276,7 +267,7 @@ export default class MapRenderer {
 							center,
 							zoom,
 						},
-						{ initialRender: true }
+						{ initialRender: true },
 					);
 				});
 			});
@@ -294,10 +285,10 @@ export default class MapRenderer {
 			for (const vectorLayer of adminVectorLayers) {
 				let layer = this.adminVectorLayers.get(vectorLayer.name);
 				if (!layer) {
-					layer = this.addVectorLayerToMap(vectorLayer)
+					layer = this.addVectorLayerToMap(vectorLayer);
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)){
+					if (this.map.getSource(vectorLayer.name)) {
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
@@ -312,7 +303,7 @@ export default class MapRenderer {
 					if (this.map.getLayer(layerName)) {
 						this.map.removeLayer(layerName);
 					}
-					if (this.map.getSource(layerName)){
+					if (this.map.getSource(layerName)) {
 						this.map.removeSource(layerName);
 					}
 					this.rasterLayers.delete(layerName);
@@ -325,9 +316,9 @@ export default class MapRenderer {
 					this.map.moveLayer(
 						rasterLayer.name,
 						`${adminVectorLayers[0].name}_${
-							adminVectorLayers[0].mapboxLayerType instanceof Array ?
-								adminVectorLayers[0].mapboxLayerType[0] :
-								adminVectorLayers[0].mapboxLayerType
+							adminVectorLayers[0].mapboxLayerType instanceof Array
+								? adminVectorLayers[0].mapboxLayerType[0]
+								: adminVectorLayers[0].mapboxLayerType
 						}`,
 					); // place raster underneath first admin layer
 					this.rasterLayers.set(rasterLayer.name, layer);
@@ -347,13 +338,12 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer);
 					this.vectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)){
+					if (this.map.getSource(vectorLayer.name)) {
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
 						});
 					}
-
 				}
 			}
 
@@ -370,7 +360,7 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer);
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)){
+					if (this.map.getSource(vectorLayer.name)) {
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
