@@ -29,14 +29,17 @@ const imagesByRegionGroup = {
 	Uganda: {
 		src: `/assets/uganda_outline.png`,
 		alt: 'Uganda outline',
+		href: `${process.env.ROOT_PATH}/map?zoom=7&lng=32.37&lat=1.313`,
 	},
 	Ethiopia: {
-		src: `/assets/ethiopia_outline.png`, // TODO: sub image
+		src: `/assets/ethiopia_outline.png`,
 		alt: 'Ethiopia outline',
+		href: `${process.env.ROOT_PATH}/map?zoom=5.82&lng=40.25&lat=8.83`,
 	},
 	Tanzania: {
-		src: `/assets/tanzania_outline.png`, // TODO: sub image
+		src: `/assets/tanzania_outline.png`,
 		alt: 'Tanzania outline',
+		href: `${process.env.ROOT_PATH}/map?zoom=6.20&lng=34.55&lat=-6.40`,
 	},
 };
 
@@ -74,48 +77,52 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{regions.map((region) => {
-				const { name, regions } = region;
-				const isCollapsed = regionIsCollapsed[regionGroup][name];
-				return (
-					<React.Fragment key={`${regionGroup}_${name}`}>
-						<ListItem button onClick={() => onSelectRegion(region)}>
-							{/*<ListItemIcon>*/}
-							{/*	<InboxIcon />*/}
-							{/*</ListItemIcon>*/}
-							<ListItemText primary={name} />
-							<ListItemSecondaryAction>
-								<IconButton
-									edge="end"
-									aria-label="comments"
-									onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
-								>
-									{isCollapsed ? <ExpandLess /> : <ExpandMore />}
-								</IconButton>
-							</ListItemSecondaryAction>
-						</ListItem>
-						<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
-							<List component="div" disablePadding>
-								{regions.map((region) => {
-									return (
-										<ListItem
-											key={`region_${name}_${region.name}`}
-											button
-											className={classes.nested}
-											onClick={() => onSelectRegion(region)}
-										>
-											{/*<ListItemIcon>*/}
-											{/*	<StarBorder />*/}
-											{/*</ListItemIcon>*/}
-											<ListItemText primary={region.name} />
-										</ListItem>
-									);
-								})}
-							</List>
-						</Collapse>
-					</React.Fragment>
-				);
-			})}
+			{regions
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.map((region) => {
+					const { name, regions } = region;
+					const isCollapsed = regionIsCollapsed[regionGroup][name];
+					return (
+						<React.Fragment key={`${regionGroup}_${name}`}>
+							<ListItem button onClick={() => onSelectRegion(region)}>
+								{/*<ListItemIcon>*/}
+								{/*	<InboxIcon />*/}
+								{/*</ListItemIcon>*/}
+								<ListItemText primary={name} />
+								<ListItemSecondaryAction>
+									<IconButton
+										edge="end"
+										aria-label="comments"
+										onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
+									>
+										{isCollapsed ? <ExpandLess /> : <ExpandMore />}
+									</IconButton>
+								</ListItemSecondaryAction>
+							</ListItem>
+							<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
+								<List component="div" disablePadding>
+									{regions
+										.sort((a, b) => a.name.localeCompare(b.name))
+										.map((region) => {
+											return (
+												<ListItem
+													key={`region_${name}_${region.name}`}
+													button
+													className={classes.nested}
+													onClick={() => onSelectRegion(region)}
+												>
+													{/*<ListItemIcon>*/}
+													{/*	<StarBorder />*/}
+													{/*</ListItemIcon>*/}
+													<ListItemText primary={region.name} />
+												</ListItem>
+											);
+										})}
+								</List>
+							</Collapse>
+						</React.Fragment>
+					);
+				})}
 		</List>
 	);
 });
@@ -312,52 +319,26 @@ class Explore extends Component {
 			adminVectors
 				.filter(({ showOnHome }) => showOnHome)
 				.map(async (vector) => {
-					const {
-						name,
-						label,
+					const { name, label, hierarchyIndex } = vector;
+
+					const data = await vector.fetchMetadata();
+
+					return {
+						regionLevel: name,
+						regionGroup: label,
 						hierarchyIndex,
-						tableIdentifier,
-						regionNameVariable,
-						regionParentVariable,
-						regionBboxVariable,
-					} = vector;
-					const variablesToFetch = [regionNameVariable, regionParentVariable, regionBboxVariable]
-						.filter((variable) => !!variable)
-						.map(({ name }) => name.toLowerCase());
-
-					const response = await fetch(
-						`https://redivis.com/api/v1/tables/${tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
-							',',
-						)}&maxResults=${MAX_RESULTS}`,
-						{
-							method: 'GET',
-							headers: {
-								Authorization: `Bearer ${ACCESS_TOKEN}`,
-							},
-						},
-					);
-					if (!response.ok) {
-						const text = await response.text();
-						alert(text);
-						return [];
-					}
-
-					const text = await response.text();
-					const data = text
-						.split('\n')
-						.map((row, i) => {
-							return JSON.parse(row);
-						})
-						.filter((row) => row[0])
-						.map((row) => {
-							return { name: row[0], parent: row[1], bbox: row[2] };
-						});
-
-					return { regionLevel: name, regionGroup: label, hierarchyIndex, regions: data };
+						regions: data.map(({ properties }) => {
+							return {
+								name: properties.regionName,
+								parent: properties.parentRegionName,
+								bbox: properties.bbox,
+							};
+						}),
+					};
 				}),
 		);
 		const regionGroups = formatData(adminRegions);
-		
+
 		const regionIsCollapsed = {};
 		for (const regionGroup of regionGroups) {
 			regionIsCollapsed[regionGroup.regionGroup] = {};
@@ -424,6 +405,10 @@ class Explore extends Component {
 						height={REGION_GROUP_IMAGE_SIZE}
 						src={`${process.env.ROOT_PATH}${(imagesByRegionGroup[regionGroup] || {}).src}`}
 						alt={(imagesByRegionGroup[regionGroup] || {}).alt}
+						onClick={() => {
+							const { history } = this.props;
+							history.push(imagesByRegionGroup[regionGroup].href);
+						}}
 					/>
 				</div>
 				<div className={styles.listWrapper}>
