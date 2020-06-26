@@ -1,7 +1,8 @@
 .aboutWrapper{
     display: flex;
     height: 100%;
-    padding: 30px;
+    padding: 30px 13px;
+    margin-left: 400px;
 }
 
 .header{
