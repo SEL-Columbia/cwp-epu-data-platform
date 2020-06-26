@@ -342,7 +342,8 @@ class MapWrapper extends Component {
 										<br />
 										<span>{region.metadata[key]}</span>
 									</p>
-								))}
+								))
+							}
 						</div>
 					</div>
 				);
