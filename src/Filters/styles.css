@@ -1,6 +1,6 @@
 .sideBarWrapper{
     overflow: auto;
-    padding: 30px;
+    padding: 20px 30px 30px 30px;
     border-radius: 0 3px 3px 0;
     min-height: 100%;
 }
@@ -14,7 +14,7 @@
 }
 
 .sectionWrapper{
-    margin-bottom: 20px;
+    /*margin-bottom: 20px;*/
 }
 .sectionWrapper:last-child{
     margin-bottom: 0;

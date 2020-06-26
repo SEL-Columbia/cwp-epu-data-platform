@@ -2,8 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import './styles.css';
 import baseMaps from '../config/baseMaps';
 
-mapboxgl.accessToken =
-	'pk.eyJ1IjoiY29sdW1iaWEtZGF0YXBsYXRmb3JtIiwiYSI6ImNrYXpxbml5bDAwMzEycm11NGpqd2l3b2cifQ.-ql-7fIcoPv0c-m6ezRwjw';
+mapboxgl.accessToken = 'pk.eyJ1IjoiaW1hdGhld3MiLCJhIjoiY2thdnl2cGVsMGtldTJ6cGl3c2tvM2NweSJ9.TXtG4gARAf4bUbnPVxk6uA';
 
 const DEFAULT_CENTER = [33, 1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
@@ -64,28 +63,29 @@ export default class MapRenderer {
 	};
 
 	waitForStyleLoad = (callback = () => {}, timeout = 200) => {
+		clearTimeout(this.styleTimeout);
 		const waiting = () => {
 			// TODO: isStyleLoaded() is unreliable - monitor https://github.com/mapbox/mapbox-gl-js/issues/8691
 			if (!this.map.isStyleLoaded()) {
-				setTimeout(waiting, timeout);
+				this.styleTimeout = setTimeout(waiting, timeout);
 			} else {
 				callback();
 			}
 		};
 		waiting();
-	};
+	}
 
 	removeLayerFromMap = (layer) => {
 		const name = layer.id;
 		const mapboxLayerTypes = layer.type instanceof Array ? layer.type : [layer.type];
-		for (const type of mapboxLayerTypes) {
+		for (const type of mapboxLayerTypes){
 			const id = `${name}_${type}`;
 			if (this.map.getLayer(id)) {
 				// remove layer from map;
 				this.map.removeLayer(id);
 			}
 		}
-		if (this.map.getSource(name)) {
+		if (this.map.getSource(name)){
 			// remove source from map;
 			this.map.removeSource(name);
 		}
@@ -112,7 +112,9 @@ export default class MapRenderer {
 			},
 		};
 		// add source to map
-		this.map.addSource(name, source);
+		if (!this.map.getSource(name)){
+			this.map.addSource(name, source);
+		}
 		// define layer
 		const layer = {
 			id: name,
@@ -121,7 +123,7 @@ export default class MapRenderer {
 			...mapboxLayerOptions,
 		};
 		const mapboxLayerTypes = mapboxLayerType instanceof Array ? mapboxLayerType : [mapboxLayerType];
-		for (const type of mapboxLayerTypes) {
+		for (const type of mapboxLayerTypes){
 			const id = `${name}_${type}`;
 			const mapLayer = {
 				id,
@@ -136,66 +138,97 @@ export default class MapRenderer {
 				mapLayer.maxzoom = maxZoom;
 			}
 			// add layer to map
-			this.map.addLayer(mapLayer);
-			// set tooltip listener
-			this.map.on('click', id, (e) => {
-				let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
-				// const metadata = e.features[0].properties;
-				const metadata = features[0].properties;
+			if (!this.map.getLayer(id)){
+				this.map.addLayer(mapLayer);
+				// set tooltip listener
+				this.map.on('click', id, (e) => {
+					let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
+					// const metadata = e.features[0].properties;
+					const metadata = features[0].properties;
 
-				if (onFeatureClick) {
-					onFeatureClick(metadata);
-					return;
-				}
-
-				if (Object.keys(metadata).length) {
-					const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-					// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
-
-					// Ensure that if the map is zoomed out such that multiple
-					// copies of the feature are visible, the popup appears
-					// over the copy being pointed to.
-					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					if (onFeatureClick){
+						onFeatureClick(metadata);
+						return;
 					}
 
-					new mapboxgl.Popup()
-						.setLngLat(coordinates)
-						.setHTML(
-							Object.keys(metadata)
-								.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-								.join(''),
-						)
-						.addTo(this.map);
-				}
-			});
+					if (Object.keys(metadata).length) {
+						const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+						// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
+
+						// Ensure that if the map is zoomed out such that multiple
+						// copies of the feature are visible, the popup appears
+						// over the copy being pointed to.
+						while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+							coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+						}
+
+						new mapboxgl.Popup()
+							.setLngLat(coordinates)
+							.setHTML(
+								Object.keys(metadata)
+									.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+									.join(''),
+							)
+							.addTo(this.map);
+					}
+				});
+			}
 		}
 
 		return layer;
 	};
 
 	addRasterLayerToMap = (rasterLayer) => {
-		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom } = rasterLayer;
+		const {
+			name,
+			mapboxId,
+			minNativeZoom,
+			maxNativeZoom,
+			bounds,
+			minZoom,
+			maxZoom,
+		} = rasterLayer;
+
+		// define source
 		const source = {
 			type: 'raster',
-			tiles: [`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`],
+			tiles: [
+				`https://api.mapbox.com/v4/${mapboxId}/{z}/{x}/{y}.png?access_token=${mapboxgl.accessToken}`,
+			],
 			tileSize: 512,
 			minzoom: minNativeZoom,
 			maxzoom: maxNativeZoom,
 			bounds,
 		};
-		this.map.addSource(name, source);
+
+		// add source to map
+		if (!this.map.getSource(name)){
+			this.map.addSource(name, source);
+		}
+
+		// define layer
 		const layer = {
 			id: name,
+			type: 'raster',
+			source: name,
+		};
+
+		const id = `${name}_raster`;
+		const mapLayer = {
+			id,
 			type: 'raster',
 			source: name,
 			minzoom: minZoom,
 			maxzoom: maxZoom,
 			paint: {
 				'raster-opacity': 0.8,
-			},
+			}
 		};
-		this.map.addLayer(layer);
+
+		// add layer to map
+		if (!this.map.getLayer(id)){
+			this.map.addLayer(mapLayer);
+		}
 
 		return layer;
 	};
@@ -216,7 +249,7 @@ export default class MapRenderer {
 		if (initialRender) {
 			this.map.jumpTo({ center, zoom });
 		}
-		if (boundingBox) {
+		if (boundingBox){
 			this.map.fitBounds(boundingBox);
 		}
 
@@ -231,30 +264,19 @@ export default class MapRenderer {
 			this.map.once('style.load', () => {
 				this.waitForStyleLoad(() => {
 					for (const [layerName, layer] of this.adminVectorLayers) {
-						if (this.map.getLayer(layerName)) {
-							this.map.removeLayer(layerName);
-						}
-						if (this.map.getSource(layerName)) {
-							this.map.removeSource(layerName);
-						}
+						this.removeLayerFromMap(layer);
 						this.adminVectorLayers.delete(layerName);
 					}
 					for (const [layerName, layer] of this.rasterLayers) {
-						if (this.map.getLayer(layerName)) {
-							this.map.removeLayer(layerName);
-						}
-						if (this.map.getSource(layerName)) {
-							this.map.removeSource(layerName);
-						}
+						this.removeLayerFromMap(layer);
 						this.rasterLayers.delete(layerName);
 					}
 					for (const [layerName, layer] of this.vectorLayers) {
-						if (this.map.getLayer(layerName)) {
-							this.map.removeLayer(layerName);
-						}
-						if (this.map.getSource(layerName)) {
-							this.map.removeSource(layerName);
-						}
+						this.removeLayerFromMap(layer);
+						this.vectorLayers.delete(layerName);
+					}
+					for (const [layerName, layer] of this.observationVectorLayers) {
+						this.removeLayerFromMap(layer);
 						this.vectorLayers.delete(layerName);
 					}
 					this.update(
@@ -267,14 +289,14 @@ export default class MapRenderer {
 							center,
 							zoom,
 						},
-						{ initialRender: true },
+						{ initialRender: true }
 					);
 				});
 			});
 			return;
 		}
 
-		if (this.map.isStyleLoaded()) {
+		this.waitForStyleLoad(() => {
 			const adminVectorLayerNamesSet = new Set(adminVectorLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.adminVectorLayers) {
 				if (!adminVectorLayerNamesSet.has(layerName)) {
@@ -288,7 +310,7 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer);
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)) {
+					if (this.map.getSource(vectorLayer.name)){
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
@@ -300,12 +322,7 @@ export default class MapRenderer {
 			const rasterLayerNamesSet = new Set(rasterLayers.map(({ name }) => name));
 			for (const [layerName, layer] of this.rasterLayers) {
 				if (!rasterLayerNamesSet.has(layerName)) {
-					if (this.map.getLayer(layerName)) {
-						this.map.removeLayer(layerName);
-					}
-					if (this.map.getSource(layerName)) {
-						this.map.removeSource(layerName);
-					}
+					this.removeLayerFromMap(layer);
 					this.rasterLayers.delete(layerName);
 				}
 			}
@@ -314,11 +331,11 @@ export default class MapRenderer {
 				if (!layer) {
 					layer = this.addRasterLayerToMap(rasterLayer);
 					this.map.moveLayer(
-						rasterLayer.name,
+						`${rasterLayer.name}_${layer.type}`,
 						`${adminVectorLayers[0].name}_${
-							adminVectorLayers[0].mapboxLayerType instanceof Array
-								? adminVectorLayers[0].mapboxLayerType[0]
-								: adminVectorLayers[0].mapboxLayerType
+							adminVectorLayers[0].mapboxLayerType instanceof Array ?
+								adminVectorLayers[0].mapboxLayerType[0] :
+								adminVectorLayers[0].mapboxLayerType
 						}`,
 					); // place raster underneath first admin layer
 					this.rasterLayers.set(rasterLayer.name, layer);
@@ -338,12 +355,13 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer);
 					this.vectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)) {
+					if (this.map.getSource(vectorLayer.name)){
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
 						});
 					}
+
 				}
 			}
 
@@ -360,7 +378,7 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer);
 					this.adminVectorLayers.set(vectorLayer.name, layer);
 				} else {
-					if (this.map.getSource(vectorLayer.name)) {
+					if (this.map.getSource(vectorLayer.name)){
 						this.map.getSource(vectorLayer.name).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
@@ -368,6 +386,6 @@ export default class MapRenderer {
 					}
 				}
 			}
-		}
+		});
 	}
 }
