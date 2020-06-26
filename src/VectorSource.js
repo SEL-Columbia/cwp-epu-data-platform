@@ -48,7 +48,73 @@ export default class VectorSource {
 		this.isDefault = isDefault;
 		this.showOnHome = showOnHome;
 		this.getGeometry = getGeometry;
+
+		this.metadata = null;
+		this.data = null;
 	}
+
+	fetchMetadata = async () => {
+		if (this.metadata) {
+			return this.metadata;
+		}
+		const variablesSet = new Set([
+			...this.filterVariables.map(({ name }) => name.toLowerCase()),
+			...this.metadataVariables.map(({ name }) => name.toLowerCase()),
+		]);
+
+		if (this.regionNameVariable) {
+			variablesSet.add(this.regionNameVariable.name.toLowerCase());
+		}
+		if (this.regionParentVariable) {
+			variablesSet.add(this.regionParentVariable.name.toLowerCase());
+		}
+		if (this.regionBboxVariable) {
+			variablesSet.add(this.regionBboxVariable.name.toLowerCase());
+		}
+		const variablesToFetch = [...variablesSet];
+		const variableToFetchedIndexMap = new Map();
+
+		for (let i = 0; i < variablesToFetch.length; i++) {
+			variableToFetchedIndexMap.set(variablesToFetch[i], i);
+		}
+
+		const apiEndpoint = `https://redivis.com/api/v1/tables/${
+			this.tableIdentifier
+		}/rows?selectedVariables=${variablesToFetch.join(',')}&maxResults=${MAX_RESULTS}`;
+
+		const metadata = await this.#fetchFromApi(apiEndpoint);
+		try {
+			this.metadata = metadata.map((row) => {
+				const metadata = {};
+				const properties = {};
+				for (const variable of this.metadataVariables) {
+					metadata[variable.label || variable.name] =
+						row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
+				}
+				for (const variable of this.filterVariables) {
+					properties[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
+				}
+				if (this.regionNameVariable) {
+					properties.regionName =
+						row[variableToFetchedIndexMap.get(this.regionNameVariable.name.toLowerCase())];
+				}
+				if (this.regionParentVariable) {
+					properties.parentRegionName =
+						row[variableToFetchedIndexMap.get(this.regionParentVariable.name.toLowerCase())];
+				}
+				if (this.regionBboxVariable) {
+					properties.bbox = row[variableToFetchedIndexMap.get(this.regionBboxVariable.name.toLowerCase())];
+				}
+				return { metadata, properties: { ...metadata, ...properties } };
+			});
+			return this.metadata;
+		} catch (e) {
+			await localforage.removeItem(`version_${apiEndpoint}`);
+			await localforage.removeItem(`response_${apiEndpoint}`);
+			alert(`An error occurred when parsing data from ${this.tableIdentifier}: ${e.message}`);
+			return [];
+		}
+	};
 
 	fetchData = async () => {
 		if (this.data) {
@@ -59,7 +125,10 @@ export default class VectorSource {
 			...this.filterVariables.map(({ name }) => name.toLowerCase()),
 			...this.metadataVariables.map(({ name }) => name.toLowerCase()),
 		]);
-		if (this.regionNameVariable){
+		if (!this.metadata) {
+			await this.fetchMetadata();
+		}
+		if (this.regionNameVariable) {
 			variablesSet.add(this.regionNameVariable.name.toLowerCase());
 		}
 		if (this.legendVariable){
@@ -77,6 +146,33 @@ export default class VectorSource {
 		const apiEndpoint = `https://redivis.com/api/v1/tables/${
 			this.tableIdentifier
 		}/rows?selectedVariables=${variablesToFetch.join(',')}&maxResults=${MAX_RESULTS}`;
+
+		const data = await this.#fetchFromApi(apiEndpoint);
+		try {
+			this.data = data.map((row, i) => {
+				let geometry;
+				if (row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]) {
+					geometry = this.getGeometry
+						? this.getGeometry(
+								...this.geoVariables.map(
+									(geoVariable) => row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
+								),
+						  )
+						: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
+				}
+
+				return { geometry, ...this.metadata[i] };
+			});
+			return this.data;
+		} catch (e) {
+			await localforage.removeItem(`version_${apiEndpoint}`);
+			await localforage.removeItem(`response_${apiEndpoint}`);
+			alert(`An error occurred when parsing data from ${this.tableIdentifier}: ${e.message}`);
+			return [];
+		}
+	};
+
+	#fetchFromApi = async (apiEndpoint) => {
 		try {
 			let responseText;
 			const currentTableVersion = await getTableVersion(this.tableIdentifier);
@@ -115,31 +211,9 @@ export default class VectorSource {
 				}
 			}
 
-			this.data = responseText
-				.split('\n')
-				.map((row, i) => {
-					return JSON.parse(row);
-				})
-				.filter((row) => row[0])
-				.map((row) => {
-					const geometry = this.getGeometry
-						? this.getGeometry(
-								...this.geoVariables.map(
-									(geoVariable) => row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
-								),
-						  )
-						: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
-
-					const metadata = {};
-					for (const variable of this.metadataVariables) {
-						metadata[variable.name] = row[variableToFetchedIndexMap.get(variable.name.toLowerCase())];
-					}
-					if (this.regionNameVariable){
-						metadata.regionName = row[variableToFetchedIndexMap.get(this.regionNameVariable.name.toLowerCase())];
-					}
-					return { geometry, metadata, properties: metadata };
-				});
-			return this.data;
+			return responseText.split('\n').map((row, i) => {
+				return JSON.parse(row);
+			});
 		} catch (e) {
 			await localforage.removeItem(`version_${apiEndpoint}`);
 			await localforage.removeItem(`response_${apiEndpoint}`);

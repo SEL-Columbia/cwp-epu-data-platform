@@ -11,7 +11,7 @@ import vectors from '../config/vectors';
 import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
-const METADATA_NULL_VALUE = '(null)'
+const METADATA_NULL_VALUE = '(null)';
 
 const ZOOM_REGEX = /&zoom=([\d+\.]+)/;
 const LAT_REGEX = /&lat=(-?[\d+\.]+)/;
@@ -19,7 +19,6 @@ const LNG_REGEX = /&lng=(-?[\d+\.]+)/;
 const BBOX_REGEX = /&bbox=(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+)/;
 const REGION_NAME_REGEX = /&region=([^&]+)/;
 const ADMIN_LAYER_REGEX = /&adminLayer=([^&]+)/;
-
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -87,7 +86,7 @@ class MapWrapper extends Component {
 		this.loadAdminVectors();
 
 		const bbox = search.match(BBOX_REGEX);
-		if (bbox){
+		if (bbox) {
 			const nextSearch = `${search.slice(0, bbox.index)}${search.slice(bbox.index + bbox[0].length)}`;
 			history.replace({ search: nextSearch });
 		}
@@ -202,14 +201,16 @@ class MapWrapper extends Component {
 			history,
 		} = this.props;
 		const regionName = search.match(REGION_NAME_REGEX);
-		let nextSearch = regionName ?
-			`${search.slice(0, regionName.index)}${search.slice(regionName.index + regionName[0].length)}` :
-			search;
+		let nextSearch = regionName
+			? `${search.slice(0, regionName.index)}${search.slice(regionName.index + regionName[0].length)}`
+			: search;
 
 		const adminLayer = nextSearch.match(ADMIN_LAYER_REGEX);
-		nextSearch = adminLayer ?
-			`${nextSearch.slice(0, adminLayer.index)}${adminLayer ? `&adminLayer=${encodeURIComponent(currentAdminVectorLayerName)}` : ''}${nextSearch.slice(adminLayer.index + adminLayer[0].length)}` :
-			nextSearch.concat(`&adminLayer=${encodeURIComponent(currentAdminVectorLayerName)}`);
+		nextSearch = adminLayer
+			? `${nextSearch.slice(0, adminLayer.index)}${
+					adminLayer ? `&adminLayer=${encodeURIComponent(currentAdminVectorLayerName)}` : ''
+			  }${nextSearch.slice(adminLayer.index + adminLayer[0].length)}`
+			: nextSearch.concat(`&adminLayer=${encodeURIComponent(currentAdminVectorLayerName)}`);
 
 		history.replace({ search: nextSearch });
 	};
@@ -231,7 +232,9 @@ class MapWrapper extends Component {
 				filterNames.every(
 					(filterName) =>
 						feature.metadata[filterName] === undefined ||
-						filtersMap[filterName].selectedValuesSet.has(feature.metadata[filterName] || METADATA_NULL_VALUE),
+						filtersMap[filterName].selectedValuesSet.has(
+							feature.metadata[filterName] || METADATA_NULL_VALUE,
+						),
 				)
 			);
 		});
@@ -242,17 +245,18 @@ class MapWrapper extends Component {
 			location: { search },
 			history,
 		} = this.props;
-		if (properties.regionName){
+		if (properties.regionName) {
 			const regionName = search.match(REGION_NAME_REGEX);
 
-			const nextSearch = regionName ?
-				`${search.slice(0, regionName.index)}${properties ? `&region=${encodeURIComponent(properties.regionName)}` : ''}${search.slice(regionName.index + regionName[0].length)}` :
-				search.concat(`&region=${encodeURIComponent(properties.regionName)}`);
+			const nextSearch = regionName
+				? `${search.slice(0, regionName.index)}${
+						properties ? `&region=${encodeURIComponent(properties.regionName)}` : ''
+				  }${search.slice(regionName.index + regionName[0].length)}`
+				: search.concat(`&region=${encodeURIComponent(properties.regionName)}`);
 
 			history.replace({ search: nextSearch });
 		}
-
-	}
+	};
 
 	handleZoomOrPan = (zoom, center) => {
 		const {
@@ -272,31 +276,32 @@ class MapWrapper extends Component {
 			pathname,
 			search: nextSearch,
 		});
-	}
+	};
 
 	getZoomAndCenter = () => {
 		const {
-			location: {
-				search,
-			}
+			location: { search },
 		} = this.props;
 		const zoomMatch = search.match(ZOOM_REGEX);
 		const latMatch = search.match(LAT_REGEX);
 		const lngMatch = search.match(LNG_REGEX);
 		const bbox = search.match(BBOX_REGEX);
 		const object = {};
-		if (zoomMatch){
+		if (zoomMatch) {
 			object.zoom = parseInt(zoomMatch[1], 10);
 		}
-		if (latMatch && lngMatch){
+		if (latMatch && lngMatch) {
 			object.center = [parseFloat(lngMatch[1]), parseFloat(latMatch[1])];
 		}
-		if (bbox){
-			object.boundingBox = [[parseFloat(bbox[1]), parseFloat(bbox[3])], [parseFloat(bbox[2]), parseFloat(bbox[4])]]
+		if (bbox) {
+			object.boundingBox = [
+				[parseFloat(bbox[1]), parseFloat(bbox[3])],
+				[parseFloat(bbox[2]), parseFloat(bbox[4])],
+			];
 		}
 
 		return object;
-	}
+	};
 
 	getSelectedAdminVectorLayerName = (props = this.props) => {
 		const {
@@ -304,12 +309,12 @@ class MapWrapper extends Component {
 		} = props;
 
 		const adminLayer = search.match(ADMIN_LAYER_REGEX);
-		if (adminLayer){
+		if (adminLayer) {
 			return decodeURIComponent(adminLayer[1]);
 		} else {
-			return adminVectors.find(({ isDefault }) => isDefault).name
+			return adminVectors.find(({ isDefault }) => isDefault).name;
 		}
-	}
+	};
 
 	renderSelectedRegion = (selectedAdminVectorLayerName) => {
 		const {
@@ -317,30 +322,34 @@ class MapWrapper extends Component {
 		} = this.props;
 		const { adminVectorFeaturesByNamesMap } = this.state;
 		const regionName = search.match(REGION_NAME_REGEX);
-		if (regionName && adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName]){
-			const region = adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName].find(({ metadata }) => metadata.regionName.toLowerCase() === decodeURIComponent(regionName[1]).toLowerCase());
-			if (region){
-				return <div className={styles.regionTileWrapper}>
-					<div className={styles.regionHeader}>
-						<span>{region.metadata.regionName}</span>
+		if (regionName && adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName]) {
+			const region = adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName].find(
+				({ properties }) =>
+					properties.regionName.toLowerCase() === decodeURIComponent(regionName[1]).toLowerCase(),
+			);
+			if (region) {
+				return (
+					<div className={styles.regionTileWrapper}>
+						<div className={styles.regionHeader}>
+							<span>{region.properties.regionName}</span>
+						</div>
+						<div className={styles.regionBody}>
+							{Object.keys(region.metadata)
+								.filter((key) => key !== 'regionName')
+								.map((key) => (
+									<p key={key}>
+										<b>{key}</b>
+										<br />
+										<span>{region.metadata[key]}</span>
+									</p>
+								))}
+						</div>
 					</div>
-					<div className={styles.regionBody}>
-						{Object.keys(region.metadata)
-							.filter((key) => key !== 'regionName')
-							.map((key) => (
-								<p key={key}>
-									<b>{key}</b>
-									<br/>
-									<span>{region.metadata[key]}</span>
-								</p>
-							))
-						}
-					</div>
-				</div>;
+				);
 			}
 		}
 		return null;
-	}
+	};
 
 	render() {
 		const {
@@ -402,15 +411,13 @@ class MapWrapper extends Component {
 							.map((vector) => ({
 								...vector,
 								features: this.filterFeatures(vector.name, vectorFeaturesByNamesMap[vector.name] || []),
-							}))
-						}
+							}))}
 						observationVectorLayers={observationVectors
 							.filter(({ name }) => currentObservationVectorLayerNamesSet.has(name))
 							.map((vector) => ({
 								...vector,
 								features: observationVectorFeaturesByNamesMap[vector.name] || [],
-							}))
-						}
+							}))}
 						adminVectorLayers={adminVectors
 							// .filter(({ name }) => name === currentAdminVectorLayerName)
 							.filter(({ name }) => name === selectedAdminVectorLayerName)
@@ -418,8 +425,7 @@ class MapWrapper extends Component {
 								...vector,
 								features: adminVectorFeaturesByNamesMap[vector.name] || [],
 								onFeatureClick: this.handleAdminVectorFeatureClick,
-							}))
-						}
+							}))}
 						onZoomOrPan={this.handleZoomOrPan}
 						zoom={zoom}
 						center={center}

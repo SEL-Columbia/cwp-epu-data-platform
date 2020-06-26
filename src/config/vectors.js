@@ -10,10 +10,11 @@ import VectorSource from '../VectorSource';
 
 import adminVectors from './adminVectors';
 
-const vectorPriorityByNameMap = { // higher numbers will be rendered on top of lower numbers
+const vectorPriorityByNameMap = {
+	// higher numbers will be rendered on top of lower numbers
 	'Uganda Electricity Transmission Lines': 0,
 	'UMEME REA power distribution lines 2018': 1,
-}
+};
 
 const vectors = [
 	new VectorSource({
@@ -93,7 +94,8 @@ const vectors = [
 			layout: {
 				'line-join': 'round',
 				'line-cap': 'round',
-				'line-sort-key': adminVectors.length + vectorPriorityByNameMap['UMEME REA power distribution lines 2018'],
+				'line-sort-key':
+					adminVectors.length + vectorPriorityByNameMap['UMEME REA power distribution lines 2018'],
 			},
 			paint: {
 				// 'line-color': 'rgb(255,129,255)',
