@@ -6,7 +6,6 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletOptions
  * */
 
 import adminVectors from './adminVectors';
@@ -39,6 +38,7 @@ const vectors = [
 			{ name: 'FINANCIER' },
 			{ name: 'CONTRACTOR' },
 		],
+		legendVariable: { name: 'VOLTAGE_KV', mapboxPaintProperty: 'line-color' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
@@ -54,14 +54,14 @@ const vectors = [
 					'match',
 					['get', 'VOLTAGE_KV'],
 					'400',
-					'#e55e5e',
+					'#045a8d',
 					'220',
-					'#fbb03b',
+					'#2b8cbe',
 					'132',
-					'rgb(32,89,255)',
+					'#74a9cf',
 					'66',
-					'rgb(51,255,150)',
-					'#ccc' /* other */,
+					'#bdc9e1',
+					'#f1eef6', /* other */
 				],
 				'line-width': 4,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
@@ -87,6 +87,7 @@ const vectors = [
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
+		legendVariable: { name: 'Voltage', mapboxPaintProperty: 'line-color' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
@@ -99,7 +100,15 @@ const vectors = [
 			paint: {
 				// 'line-color': 'rgb(255,129,255)',
 				// conditional styling with 'match' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#match
-				'line-color': ['match', ['get', 'Voltage'], '33 kV', '#e55e5e', '11 kV', '#fbb03b', '#ccc' /* other */],
+				'line-color': [
+					'match',
+					['get', 'Voltage'],
+					'33 kV',
+					'#dd1c77',
+					'11 kV',
+					'#c994c7',
+					'#e7e1ef', /* other */
+				],
 				'line-width': 2,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
 				// 'line-dasharray':[

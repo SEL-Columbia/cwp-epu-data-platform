@@ -123,8 +123,12 @@ class MapWrapper extends Component {
 			vectorsToFetch.map(async (vector) => {
 				const features = await vector.fetchData();
 				nextVectorFeaturesByNamesMap[vector.name] = features;
-				if (vector.filterVariables && vector.filterVariables.length) {
-					const filtersMap = getFiltersMap(features, new Set(vector.filterVariables.map(({ name }) => name)));
+				const variableNamesToFilter = new Set([...(vector.filterVariables || []).map(({ name }) => name)]);
+				if (vector.legendVariable){
+					variableNamesToFilter.add(vector.legendVariable.name);
+				}
+				if (variableNamesToFilter.size) {
+					const filtersMap = getFiltersMap(features, variableNamesToFilter);
 					nextVectorFiltersByNamesMap[vector.name] = filtersMap;
 				}
 			}),
