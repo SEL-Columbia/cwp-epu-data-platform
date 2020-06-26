@@ -17,14 +17,14 @@ export default class VectorSource {
 		showOnHome,
 		filterVariables,
 		metadataVariables,
+		legendVariable,
+		legend,
 		regionNameVariable,
 		regionParentVariable,
 		regionBboxVariable,
-		leafletType,
 		mapboxSourceType,
 		mapboxLayerType,
 		mapboxLayerOptions,
-		leafletOptions,
 		minZoom,
 		maxZoom,
 	}) {
@@ -35,14 +35,14 @@ export default class VectorSource {
 		this.geoVariables = geoVariables;
 		this.filterVariables = filterVariables;
 		this.metadataVariables = metadataVariables;
+		this.legendVariable = legendVariable;
+		this.legend = legend;
 		this.regionNameVariable = regionNameVariable;
 		this.regionParentVariable = regionParentVariable;
 		this.regionBboxVariable = regionBboxVariable;
-		this.leafletType = leafletType;
 		this.mapboxSourceType = mapboxSourceType;
 		this.mapboxLayerType = mapboxLayerType;
 		this.mapboxLayerOptions = mapboxLayerOptions;
-		this.leafletOptions = leafletOptions;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
 		this.isDefault = isDefault;
@@ -61,6 +61,9 @@ export default class VectorSource {
 		]);
 		if (this.regionNameVariable){
 			variablesSet.add(this.regionNameVariable.name.toLowerCase());
+		}
+		if (this.legendVariable){
+			variablesSet.add(this.legendVariable.name.toLowerCase());
 		}
 		const variablesToFetch = [
 			...variablesSet,

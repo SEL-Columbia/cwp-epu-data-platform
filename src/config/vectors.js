@@ -6,8 +6,6 @@ import VectorSource from '../VectorSource';
  * geoVariables:
  * filterVariables
  * metadataVariables
- * leafletType
- * leafletOptions
  * */
 
 import adminVectors from './adminVectors';
@@ -39,7 +37,7 @@ const vectors = [
 			{ name: 'FINANCIER' },
 			{ name: 'CONTRACTOR' },
 		],
-		leafletType: 'geoJSON',
+		legendVariable: { name: 'VOLTAGE_KV', mapboxPaintProperty: 'line-color' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
@@ -55,14 +53,14 @@ const vectors = [
 					'match',
 					['get', 'VOLTAGE_KV'],
 					'400',
-					'#e55e5e',
+					'#045a8d',
 					'220',
-					'#fbb03b',
+					'#2b8cbe',
 					'132',
-					'rgb(32,89,255)',
+					'#74a9cf',
 					'66',
-					'rgb(51,255,150)',
-					'#ccc', /* other */
+					'#bdc9e1',
+					'#f1eef6', /* other */
 				],
 				'line-width': 4,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
@@ -88,7 +86,7 @@ const vectors = [
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
-		leafletType: 'geoJSON',
+		legendVariable: { name: 'Voltage', mapboxPaintProperty: 'line-color' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'line',
 		mapboxLayerOptions: {
@@ -104,10 +102,10 @@ const vectors = [
 					'match',
 					['get', 'Voltage'],
 					'33 kV',
-					'#e55e5e',
+					'#dd1c77',
 					'11 kV',
-					'#fbb03b',
-					'#ccc', /* other */
+					'#c994c7',
+					'#e7e1ef', /* other */
 				],
 				'line-width': 2,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
