@@ -1,6 +1,5 @@
 import * as styles from './styles.css';
 import downloads from '../config/downloads';
-console.log(downloads);
 
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
