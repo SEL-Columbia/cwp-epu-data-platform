@@ -23,7 +23,7 @@ class App extends Component {
 		return (
 			<div className={styles.headerWrapper}>
 				<div className={styles.header}>
-					<h2>{'Columbia World Projects Energy for Productive Use Data Platform'}</h2>
+					<h2>{'Columbia World Projects Energy for Productive Use'}</h2>
 				</div>
 				<div className={styles.navigation}>
 					<NavLink
