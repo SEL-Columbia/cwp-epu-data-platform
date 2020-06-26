@@ -120,23 +120,11 @@ export default class VectorSource {
 		if (this.data) {
 			return this.data;
 		}
-		const variablesSet = new Set([
-			...this.geoVariables.map(({ name }) => name.toLowerCase()),
-			...this.filterVariables.map(({ name }) => name.toLowerCase()),
-			...this.metadataVariables.map(({ name }) => name.toLowerCase()),
-		]);
+		const variablesSet = new Set([...this.geoVariables.map(({ name }) => name.toLowerCase())]);
 		if (!this.metadata) {
 			await this.fetchMetadata();
 		}
-		if (this.regionNameVariable) {
-			variablesSet.add(this.regionNameVariable.name.toLowerCase());
-		}
-		if (this.legendVariable){
-			variablesSet.add(this.legendVariable.name.toLowerCase());
-		}
-		const variablesToFetch = [
-			...variablesSet,
-		];
+		const variablesToFetch = [...variablesSet];
 		const variableToFetchedIndexMap = new Map();
 
 		for (let i = 0; i < variablesToFetch.length; i++) {
