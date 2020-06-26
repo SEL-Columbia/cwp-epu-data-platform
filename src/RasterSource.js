@@ -9,6 +9,7 @@ export default class RasterSource {
 		boundingBox,
 		name,
 		label,
+		customLegend,
 	}) {
 		this.name = name;
 		this.label = label;
@@ -18,6 +19,7 @@ export default class RasterSource {
 		this.minNativeZoom = parseInt(minNativeZoom);
 		this.maxNativeZoom = parseInt(maxNativeZoom);
 		this.isDefault = isDefault;
+		this.customLegend = customLegend;
 
 		if (boundingBox) {
 			boundingBox = boundingBox.split(',');

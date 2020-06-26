@@ -9,20 +9,13 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import SendIcon from '@material-ui/icons/Send';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import StarBorder from '@material-ui/icons/StarBorder';
 
-const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
-const MAX_RESULTS = 10000;
 const REGION_GROUP_IMAGE_SIZE = 100;
 
 const imagesByRegionGroup = {
@@ -42,10 +35,6 @@ const imagesByRegionGroup = {
 		href: `${process.env.ROOT_PATH}/map?zoom=6.20&lng=34.55&lat=-6.40`,
 	},
 };
-
-function getRegionLink(bbox) {
-	return `${process.env.ROOT_PATH}/map?bbox=${bbox}`;
-}
 
 const CustomNestedList = withStyles((theme) => ({
 	root: {
@@ -77,52 +66,47 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{regions
-				.sort((a, b) => a.name.localeCompare(b.name))
-				.map((region) => {
-					const { name, regions } = region;
-					const isCollapsed = regionIsCollapsed[regionGroup][name];
-					return (
-						<React.Fragment key={`${regionGroup}_${name}`}>
-							<ListItem button onClick={() => onSelectRegion(region)}>
-								{/*<ListItemIcon>*/}
-								{/*	<InboxIcon />*/}
-								{/*</ListItemIcon>*/}
-								<ListItemText primary={name} />
-								<ListItemSecondaryAction>
-									<IconButton
-										edge="end"
-										aria-label="comments"
-										onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
-									>
-										{isCollapsed ? <ExpandLess /> : <ExpandMore />}
-									</IconButton>
-								</ListItemSecondaryAction>
-							</ListItem>
-							<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
-								<List component="div" disablePadding>
-									{regions
-										.sort((a, b) => a.name.localeCompare(b.name))
-										.map((region) => {
-											return (
-												<ListItem
-													key={`region_${name}_${region.name}`}
-													button
-													className={classes.nested}
-													onClick={() => onSelectRegion(region)}
-												>
-													{/*<ListItemIcon>*/}
-													{/*	<StarBorder />*/}
-													{/*</ListItemIcon>*/}
-													<ListItemText primary={region.name} />
-												</ListItem>
-											);
-										})}
-								</List>
-							</Collapse>
-						</React.Fragment>
-					);
-				})}
+			{regionGroup === 'Uganda' && // TODO remove once Ethiopia + Tanzania are regions are populated
+				regions
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map((region) => {
+						const { name, regions } = region;
+						const isCollapsed = regionIsCollapsed[regionGroup][name];
+						return (
+							<React.Fragment key={`${regionGroup}_${name}`}>
+								<ListItem button onClick={() => onSelectRegion(region)}>
+									<ListItemText primary={name} />
+									<ListItemSecondaryAction>
+										<IconButton
+											edge="end"
+											aria-label="comments"
+											onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
+										>
+											{isCollapsed ? <ExpandLess /> : <ExpandMore />}
+										</IconButton>
+									</ListItemSecondaryAction>
+								</ListItem>
+								<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
+									<List component="div" disablePadding dense={true}>
+										{regions
+											.sort((a, b) => a.name.localeCompare(b.name))
+											.map((region) => {
+												return (
+													<ListItem
+														key={`${regionGroup}_${name}_${region.name}`}
+														button
+														className={classes.nested}
+														onClick={() => onSelectRegion(region)}
+													>
+														<ListItemText primary={region.name} />
+													</ListItem>
+												);
+											})}
+									</List>
+								</Collapse>
+							</React.Fragment>
+						);
+					})}
 		</List>
 	);
 });
@@ -270,9 +254,9 @@ function nestRegions(parentRegions) {
 		}
 		higherLevelRegion.regions[parentRegionIndexesByName[parent]].regions.push({
 			...region,
-			regionLevel: higherLevelRegion.regionLevel,
-			hierarchyIndex: higherLevelRegion.hierarchyIndex,
-			regionGroup: higherLevelRegion.regionGroup,
+			regionLevel: lowerLevelRegion.regionLevel,
+			hierarchyIndex: lowerLevelRegion.hierarchyIndex,
+			regionGroup: lowerLevelRegion.regionGroup,
 		});
 	});
 
@@ -354,17 +338,6 @@ class Explore extends Component {
 		});
 	};
 
-	// renderAdminRegion = (region) => {
-	// 	const { name, parent, bbox } = region;
-	// 	return (
-	// 		<div key={`${parent}_${name}`}>
-	// 			<Link to={`${process.env.ROOT_PATH}/map?&bbox=${bbox}`}>
-	// 				<span>{name}</span>
-	// 			</Link>
-	// 		</div>
-	// 	);
-	// };
-
 	handleToggleRegionIsCollapsed = (regionGroup, regionName) => {
 		const { regionIsCollapsed } = this.state;
 		const isCollapsed = regionIsCollapsed[regionGroup][regionName];
@@ -427,22 +400,9 @@ class Explore extends Component {
 				</div>
 			</div>
 		));
-
-		// return adminRegions.map((region) => {
-		// 	const { regionLevel, regions = [] } = region;
-		// 	return (
-		// 		<div key={regionLevel} className={styles.regionWrapper}>
-		// 			<div className={styles.regionName}>
-		// 				<span className={styles.header}>{regionLevel}</span>
-		// 			</div>
-		// 			<div className={styles.itemsWrapper}>{regions.map(this.renderAdminRegion)}</div>
-		// 		</div>
-		// 	);
-		// });
 	};
 
 	render() {
-		// TODO: add ethiopia, tanzania
 		return <div className={styles.exploreWrapper}>{this.renderAdminRegions()}</div>;
 	}
 }
