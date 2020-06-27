@@ -180,7 +180,7 @@ export default class MapRenderer {
 	};
 
 	addRasterLayerToMap = (rasterLayer) => {
-		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom } = rasterLayer;
+		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom, opacity, } = rasterLayer;
 
 		// define source
 		const source = {
@@ -212,7 +212,7 @@ export default class MapRenderer {
 			minzoom: minZoom,
 			maxzoom: maxZoom,
 			paint: {
-				'raster-opacity': 0.8,
+				'raster-opacity': opacity,
 			},
 		};
 
@@ -330,6 +330,12 @@ export default class MapRenderer {
 						}`,
 					); // place raster underneath first admin layer
 					this.rasterLayers.set(rasterLayer.name, layer);
+				} else {
+					const id = `${rasterLayer.name}_raster`;
+					const currentOpacity = this.map.getPaintProperty(id, 'raster-opacity');
+					if (rasterLayer.opacity !== currentOpacity){
+						this.map.setPaintProperty(id, 'raster-opacity', rasterLayer.opacity);
+					}
 				}
 			}
 

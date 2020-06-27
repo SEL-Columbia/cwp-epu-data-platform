@@ -12,6 +12,7 @@ import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
 const METADATA_NULL_VALUE = '(null)';
+const DEFAULT_RASTER_OPACITY = 0.8;
 
 const ZOOM_REGEX = /&zoom=([\d+\.]+)/;
 const LAT_REGEX = /&lat=(-?[\d+\.]+)/;
@@ -63,6 +64,7 @@ class MapWrapper extends Component {
 			currentAdminVectorLayerName: adminVectors.find(({ isDefault }) => isDefault).name,
 			currentObservationVectorLayerNamesSet: new Set(currentObservationVectorLayers.map(({ name }) => name)),
 			rasters: [],
+			rasterOpacityByNameMap: {},
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
 			adminVectorFeaturesByNamesMap,
@@ -110,7 +112,15 @@ class MapWrapper extends Component {
 			}),
 		);
 		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-		this.setState({ rasters, isLoadingRasters: false });
+		const rasterOpacityByNameMap = {};
+		for (const raster of rasters){
+			rasterOpacityByNameMap[raster.name] = DEFAULT_RASTER_OPACITY;
+		}
+		this.setState({
+			rasters,
+			rasterOpacityByNameMap,
+			isLoadingRasters: false,
+		});
 	};
 
 	loadVectors = async () => {
@@ -183,6 +193,10 @@ class MapWrapper extends Component {
 	handleUpdateRasterLayers = (currentRasterLayerNamesSet) => {
 		this.setState({ currentRasterLayerNamesSet });
 	};
+
+	handleUpdateRasterLayerOpacityByNameMap = (rasterOpacityByNameMap) => {
+		this.setState({ rasterOpacityByNameMap });
+	}
 
 	handleUpdateVectorLayers = (currentVectorLayerNamesSet) => {
 		this.setState({ currentVectorLayerNamesSet }, this.loadVectors);
@@ -364,6 +378,7 @@ class MapWrapper extends Component {
 			currentObservationVectorLayerNamesSet,
 			currentBaseMapLayerName,
 			rasters,
+			rasterOpacityByNameMap,
 			isLoadingRasters,
 			isLoadingVectors,
 			isLoadingObservationVectors,
@@ -389,10 +404,12 @@ class MapWrapper extends Component {
 						vectorFiltersByNamesMap={vectorFiltersByNamesMap}
 						selectedBaseMapLayerName={currentBaseMapLayerName}
 						selectedRasterLayerNamesSet={currentRasterLayerNamesSet}
+						rasterOpacityByNameMap={rasterOpacityByNameMap}
 						selectedVectorLayerNamesSet={currentVectorLayerNamesSet}
 						selectedObservationVectorLayerNamesSet={currentObservationVectorLayerNamesSet}
 						onUpdateBaseMapLayer={this.handleUpdateBaseMapLayer}
 						onUpdateRasterLayers={this.handleUpdateRasterLayers}
+						onUpdateRasterLayerOpacityByNameMap={this.handleUpdateRasterLayerOpacityByNameMap}
 						onUpdateVectorLayers={this.handleUpdateVectorLayers}
 						onUpdateAdminVectorLayer={this.handleUpdateAdminVectorLayer}
 						onUpdateObservationVectorLayers={this.handleUpdateObservationVectorLayers}
@@ -406,7 +423,13 @@ class MapWrapper extends Component {
 				<div className={styles.map}>
 					<Map
 						baseMapLayer={baseMaps.find(({ name }) => name === currentBaseMapLayerName)}
-						rasterLayers={rasters.filter(({ name }) => currentRasterLayerNamesSet.has(name))}
+						rasterLayers={rasters
+							.filter(({ name }) => currentRasterLayerNamesSet.has(name))
+							.map((raster) => ({
+								...raster,
+								opacity: rasterOpacityByNameMap[raster.name],
+							}))
+						}
 						vectorLayers={vectors
 							.filter(({ name }) => currentVectorLayerNamesSet.has(name))
 							.map((vector) => ({
