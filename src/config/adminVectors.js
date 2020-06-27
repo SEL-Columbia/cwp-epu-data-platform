@@ -1,5 +1,9 @@
 import VectorSource from '../VectorSource';
 
+import {
+	DEFAULT_ADMIN_VECTOR_OPACITY,
+} from './constants';
+
 /*
  * name: display name, required. Must be unique.
  * label: to assign a grouping to the layer
@@ -41,7 +45,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Regions'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#787b8c',
 				},
 			},
@@ -84,7 +89,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#9699a6',
 				},
 			},
@@ -122,7 +128,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Subcounties'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#9699a6',
 				},
 			},
@@ -160,7 +167,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Parishes'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#9699a6',
 				},
 			},
@@ -200,7 +208,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Regions'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#787b8c',
 				},
 			},
@@ -239,7 +248,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#9699a6',
 				},
 			},
@@ -278,7 +288,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Regions'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#787b8c',
 				},
 			},
@@ -317,7 +328,8 @@ const adminVectorSpecs = [
 					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
 				},
 				paint: {
-					'fill-opacity': 0.1,
+					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
+					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
 					'fill-color': '#9699a6',
 				},
 			},
