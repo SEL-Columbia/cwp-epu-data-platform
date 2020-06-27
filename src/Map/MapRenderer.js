@@ -142,45 +142,64 @@ export default class MapRenderer {
 			if (!this.map.getLayer(id)) {
 				this.map.addLayer(mapLayer);
 				// set tooltip listener
-				this.map.on('click', id, (e) => {
-					let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
-					// const metadata = e.features[0].properties;
-					const metadata = features[0].properties;
 
-					if (onFeatureClick) {
+				if (onFeatureClick) {
+					this.map.on('click', id, (e) => {
+						let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
+						// const metadata = e.features[0].properties;
+						const metadata = features[0].properties;
+
 						onFeatureClick(metadata);
-						return;
-					}
+					});
+				} else {
+					const popup = new mapboxgl.Popup({
+						closeButton: false,
+						closeOnClick: false,
+					});
 
-					if (Object.keys(metadata).length) {
-						const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
-						// const coordinates = e.features[0].geometry.coordinates.slice(); // FOR 'circle' layers
+					this.map.on('mouseenter', id, (e) => {
+						let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
+						// const metadata = e.features[0].properties;
+						const metadata = features[0].properties;
 
-						// Ensure that if the map is zoomed out such that multiple
-						// copies of the feature are visible, the popup appears
-						// over the copy being pointed to.
-						while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-							coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-						}
+						if (Object.keys(metadata).length) {
+							// Change the cursor style as a UI indicator.
+							this.map.getCanvas().style.cursor = 'pointer';
 
-						new mapboxgl.Popup()
-							.setLngLat(coordinates)
-							.setHTML(
-								Object.keys(metadata)
+							const coordinates = [parseFloat(e.lngLat.lng), parseFloat(e.lngLat.lat)];
+
+							// Ensure that if the map is zoomed out such that multiple
+							// copies of the feature are visible, the popup appears
+							// over the copy being pointed to.
+							while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+								coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+							}
+
+							// Populate the popup and set its coordinates
+							// based on the feature found.
+							popup
+								.setLngLat(coordinates)
+								.setHTML(Object.keys(metadata)
 									.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
 									.join(''),
-							)
-							.addTo(this.map);
-					}
-				});
+								)
+								.addTo(this.map);
+						}
+					});
+
+					this.map.on('mouseleave', id, () => {
+						this.map.getCanvas().style.cursor = '';
+						popup.remove();
+					});
+				}
 			}
 		}
 
 		return layer;
 	};
 
-	addRasterLayerToMap = (rasterLayer) => {
-		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom, opacity, } = rasterLayer;
+	addRasterLayerToMap = (rasterLayer, beforeId) => {
+		const { name, mapboxId, minNativeZoom, maxNativeZoom, bounds, minZoom, maxZoom, opacity } = rasterLayer;
 
 		// define source
 		const source = {
@@ -218,7 +237,7 @@ export default class MapRenderer {
 
 		// add layer to map
 		if (!this.map.getLayer(id)) {
-			this.map.addLayer(mapLayer);
+			this.map.addLayer(mapLayer, beforeId);
 		}
 
 		return layer;
@@ -320,15 +339,15 @@ export default class MapRenderer {
 			for (const rasterLayer of rasterLayers) {
 				let layer = this.rasterLayers.get(rasterLayer.name);
 				if (!layer) {
-					layer = this.addRasterLayerToMap(rasterLayer);
-					this.map.moveLayer(
-						`${rasterLayer.name}_${layer.type}`,
+					layer = this.addRasterLayerToMap(
+						rasterLayer,
+						// place raster underneath first admin layer
 						`${adminVectorLayers[0].name}_${
 							adminVectorLayers[0].mapboxLayerType instanceof Array
 								? adminVectorLayers[0].mapboxLayerType[0]
 								: adminVectorLayers[0].mapboxLayerType
 						}`,
-					); // place raster underneath first admin layer
+					);
 					this.rasterLayers.set(rasterLayer.name, layer);
 				} else {
 					const id = `${rasterLayer.name}_raster`;
