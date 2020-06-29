@@ -19,6 +19,8 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Collapse from '@material-ui/core/Collapse';
 import List from '@material-ui/core/List';
+import Slider from '@material-ui/core/Slider';
+import Tooltip from '@material-ui/core/Tooltip';
 
 const CustomSwitch = withStyles({
 	switchBase: {
@@ -45,6 +47,24 @@ const CustomRadio = withStyles({
 	},
 	checked: {},
 })((props) => <Radio color="default" {...props} />);
+
+const CustomSlider = withStyles({
+	thumb: {
+		backgroundColor: grey[500],
+		// '&:focus, &:hover, &$active': {
+		// 	boxShadow: '#ccc 0 2px 3px 1px',
+		// },
+	},
+	track: {
+		backgroundColor: grey[500],
+	},
+	rail: {
+		backgroundColor: grey[500],
+	},
+	mark: {
+		backgroundColor: grey[500],
+	}
+})(Slider);
 
 const CustomCircularProgress = withStyles({
 	root: {
@@ -104,6 +124,24 @@ const LegendList = withStyles({
 	}
 })(List);
 
+function hexToRgba(hex, opacity){
+	const r = parseInt(hex.slice(1, 3), 16);
+	const g = parseInt(hex.slice(3, 5), 16);
+	const b = parseInt(hex.slice(5), 16);
+	return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+
+}
+
+function ValueLabelComponent(props) {
+	const { children, open, value } = props;
+
+	return (
+		<Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
+			{children}
+		</Tooltip>
+	);
+}
+
 import vectorStyles from './vectorStyles'
 
 import * as styles from './styles.css';
@@ -141,10 +179,12 @@ export default function Filters({
 	vectorFiltersByNamesMap,
 	selectedBaseMapLayerName,
 	selectedRasterLayerNamesSet,
+	rasterOpacityByNameMap,
 	selectedVectorLayerNamesSet,
 	selectedObservationVectorLayerNamesSet,
 	onUpdateBaseMapLayer,
 	onUpdateRasterLayers,
+	onUpdateRasterLayerOpacityByNameMap,
 	onUpdateVectorLayers,
 	onUpdateObservationVectorLayers,
 	onUpdateAdminVectorLayer,
@@ -176,6 +216,12 @@ export default function Filters({
 			nextSelectedRasterLayerNamesSet.delete(name);
 		}
 		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
+	}
+
+	function handleUpdateRasterOpacity(name, opacity){
+		let nextRasterOpacityByNameMap = { ...rasterOpacityByNameMap };
+		nextRasterOpacityByNameMap[name] = opacity;
+		onUpdateRasterLayerOpacityByNameMap(nextRasterOpacityByNameMap);
 	}
 
 	function handleToggleObservationVectorLayer(name, checked){
@@ -295,13 +341,27 @@ export default function Filters({
 				</Collapse>
 			);
 		} else if (customLegend){
+			const opacity = rasterOpacityByNameMap[name];
 			return (
 				<Collapse in={checked} timeout="auto" unmountOnExit>
 					<LegendList component="div" disablePadding dense={true}>
+						<CustomFormHelperText>{`Opacity: ${opacity}`}</CustomFormHelperText>
+						<CustomSlider
+							defaultValue={opacity}
+							onChangeCommitted={(e, nextOpacity) => handleUpdateRasterOpacity(name, nextOpacity)}
+							getAriaValueText={() => `${opacity}`}
+							ValueLabelComponent={ValueLabelComponent}
+							aria-labelledby="discrete-slider"
+							valueLabelDisplay="auto"
+							step={0.1}
+							marks
+							min={0}
+							max={1}
+						/>
 						{customLegend.map(({ key, value }) => {
 							const LegendListItem = withStyles({
 								root: {
-									backgroundColor: value,
+									backgroundColor: hexToRgba(value, opacity),
 								},
 							})(ListItem);
 

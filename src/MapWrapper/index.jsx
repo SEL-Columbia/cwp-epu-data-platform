@@ -11,7 +11,12 @@ import vectors from '../config/vectors';
 import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
-const METADATA_NULL_VALUE = '(null)';
+import {
+	DEFAULT_RASTER_OPACITY,
+	SELECTED_ADMIN_VECTOR_OPACITY,
+} from '../config/constants';
+
+const METADATA_NULL_VALUE = 'null';
 
 const ZOOM_REGEX = /&zoom=([\d+\.]+)/;
 const LAT_REGEX = /&lat=(-?[\d+\.]+)/;
@@ -34,6 +39,29 @@ function getFiltersMap(features, whitelist) {
 		}
 	}
 	return filters;
+}
+
+function getSelectedAdminVectorLayerName(props){
+	const {
+		location: { search },
+	} = props;
+
+	const adminLayer = search.match(ADMIN_LAYER_REGEX);
+	if (adminLayer) {
+		return decodeURIComponent(adminLayer[1]);
+	} else {
+		return adminVectors.find(({ isDefault }) => isDefault).name;
+	}
+}
+
+function getSelectedRegionName(props){
+	const {
+		location: { search },
+	} = props;
+
+	const region = search.match(REGION_NAME_REGEX);
+
+	return region ? decodeURIComponent(region[1]) : null;
 }
 
 class MapWrapper extends Component {
@@ -63,6 +91,7 @@ class MapWrapper extends Component {
 			currentAdminVectorLayerName: adminVectors.find(({ isDefault }) => isDefault).name,
 			currentObservationVectorLayerNamesSet: new Set(currentObservationVectorLayers.map(({ name }) => name)),
 			rasters: [],
+			rasterOpacityByNameMap: {},
 			vectorFeaturesByNamesMap,
 			vectorFiltersByNamesMap,
 			adminVectorFeaturesByNamesMap,
@@ -71,6 +100,7 @@ class MapWrapper extends Component {
 			isLoadingVectors: false,
 			isLoadingObservationVectors: false,
 			isLoadingAdminVectors: false,
+			previousRegionName: null,
 		};
 	}
 
@@ -92,12 +122,43 @@ class MapWrapper extends Component {
 		}
 	}
 
+	static getDerivedStateFromProps(props, state){
+		const {
+			location: { search },
+		} = props;
+		const {
+			adminVectorFeaturesByNamesMap,
+			previousRegionName,
+		} = state;
+		const selectedAdminVectorLayerName = getSelectedAdminVectorLayerName(props);
+		let regionName = getSelectedRegionName(props);
+
+		if (regionName !== previousRegionName){
+			const nextState = {
+				adminVectorFeaturesByNamesMap: {
+					...adminVectorFeaturesByNamesMap,
+				},
+				previousRegionName: regionName,
+			};
+			for (const feature of nextState.adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName] || []) {
+				if (previousRegionName && feature.properties.regionName === previousRegionName){
+					feature.properties.opacity = undefined;
+				}
+				if (regionName && feature.properties.regionName === regionName){
+					feature.properties.opacity = SELECTED_ADMIN_VECTOR_OPACITY;
+				}
+			}
+			return nextState;
+		}
+
+		return null;
+	}
+
 	componentDidUpdate(prevProps) {
-		const selectedAdminVectorLayerName = this.getSelectedAdminVectorLayerName();
-		const previousSelectedAdminVectorLayerName = this.getSelectedAdminVectorLayerName(prevProps);
+		const selectedAdminVectorLayerName = getSelectedAdminVectorLayerName(this.props);
+		const previousSelectedAdminVectorLayerName = getSelectedAdminVectorLayerName(prevProps);
 
 		if (selectedAdminVectorLayerName !== previousSelectedAdminVectorLayerName) {
-			// TODO BUG won't load after admin vector change
 			this.loadAdminVectors();
 		}
 	}
@@ -110,7 +171,15 @@ class MapWrapper extends Component {
 			}),
 		);
 		const rasters = rasterSourceGroups.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-		this.setState({ rasters, isLoadingRasters: false });
+		const rasterOpacityByNameMap = {};
+		for (const raster of rasters){
+			rasterOpacityByNameMap[raster.name] = DEFAULT_RASTER_OPACITY;
+		}
+		this.setState({
+			rasters,
+			rasterOpacityByNameMap,
+			isLoadingRasters: false,
+		});
 	};
 
 	loadVectors = async () => {
@@ -160,13 +229,21 @@ class MapWrapper extends Component {
 	loadAdminVectors = async () => {
 		this.setState({ isLoadingAdminVectors: true });
 		const { currentAdminVectorLayerName } = this.state;
-		const selectedAdminVectorLayerName = this.getSelectedAdminVectorLayerName();
+		const selectedAdminVectorLayerName = getSelectedAdminVectorLayerName(this.props);
+		const regionName = getSelectedRegionName(this.props);
 		// const vectorsToFetch = adminVectors.filter(({ name }) => name === currentAdminVectorLayerName);
 		const vectorsToFetch = adminVectors.filter(({ name }) => name === selectedAdminVectorLayerName);
 		const nextAdminVectorFeaturesByNamesMap = {};
 		await Promise.all(
 			vectorsToFetch.map(async (vector) => {
 				const features = await vector.fetchData();
+				if (regionName){
+					for (const feature of features){
+						if (feature.properties.regionName === regionName){
+							feature.properties.opacity = SELECTED_ADMIN_VECTOR_OPACITY;
+						}
+					}
+				}
 				nextAdminVectorFeaturesByNamesMap[vector.name] = features;
 			}),
 		);
@@ -184,6 +261,10 @@ class MapWrapper extends Component {
 		this.setState({ currentRasterLayerNamesSet });
 	};
 
+	handleUpdateRasterLayerOpacityByNameMap = (rasterOpacityByNameMap) => {
+		this.setState({ rasterOpacityByNameMap });
+	}
+
 	handleUpdateVectorLayers = (currentVectorLayerNamesSet) => {
 		this.setState({ currentVectorLayerNamesSet }, this.loadVectors);
 	};
@@ -200,9 +281,9 @@ class MapWrapper extends Component {
 			location: { search },
 			history,
 		} = this.props;
-		const regionName = search.match(REGION_NAME_REGEX);
-		let nextSearch = regionName
-			? `${search.slice(0, regionName.index)}${search.slice(regionName.index + regionName[0].length)}`
+		const region = search.match(REGION_NAME_REGEX);
+		let nextSearch = region
+			? `${search.slice(0, region.index)}${search.slice(region.index + region[0].length)}`
 			: search;
 
 		const adminLayer = nextSearch.match(ADMIN_LAYER_REGEX);
@@ -246,12 +327,12 @@ class MapWrapper extends Component {
 			history,
 		} = this.props;
 		if (properties.regionName) {
-			const regionName = search.match(REGION_NAME_REGEX);
+			const region = search.match(REGION_NAME_REGEX);
 
-			const nextSearch = regionName
-				? `${search.slice(0, regionName.index)}${
+			const nextSearch = region
+				? `${search.slice(0, region.index)}${
 						properties ? `&region=${encodeURIComponent(properties.regionName)}` : ''
-				  }${search.slice(regionName.index + regionName[0].length)}`
+				  }${search.slice(region.index + region[0].length)}`
 				: search.concat(`&region=${encodeURIComponent(properties.regionName)}`);
 
 			history.replace({ search: nextSearch });
@@ -263,11 +344,11 @@ class MapWrapper extends Component {
 			location: { pathname, search },
 			history,
 		} = this.props;
-		const regionName = search.match(REGION_NAME_REGEX);
+		const region = search.match(REGION_NAME_REGEX);
 		const adminLayer = search.match(ADMIN_LAYER_REGEX);
 		let nextSearch = `&zoom=${zoom}&lng=${center.lng}&lat=${center.lat}`;
-		if (regionName) {
-			nextSearch = nextSearch.concat(regionName[0]);
+		if (region) {
+			nextSearch = nextSearch.concat(region[0]);
 		}
 		if (adminLayer) {
 			nextSearch = nextSearch.concat(adminLayer[0]);
@@ -303,30 +384,12 @@ class MapWrapper extends Component {
 		return object;
 	};
 
-	getSelectedAdminVectorLayerName = (props = this.props) => {
-		const {
-			location: { search },
-		} = props;
-
-		const adminLayer = search.match(ADMIN_LAYER_REGEX);
-		if (adminLayer) {
-			return decodeURIComponent(adminLayer[1]);
-		} else {
-			return adminVectors.find(({ isDefault }) => isDefault).name;
-		}
-	};
-
 	renderSelectedRegion = (selectedAdminVectorLayerName) => {
-		const {
-			location: { search },
-		} = this.props;
 		const { adminVectorFeaturesByNamesMap } = this.state;
-		const regionName = search.match(REGION_NAME_REGEX);
+		const regionName = getSelectedRegionName(this.props);
 		if (regionName && adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName]) {
 			const region = adminVectorFeaturesByNamesMap[selectedAdminVectorLayerName].find(
-				({ properties }) =>
-					properties.regionName.toLowerCase() === decodeURIComponent(regionName[1]).toLowerCase(),
-			);
+				({ properties }) => properties.regionName === regionName);
 			if (region) {
 				return (
 					<div className={styles.regionTileWrapper}>
@@ -364,6 +427,7 @@ class MapWrapper extends Component {
 			currentObservationVectorLayerNamesSet,
 			currentBaseMapLayerName,
 			rasters,
+			rasterOpacityByNameMap,
 			isLoadingRasters,
 			isLoadingVectors,
 			isLoadingObservationVectors,
@@ -372,7 +436,7 @@ class MapWrapper extends Component {
 
 		const { zoom, center, boundingBox } = this.getZoomAndCenter();
 
-		const selectedAdminVectorLayerName = this.getSelectedAdminVectorLayerName();
+		const selectedAdminVectorLayerName = getSelectedAdminVectorLayerName(this.props);
 
 		return (
 			<div className={styles.mapWrapper}>
@@ -389,10 +453,12 @@ class MapWrapper extends Component {
 						vectorFiltersByNamesMap={vectorFiltersByNamesMap}
 						selectedBaseMapLayerName={currentBaseMapLayerName}
 						selectedRasterLayerNamesSet={currentRasterLayerNamesSet}
+						rasterOpacityByNameMap={rasterOpacityByNameMap}
 						selectedVectorLayerNamesSet={currentVectorLayerNamesSet}
 						selectedObservationVectorLayerNamesSet={currentObservationVectorLayerNamesSet}
 						onUpdateBaseMapLayer={this.handleUpdateBaseMapLayer}
 						onUpdateRasterLayers={this.handleUpdateRasterLayers}
+						onUpdateRasterLayerOpacityByNameMap={this.handleUpdateRasterLayerOpacityByNameMap}
 						onUpdateVectorLayers={this.handleUpdateVectorLayers}
 						onUpdateAdminVectorLayer={this.handleUpdateAdminVectorLayer}
 						onUpdateObservationVectorLayers={this.handleUpdateObservationVectorLayers}
@@ -406,7 +472,13 @@ class MapWrapper extends Component {
 				<div className={styles.map}>
 					<Map
 						baseMapLayer={baseMaps.find(({ name }) => name === currentBaseMapLayerName)}
-						rasterLayers={rasters.filter(({ name }) => currentRasterLayerNamesSet.has(name))}
+						rasterLayers={rasters
+							.filter(({ name }) => currentRasterLayerNamesSet.has(name))
+							.map((raster) => ({
+								...raster,
+								opacity: rasterOpacityByNameMap[raster.name],
+							}))
+						}
 						vectorLayers={vectors
 							.filter(({ name }) => currentVectorLayerNamesSet.has(name))
 							.map((vector) => ({
