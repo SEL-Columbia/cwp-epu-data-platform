@@ -31,7 +31,7 @@ The [Explore data](https://qsel.columbia.edu/cwp-epu-data-platform) homepage org
 #### Countries
 To add, remove or update the countries shown, add an appropriate **VectorSource** (via the [Admin polygons](#admin-polygons) configuration below) for the country's regions, and set its the `options.label` attribute to the country name.
 
-To update the images shown above the section, you can modify the **imagesByRegionGroup** object in [`./src/config/images`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/baseMaps), which maps a country name to an object specifying the url (`src`), alternate text (`alt`), and link to the map (`href`) for that country.
+To update the images shown above the section, you can modify the **imagesByRegionGroup** object in [`./src/config/images`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/baseMaps.js), which maps a country name to an object specifying the url (`src`), alternate text (`alt`), and link to the map (`href`) for that country.
 
 The `src` property of a country specification should point to an image in the [./assets](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/assets) directory.
 
@@ -39,7 +39,7 @@ The `src` property of a country specification should point to an image in the [.
 To configure the [Map](https://qsel.columbia.edu/cwp-epu-data-platform/map) page, you can customize the available options and styles of [base maps](#base-maps), [pre-existing maps and data](#pre-existing-maps-and-data), [landscape predictions](#landscape-predictions), [landscape observations](#landscape-observations), and [admin polygons](#admin-polygons).
 
 #### Base maps
-To add, remove, or update available base maps, you can modify the exported array **baseMaps** in [`./src/config/baseMaps`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/baseMaps), each of which is an **options** object specifying a base map's display name and style.
+To add, remove, or update available base maps, you can modify the exported array **baseMaps** in [`./src/config/baseMaps`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/baseMaps.js), each of which is an **options** object specifying a base map's display name and style.
 
 ##### Parameters
 **options** [`(Object)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
@@ -51,7 +51,7 @@ To add, remove, or update available base maps, you can modify the exported array
 | **options.isDefault** [`boolean`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean) | If `true`, this base map will be selected when the page loads |
 
 #### Pre-existing maps and data
-To add, remove, or update the available vector layers, you can modify the exported array **vectors** in [`./src/config/vectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/vectors), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
+To add, remove, or update the available vector layers, you can modify the exported array **vectors** in [`./src/config/vectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/vectors.js), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
 ```js
 new VectorSource(options)
 ```
@@ -75,7 +75,7 @@ new VectorSource(options)
 | **options.mapboxLayerOptions** [`string`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | An object which configures the appearance of the layer of a given type, e.g., [Line](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line). May have `layout` and `paint` objects specifying different properties, usually prefixed with the layer type, e.g., [`line-color`](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#paint-line-line-color). <br><br> Note that conditional styling can be based on variable values using [match](https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#match) or other [Mapbox expressions](https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/) |
 
 #### Landscape predictions
-To add, remove, or update the available raster layers, you can modify the exported array **rasterGroups** in [`./src/config/rasterGroups`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/rasterGroups), each of which is a **RasterSourceGroup** class specifying a single table where each row represents a distinct raster layer.
+To add, remove, or update the available raster layers, you can modify the exported array **rasterGroups** in [`./src/config/rasterGroups`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/rasterGroups.js), each of which is a **RasterSourceGroup** class specifying a single table where each row represents a distinct raster layer.
 
 ```js
 new RasterSourceGroup(options)
@@ -99,17 +99,17 @@ new RasterSourceGroup(options)
 
 Raster opacities can be controlled by users to help view multiple raster layers more clearly.
 
-You can modify the initial opacity when showing a landscape prediction raster by updating the `DEFAULT_RASTER_OPACITY` constant in [`./src/config/constants`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/observationVectors).
+You can modify the initial opacity when showing a landscape prediction raster by updating the `DEFAULT_RASTER_OPACITY` constant in [`./src/config/constants`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/constants.js).
 
 #### Landscape observations
-To add, remove, or update the available vector layers, you can modify the exported array **observationVectors** in [`./src/config/observationVectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/observationVectors), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
+To add, remove, or update the available vector layers, you can modify the exported array **observationVectors** in [`./src/config/observationVectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/observationVectors.js), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
 
 Landscape observation layers use the same vector configuration described above in [Pre-existing maps and data](#pre-existing-maps-and-data).
 
 Note that, currently, the landscape observation configuration takes advantage of custom geometry parsing specified in **option.getGeometry** and a static legend specification in **options.legend**.
 
 #### Admin polygons
-To add, remove, or update the available vector layers, you can modify the exported array **adminVectorSpecs** in [`./src/config/adminVectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/adminVectors), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
+To add, remove, or update the available vector layers, you can modify the exported array **adminVectorSpecs** in [`./src/config/adminVectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/adminVectors.js), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
 
 ##### Additional Parameters
 
@@ -131,10 +131,10 @@ Note that `options.mapboxLayerType` can be an [`Array<string>`](https://develope
 
 Vector opacities for admin polygons are set lower to allow viewing of base maps and other features, and raised slightly to highlight selected admin regions.
 
-You can modify the base and selected region vector opacities by updating the `SELECTED_ADMIN_VECTOR_OPACITY` and `DEFAULT_ADMIN_VECTOR_OPACITY` constants in [`./src/config/constants`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/observationVectors).
+You can modify the base and selected region vector opacities by updating the `SELECTED_ADMIN_VECTOR_OPACITY` and `DEFAULT_ADMIN_VECTOR_OPACITY` constants in [`./src/config/constants`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/constants.js).
 
 ### Download
-To add, remove, or update links on the [Download](https://qsel.columbia.edu/cwp-epu-data-platform/download) page, you can modify the exported array **downloads** in [`./src/config/downloads`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/downloads), each of which is an **options** object specifying a download's display name and link.
+To add, remove, or update links on the [Download](https://qsel.columbia.edu/cwp-epu-data-platform/download) page, you can modify the exported array **downloads** in [`./src/config/downloads`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/downloads.js), each of which is an **options** object specifying a download's display name and link.
 
 ##### Parameters
 **options** [`(Object)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
