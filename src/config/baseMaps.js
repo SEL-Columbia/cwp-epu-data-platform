@@ -5,7 +5,7 @@ const baseMaps = [
 	{
 		name: 'Topo',
 		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbva72vc19hi1ipk8im36in5',
-		isDefault: true, // must have one default: true map
+		isDefault: true, // must have one `default: true` map
 	},
 	{
 		name: 'Satellite',
