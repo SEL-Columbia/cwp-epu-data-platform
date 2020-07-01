@@ -106,7 +106,7 @@ To add, remove, or update the available vector layers, you can modify the export
 
 Landscape observation layers use the same vector configuration described above in [Pre-existing maps and data](#pre-existing-maps-and-data).
 
-Note that, currently, the landscape observation configuration takes advantage of custom geometry parsing specified in **option.getGeometry** and a static legend specification in **options.legend**.
+Note that, currently, the landscape observation configuration takes advantage of custom geometry parsing specified in **options.getGeometry** and a static legend specification in **options.legend**.
 
 #### Admin polygons
 To add, remove, or update the available vector layers, you can modify the exported array **adminVectorSpecs** in [`./src/config/adminVectors`](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/adminVectors.js), each of which is a **VectorSource** class specifying the styling and data shown in the vector layer.
