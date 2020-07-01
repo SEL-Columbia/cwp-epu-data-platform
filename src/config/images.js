@@ -1,4 +1,4 @@
-export const imagesByRegionGroup = {
+const imagesByRegionGroup = {
     Uganda: {
         src: `/assets/uganda_outline.png`,
         alt: 'Uganda outline',
@@ -15,3 +15,5 @@ export const imagesByRegionGroup = {
         href: `${process.env.ROOT_PATH}/map?zoom=6.20&lng=34.55&lat=-6.40`,
     },
 };
+
+export default imagesByRegionGroup;
