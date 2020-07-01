@@ -16,25 +16,9 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
-const REGION_GROUP_IMAGE_SIZE = 100;
+import imagesByRegionGroup from '../config/images';
 
-const imagesByRegionGroup = {
-	Uganda: {
-		src: `/assets/uganda_outline.png`,
-		alt: 'Uganda outline',
-		href: `${process.env.ROOT_PATH}/map?zoom=7&lng=32.37&lat=1.313`,
-	},
-	Ethiopia: {
-		src: `/assets/ethiopia_outline.png`,
-		alt: 'Ethiopia outline',
-		href: `${process.env.ROOT_PATH}/map?zoom=5.82&lng=40.25&lat=8.83`,
-	},
-	Tanzania: {
-		src: `/assets/tanzania_outline.png`,
-		alt: 'Tanzania outline',
-		href: `${process.env.ROOT_PATH}/map?zoom=6.20&lng=34.55&lat=-6.40`,
-	},
-};
+const REGION_GROUP_IMAGE_SIZE = 100;
 
 const CustomNestedList = withStyles((theme) => ({
 	root: {

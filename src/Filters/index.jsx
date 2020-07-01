@@ -358,18 +358,18 @@ export default function Filters({
 							min={0}
 							max={1}
 						/>
-						{customLegend.map(({ key, value }) => {
+						{customLegend.map(({ name, color }) => {
 							const LegendListItem = withStyles({
 								root: {
-									backgroundColor: hexToRgba(value, opacity),
+									backgroundColor: hexToRgba(color, opacity),
 								},
 							})(ListItem);
 
 							return (
 								<LegendListItem
-									key={key}
+									key={name}
 								>
-									<ListItemText primary={key} />
+									<ListItemText primary={name} />
 									<ListItemSecondaryAction>
 
 									</ListItemSecondaryAction>
