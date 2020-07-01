@@ -36,7 +36,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		regionNameVariable: { name: 'ID' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -80,7 +80,7 @@ const adminVectorSpecs = [
 		],
 		regionNameVariable: { name: 'DNAME2019' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -119,7 +119,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
 		regionNameVariable: { name: 'Subcounty' },
 		regionParentVariable: { name: 'District' },
-		regionBboxVariable: null,
+		regionBoundingBoxVariable: null,
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -158,7 +158,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
 		regionNameVariable: { name: 'P' },
 		regionParentVariable: { name: 'S' },
-		regionBboxVariable: null,
+		regionBoundingBoxVariable: null,
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -199,7 +199,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		regionNameVariable: { name: 'ID' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -239,7 +239,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
 		regionNameVariable: { name: 'DNAME2019' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -279,7 +279,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		regionNameVariable: { name: 'ID' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {
@@ -319,7 +319,7 @@ const adminVectorSpecs = [
 		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
 		regionNameVariable: { name: 'DNAME2019' },
 		regionParentVariable: { name: 'CAPTION' },
-		regionBboxVariable: { name: 'BBOX' },
+		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
 		mapboxLayerOptions: {

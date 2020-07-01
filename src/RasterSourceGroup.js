@@ -5,7 +5,7 @@ const MAX_RESULTS = 10000;
 
 export default class RasterSourceGroup {
 	constructor({
-		name,
+		label,
 		tableIdentifier,
 		mapboxIdVariable,
 		minNativeZoomVariable,
@@ -14,7 +14,7 @@ export default class RasterSourceGroup {
 		nameVariable,
 		customLegendsByName,
 	}) {
-		this.name = name;
+		this.label = label;
 		this.tableIdentifier = tableIdentifier;
 		this.mapboxIdVariable = mapboxIdVariable;
 		this.minNativeZoomVariable = minNativeZoomVariable;
@@ -68,7 +68,7 @@ export default class RasterSourceGroup {
 					maxNativeZoom: row[2],
 					boundingBox: row[3],
 					name: row[4],
-					label: this.name,
+					label: this.label,
 					customLegend: this.customLegendsByName && row[4] ? this.customLegendsByName[row[4]] : null,
 				});
 			});

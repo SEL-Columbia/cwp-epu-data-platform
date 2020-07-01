@@ -21,7 +21,7 @@ export default class VectorSource {
 		legend,
 		regionNameVariable,
 		regionParentVariable,
-		regionBboxVariable,
+		regionBoundingBoxVariable,
 		mapboxSourceType,
 		mapboxLayerType,
 		mapboxLayerOptions,
@@ -39,7 +39,7 @@ export default class VectorSource {
 		this.legend = legend;
 		this.regionNameVariable = regionNameVariable;
 		this.regionParentVariable = regionParentVariable;
-		this.regionBboxVariable = regionBboxVariable;
+		this.regionBoundingBoxVariable = regionBoundingBoxVariable;
 		this.mapboxSourceType = mapboxSourceType;
 		this.mapboxLayerType = mapboxLayerType;
 		this.mapboxLayerOptions = mapboxLayerOptions;
@@ -68,8 +68,8 @@ export default class VectorSource {
 		if (this.regionParentVariable) {
 			variablesSet.add(this.regionParentVariable.name.toLowerCase());
 		}
-		if (this.regionBboxVariable) {
-			variablesSet.add(this.regionBboxVariable.name.toLowerCase());
+		if (this.regionBoundingBoxVariable) {
+			variablesSet.add(this.regionBoundingBoxVariable.name.toLowerCase());
 		}
 		const variablesToFetch = [...variablesSet];
 		const variableToFetchedIndexMap = new Map();
@@ -102,8 +102,8 @@ export default class VectorSource {
 					properties.parentRegionName =
 						row[variableToFetchedIndexMap.get(this.regionParentVariable.name.toLowerCase())];
 				}
-				if (this.regionBboxVariable) {
-					properties.bbox = row[variableToFetchedIndexMap.get(this.regionBboxVariable.name.toLowerCase())];
+				if (this.regionBoundingBoxVariable) {
+					properties.bbox = row[variableToFetchedIndexMap.get(this.regionBoundingBoxVariable.name.toLowerCase())];
 				}
 				return { metadata, properties: { ...metadata, ...properties } };
 			});
