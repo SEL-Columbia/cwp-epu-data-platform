@@ -92,6 +92,10 @@ module.exports = function ({ env } = {}) {
 					sideEffects: true,
 					loader: 'style-loader!css-loader',
 				},
+				{
+					test: /\.svg$|\.html$|\.frag$|\.vert$|\.txt$|\.md$|\.woff2$/,
+					loader: 'text-loader',
+				},
 			],
 		},
 		resolve: {

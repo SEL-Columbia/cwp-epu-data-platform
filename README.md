@@ -145,7 +145,5 @@ To add, remove, or update links on the [Download](https://qsel.columbia.edu/cwp-
 | **options.links** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | An array of links, each specified by an object with the display name (`name`) and url (`href`) of the link. |
 
 ### About
-To update the content on the [About](https://qsel.columbia.edu/cwp-epu-data-platform/about) page, you can edit the html directly in [./src/About/index.jsx](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/About/index.jsx).
-
-We are in the process of moving this configuration to the [./src/config](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/) section; see [this issue](https://github.com/SEL-Columbia/cwp-epu-data-platform/issues/80) for details.
+To update the content on the [About](https://qsel.columbia.edu/cwp-epu-data-platform/about) page, you can edit the [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) in [./src/config/about.md](https://github.com/SEL-Columbia/cwp-epu-data-platform/tree/master/src/config/about.md).
 
