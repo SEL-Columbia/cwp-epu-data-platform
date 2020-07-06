@@ -1,6 +1,7 @@
 import * as pako from 'pako';
 import * as localforage from 'localforage';
-
+import * as geobuf from 'geobuf';
+import * as Pbf from 'pbf';
 localforage.config({});
 
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
@@ -12,11 +13,12 @@ export default class VectorSource {
 		hierarchyIndex,
 		tableIdentifier,
 		geoVariables,
+		isGeobuf,
 		getGeometry,
 		isDefault,
 		showOnHome,
-		filterVariables,
-		metadataVariables,
+		filterVariables = [],
+		metadataVariables = [],
 		legendVariable,
 		legend,
 		regionNameVariable,
@@ -33,6 +35,7 @@ export default class VectorSource {
 		this.hierarchyIndex = hierarchyIndex;
 		this.tableIdentifier = tableIdentifier;
 		this.geoVariables = geoVariables;
+		this.isGeobuf = isGeobuf;
 		this.filterVariables = filterVariables;
 		this.metadataVariables = metadataVariables;
 		this.legendVariable = legendVariable;
@@ -103,7 +106,8 @@ export default class VectorSource {
 						row[variableToFetchedIndexMap.get(this.regionParentVariable.name.toLowerCase())];
 				}
 				if (this.regionBoundingBoxVariable) {
-					properties.bbox = row[variableToFetchedIndexMap.get(this.regionBoundingBoxVariable.name.toLowerCase())];
+					properties.bbox =
+						row[variableToFetchedIndexMap.get(this.regionBoundingBoxVariable.name.toLowerCase())];
 				}
 				return { metadata, properties: { ...metadata, ...properties } };
 			});
@@ -140,17 +144,32 @@ export default class VectorSource {
 			this.data = data.map((row, i) => {
 				let geometry;
 				if (row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]) {
-					geometry = this.getGeometry
-						? this.getGeometry(
-								...this.geoVariables.map(
-									(geoVariable) => row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
+					if (this.isGeobuf) {
+						geometry = geobuf.decode(
+							new Pbf(
+								new Uint8Array(
+									atob(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())])
+										.split('')
+										.map(function (c) {
+											return c.charCodeAt(0);
+										}),
 								),
-						  )
-						: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
+							),
+						).geometry;
+					} else {
+						geometry = this.getGeometry
+							? this.getGeometry(
+									...this.geoVariables.map(
+										(geoVariable) =>
+											row[variableToFetchedIndexMap.get(geoVariable.name.toLowerCase())],
+									),
+							  )
+							: JSON.parse(row[variableToFetchedIndexMap.get(this.geoVariables[0].name.toLowerCase())]);
+					}
 				}
-
 				return { geometry, ...this.metadata[i] };
 			});
+
 			return this.data;
 		} catch (e) {
 			await localforage.removeItem(`version_${apiEndpoint}`);

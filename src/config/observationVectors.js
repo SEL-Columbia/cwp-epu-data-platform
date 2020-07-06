@@ -21,7 +21,7 @@ const observationVectors = [
 		name: 'Uganda Geosurvey Results',
 		label: 'Uganda',
 		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_geosurvey_results:1',
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_geosurvey_results:2',
 		geoVariables: [{ name: 'lat' }, { name: 'lon' }],
 		getGeometry: (lat, lng) => {
 			return {

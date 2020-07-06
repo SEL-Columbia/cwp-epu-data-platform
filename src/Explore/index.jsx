@@ -50,7 +50,7 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{regionGroup === 'Uganda' && // TODO remove once Ethiopia + Tanzania are regions are populated
+			{(regionGroup === 'Uganda' || regionGroup === 'Ethiopia') && // TODO remove once Ethiopia + Tanzania are regions are populated
 				regions
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.map((region) => {
