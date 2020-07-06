@@ -21,7 +21,7 @@ const vectors = [
 		name: 'Uganda Electricity Transmission Lines',
 		label: 'Uganda',
 		tableIdentifier: 'modilab.uganda_geodata:3.uganda_electricity_transmission_lines:6',
-		geoVariables: [{ name: 'geoBuf' }],
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
 		isGeobuf: true,
 		filterVariables: [{ name: 'VOLTAGE_KV' }, { name: 'STATUS' }, { name: 'INSTALLATI' }, { name: 'STRUCTURE_' }],
 		metadataVariables: [
@@ -85,7 +85,7 @@ const vectors = [
 		label: 'Uganda',
 		isDefault: true,
 		tableIdentifier: `modilab.uganda_geodata:3.umeme_rea_power_distribution_lines_2018:5`,
-		geoVariables: [{ name: 'geoBuf' }],
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
 		isGeobuf: true,
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
