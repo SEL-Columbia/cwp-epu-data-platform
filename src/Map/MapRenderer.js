@@ -2,8 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import './styles.css';
 import baseMaps from '../config/baseMaps';
 
-mapboxgl.accessToken =
-	'pk.eyJ1IjoiY29sdW1iaWEtZGF0YXBsYXRmb3JtIiwiYSI6ImNrYXpxbml5bDAwMzEycm11NGpqd2l3b2cifQ.-ql-7fIcoPv0c-m6ezRwjw';
+mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
 const DEFAULT_CENTER = [33, 1]; // [lng, lat]
 const DEFAULT_ZOOM = 7;
@@ -179,9 +178,10 @@ export default class MapRenderer {
 							// based on the feature found.
 							popup
 								.setLngLat(coordinates)
-								.setHTML(Object.keys(metadata)
-									.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
-									.join(''),
+								.setHTML(
+									Object.keys(metadata)
+										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+										.join(''),
 								)
 								.addTo(this.map);
 						}
@@ -352,7 +352,7 @@ export default class MapRenderer {
 				} else {
 					const id = `${rasterLayer.name}_raster`;
 					const currentOpacity = this.map.getPaintProperty(id, 'raster-opacity');
-					if (rasterLayer.opacity !== currentOpacity){
+					if (rasterLayer.opacity !== currentOpacity) {
 						this.map.setPaintProperty(id, 'raster-opacity', rasterLayer.opacity);
 					}
 				}

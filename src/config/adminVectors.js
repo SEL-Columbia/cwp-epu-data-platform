@@ -1,17 +1,7 @@
 import VectorSource from '../VectorSource';
 
-import {
-	DEFAULT_ADMIN_VECTOR_OPACITY,
-} from './constants';
-
-/*
- * name: display name, required. Must be unique.
- * label: to assign a grouping to the layer
- * tableIdentifier: The fully qualified Redivis table identifier. Make sure to point to the current version
- * geoVariables:
- * filterVariables
- * metadataVariables
- * */
+import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
+const simplificationLevels = [1, 5, 10, 20, 50];
 
 const vectorPriorityByNameMap = {
 	// higher numbers will be rendered on top of lower numbers
@@ -30,8 +20,9 @@ const adminVectorSpecs = [
 		hierarchyIndex: 0,
 		isDefault: true,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_regions:8',
-		geoVariables: [{ name: 'geom' }],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_regions:9',
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
+		isGeobuf: true,
 		filterVariables: [],
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		regionNameVariable: { name: 'ID' },
@@ -70,8 +61,9 @@ const adminVectorSpecs = [
 		hierarchyIndex: 1,
 		isDefault: false,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1:next.uganda_districts:9',
-		geoVariables: [{ name: 'geom' }],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_districts:3',
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
+		isGeobuf: true,
 		filterVariables: [],
 		metadataVariables: [
 			{ name: 'AREA_SQKM', label: 'Area (km^2)' },
@@ -113,9 +105,9 @@ const adminVectorSpecs = [
 		label: 'Uganda',
 		hierarchyIndex: 2,
 		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_subcounties:11',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_subcounties:8',
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
+		isGeobuf: true,
 		metadataVariables: [{ name: 'District' }, { name: 'County' }, { name: 'Subcounty' }, { name: 'regions' }],
 		regionNameVariable: { name: 'Subcounty' },
 		regionParentVariable: { name: 'District' },
@@ -148,12 +140,13 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Parishes (full res, 74MB)',
+		name: 'Parishes',
 		label: 'Uganda',
 		hierarchyIndex: 3,
 		isDefault: false,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_parishes:10',
-		geoVariables: [{ name: 'geom' }],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_parishes:7',
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
+		isGeobuf: true,
 		filterVariables: [],
 		metadataVariables: [{ name: 'DName2016' }, { name: 'CName2016' }, { name: 'SName2016' }],
 		regionNameVariable: { name: 'P' },
@@ -193,12 +186,10 @@ const adminVectorSpecs = [
 		hierarchyIndex: 0,
 		isDefault: true,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_regions:8',
+		tableIdentifier: 'modilab.ethiopia_geodata:2.ethiopia_regions:3',
 		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
-		regionNameVariable: { name: 'ID' },
-		regionParentVariable: { name: 'CAPTION' },
+		metadataVariables: [{ name: 'ADM1_EN', label: 'Region' }],
+		regionNameVariable: { name: 'ADM1_EN' },
 		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
@@ -223,46 +214,6 @@ const adminVectorSpecs = [
 					'line-color': '#787b8c',
 					'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.5, 10, 2],
 					'line-dasharray': [10, 0],
-				},
-			},
-		},
-	},
-	{
-		name: 'Ethiopia Districts',
-		label: 'Ethiopia',
-		hierarchyIndex: 1,
-		isDefault: false,
-		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_districts:9',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
-		regionNameVariable: { name: 'DNAME2019' },
-		regionParentVariable: { name: 'CAPTION' },
-		regionBoundingBoxVariable: { name: 'BBOX' },
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: ['fill', 'line'],
-		mapboxLayerOptions: {
-			fill: {
-				layout: {
-					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
-				},
-				paint: {
-					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
-					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
-					'fill-color': '#9699a6',
-				},
-			},
-			line: {
-				layout: {
-					'line-join': 'round',
-					'line-cap': 'round',
-					'line-sort-key': vectorPriorityByNameMap['Uganda Districts'],
-				},
-				paint: {
-					'line-color': '#9699a6',
-					'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.75, 12, 1.5],
-					'line-dasharray': ['step', ['zoom'], ['literal', [2, 0]], 7, ['literal', [2, 2, 6, 2]]],
 				},
 			},
 		},
@@ -273,8 +224,9 @@ const adminVectorSpecs = [
 		hierarchyIndex: 0,
 		isDefault: true,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_regions:8',
-		geoVariables: [{ name: 'geom' }],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_regions:9',
+		geoVariables: [{ name: 'geoBuf_simplified_10' }],
+		isGeobuf: true,
 		filterVariables: [],
 		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
 		regionNameVariable: { name: 'ID' },
@@ -307,63 +259,19 @@ const adminVectorSpecs = [
 			},
 		},
 	},
-	{
-		name: 'Tanzania Districts',
-		label: 'Tanzania',
-		hierarchyIndex: 1,
-		isDefault: false,
-		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_districts:9',
-		geoVariables: [{ name: 'geom' }],
-		filterVariables: [],
-		metadataVariables: [{ name: 'DNAME2016' }, { name: 'DNAMA2017' }, { name: 'DNAME2018' }, { name: 'DNAME2019' }],
-		regionNameVariable: { name: 'DNAME2019' },
-		regionParentVariable: { name: 'CAPTION' },
-		regionBoundingBoxVariable: { name: 'BBOX' },
-		mapboxSourceType: 'geojson',
-		mapboxLayerType: ['fill', 'line'],
-		mapboxLayerOptions: {
-			fill: {
-				layout: {
-					'fill-sort-key': vectorPriorityByNameMap['Uganda Districts'],
-				},
-				paint: {
-					// conditional styling with 'get' expression: see https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#types-number
-					'fill-opacity': ['number', ['get', 'opacity'], DEFAULT_ADMIN_VECTOR_OPACITY],
-					'fill-color': '#9699a6',
-				},
-			},
-			line: {
-				layout: {
-					'line-join': 'round',
-					'line-cap': 'round',
-					'line-sort-key': vectorPriorityByNameMap['Uganda Districts'],
-				},
-				paint: {
-					'line-color': '#9699a6',
-					'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.75, 12, 1.5],
-					'line-dasharray': ['step', ['zoom'], ['literal', [2, 0]], 7, ['literal', [2, 2, 6, 2]]],
-				},
-			},
-		},
-	},
 ];
 
-const simplificationTables = [
-	{
-		name: 'Parishes (100m, 9MB)',
-		tableIdentifier: 'imathews.uganda_boundaries:68.table_6:6',
-		level: 3,
-	},
-	{
-		name: 'Parishes (500m, 4MB)',
-		tableIdentifier: 'imathews.uganda_boundaries:68.table_8:8',
-		level: 3,
-	},
-];
-
-for (const table of simplificationTables) {
-	adminVectorSpecs.push({ ...adminVectorSpecs[table.level], ...table });
+for (let i = 0; i < adminVectorSpecs.length; i++) {
+	for (let n = 0; n < simplificationLevels.length; n++) {
+		const level = simplificationLevels[n];
+		adminVectorSpecs.splice(i + n + 1, 0, {
+			...adminVectorSpecs[i],
+			isDefault: false,
+			name: `${adminVectorSpecs[i].name} (${level}%)`,
+			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
+		});
+	}
+	i += simplificationLevels.length;
 }
 
 export default adminVectorSpecs.map((obj) => new VectorSource(obj));
