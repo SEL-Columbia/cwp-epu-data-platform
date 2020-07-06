@@ -267,6 +267,7 @@ for (let i = 0; i < adminVectorSpecs.length; i++) {
 		adminVectorSpecs.splice(i + n + 1, 0, {
 			...adminVectorSpecs[i],
 			isDefault: false,
+			showOnHome: false,
 			name: `${adminVectorSpecs[i].name} (${level}%)`,
 			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
 		});
