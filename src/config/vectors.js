@@ -77,7 +77,7 @@ const vectors = [
 	{
 		name: 'UMEME REA power distribution lines 2018',
 		label: 'Uganda',
-		isDefault: true,
+		isDefault: false,
 		tableIdentifier: `modilab.uganda_geodata:3.umeme_rea_power_distribution_lines_2018:5`,
 		geoVariables: [{ name: 'geoBuf' }],
 		isGeobuf: true,
