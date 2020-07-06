@@ -229,7 +229,7 @@ function nestRegions(parentRegions) {
 	});
 
 	lowerLevelRegion.regions.forEach((region) => {
-		const parent = region.parent.toLowerCase();
+		const parent = region.parent ? region.parent.toLowerCase() : null;
 		if (!parent || parentRegionIndexesByName[parent] === undefined) {
 			console.error(
 				`Region (${region.name}) does not have a parent or parent (${parent}) was not found in higher level regions`,
