@@ -1,6 +1,7 @@
 import VectorSource from '../VectorSource';
 
 import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
+const simplificationLevels = [1, 5, 10, 20, 50];
 
 const vectorPriorityByNameMap = {
 	// higher numbers will be rendered on top of lower numbers
@@ -259,5 +260,18 @@ const adminVectorSpecs = [
 		},
 	},
 ];
+
+for (let i = 0; i < adminVectorSpecs.length; i++) {
+	for (let n = 0; n < simplificationLevels.length; n++) {
+		const level = simplificationLevels[n];
+		adminVectorSpecs.splice(i + n + 1, 0, {
+			...adminVectorSpecs[i],
+			isDefault: false,
+			name: `${adminVectorSpecs[i].name} (${level}%)`,
+			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
+		});
+	}
+	i += simplificationLevels.length;
+}
 
 export default adminVectorSpecs.map((obj) => new VectorSource(obj));
