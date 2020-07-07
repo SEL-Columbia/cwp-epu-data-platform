@@ -1,6 +1,7 @@
 import VectorSource from '../VectorSource';
 
 import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
+
 const simplificationLevels = [1, 10];
 
 const vectorPriorityByNameMap = {
@@ -188,8 +189,10 @@ const adminVectorSpecs = [
 		tableIdentifier: 'modilab.ethiopia_geodata:2.ethiopia_regions:3',
 		geoVariables: [{ name: 'geoBuf' }],
 		isGeobuf: true,
+		filterVariables: [],
 		metadataVariables: [{ name: 'ADM1_EN', label: 'Region' }],
 		regionNameVariable: { name: 'ADM1_EN' },
+		regionParentVariable: { name: 'ADM0_EN' },
 		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
