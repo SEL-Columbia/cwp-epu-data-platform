@@ -50,16 +50,16 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{regionGroup === 'Uganda' && // TODO remove once Ethiopia + Tanzania are regions are populated
-				regions
-					.sort((a, b) => a.name.localeCompare(b.name))
-					.map((region) => {
-						const { name, regions } = region;
-						const isCollapsed = regionIsCollapsed[regionGroup][name];
-						return (
-							<React.Fragment key={`${regionGroup}_${name}`}>
-								<ListItem button onClick={() => onSelectRegion(region)}>
-									<ListItemText primary={name} />
+			{regions
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.map((region) => {
+					const { name, regions } = region;
+					const isCollapsed = regionIsCollapsed[regionGroup][name];
+					return (
+						<React.Fragment key={`${regionGroup}_${name}`}>
+							<ListItem button onClick={() => onSelectRegion(region)}>
+								<ListItemText primary={name} />
+								{regions && (
 									<ListItemSecondaryAction>
 										<IconButton
 											edge="end"
@@ -69,7 +69,9 @@ const CustomNestedList = withStyles((theme) => ({
 											{isCollapsed ? <ExpandLess /> : <ExpandMore />}
 										</IconButton>
 									</ListItemSecondaryAction>
-								</ListItem>
+								)}
+							</ListItem>
+							{regions && (
 								<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
 									<List component="div" disablePadding dense={true}>
 										{regions
@@ -88,9 +90,10 @@ const CustomNestedList = withStyles((theme) => ({
 											})}
 									</List>
 								</Collapse>
-							</React.Fragment>
-						);
-					})}
+							)}
+						</React.Fragment>
+					);
+				})}
 		</List>
 	);
 });
@@ -209,6 +212,13 @@ function nestRegions(parentRegions) {
 	const higherLevelRegion = parentRegions[1];
 
 	if (parentRegions.length < 2) {
+		lowerLevelRegion.regions = lowerLevelRegion.regions.map((region) => ({
+			...region,
+			regionLevel: lowerLevelRegion.regionLevel,
+			hierarchyIndex: lowerLevelRegion.hierarchyIndex,
+			regionGroup: lowerLevelRegion.regionGroup,
+			// regions: [],
+		}));
 		return lowerLevelRegion;
 	}
 
