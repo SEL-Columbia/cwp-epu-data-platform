@@ -70,7 +70,6 @@ const CustomNestedList = withStyles((theme) => ({
 										</IconButton>
 									)}
 								</ListItemSecondaryAction>
-								)}
 							</ListItem>
 							<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
 								<List component="div" disablePadding dense={true}>
