@@ -1,8 +1,6 @@
 import VectorSource from '../VectorSource';
 
-import {
-	DEFAULT_ADMIN_VECTOR_OPACITY,
-} from './constants';
+import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
 
 /*
  * name: display name, required. Must be unique.
@@ -193,12 +191,12 @@ const adminVectorSpecs = [
 		hierarchyIndex: 0,
 		isDefault: true,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:1.uganda_regions:8',
+		tableIdentifier: 'modilab.ethiopia_geodata:2.ethiopia_regions:3',
 		geoVariables: [{ name: 'geom' }],
 		filterVariables: [],
-		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
-		regionNameVariable: { name: 'ID' },
-		regionParentVariable: { name: 'CAPTION' },
+		metadataVariables: [{ name: 'ADM1_EN' }],
+		regionNameVariable: { name: 'ADM1_EN' },
+		regionParentVariable: { name: 'ADM0_EN' },
 		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
