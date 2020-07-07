@@ -50,49 +50,49 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{(regionGroup === 'Uganda' || regionGroup === 'Ethiopia') && // TODO remove once Ethiopia + Tanzania are regions are populated
-				regions
-					.sort((a, b) => a.name.localeCompare(b.name))
-					.map((region) => {
-						const { name, regions = [] } = region;
-						const isCollapsed = regionIsCollapsed[regionGroup][name];
-						return (
-							<React.Fragment key={`${regionGroup}_${name}`}>
-								<ListItem button onClick={() => onSelectRegion(region)}>
-									<ListItemText primary={name} />
-									<ListItemSecondaryAction>
-										{!!regions.length && (
-											<IconButton
-												edge="end"
-												aria-label="comments"
-												onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
-											>
-												{isCollapsed ? <ExpandLess /> : <ExpandMore />}
-											</IconButton>
-										)}
-									</ListItemSecondaryAction>
-								</ListItem>
-								<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
-									<List component="div" disablePadding dense={true}>
-										{regions
-											.sort((a, b) => a.name.localeCompare(b.name))
-											.map((region) => {
-												return (
-													<ListItem
-														key={`${regionGroup}_${name}_${region.name}`}
-														button
-														className={classes.nested}
-														onClick={() => onSelectRegion(region)}
-													>
-														<ListItemText primary={region.name} />
-													</ListItem>
-												);
-											})}
-									</List>
-								</Collapse>
-							</React.Fragment>
-						);
-					})}
+			{regions
+				.sort((a, b) => a.name.localeCompare(b.name))
+				.map((region) => {
+					const { name, regions = [] } = region;
+					const isCollapsed = regionIsCollapsed[regionGroup][name];
+					return (
+						<React.Fragment key={`${regionGroup}_${name}`}>
+							<ListItem button onClick={() => onSelectRegion(region)}>
+								<ListItemText primary={name} />
+								<ListItemSecondaryAction>
+									{!!regions.length && (
+										<IconButton
+											edge="end"
+											aria-label="comments"
+											onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
+										>
+											{isCollapsed ? <ExpandLess /> : <ExpandMore />}
+										</IconButton>
+									)}
+								</ListItemSecondaryAction>
+								)}
+							</ListItem>
+							<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
+								<List component="div" disablePadding dense={true}>
+									{regions
+										.sort((a, b) => a.name.localeCompare(b.name))
+										.map((region) => {
+											return (
+												<ListItem
+													key={`${regionGroup}_${name}_${region.name}`}
+													button
+													className={classes.nested}
+													onClick={() => onSelectRegion(region)}
+												>
+													<ListItemText primary={region.name} />
+												</ListItem>
+											);
+										})}
+								</List>
+							</Collapse>
+						</React.Fragment>
+					);
+				})}
 		</List>
 	);
 });
@@ -211,6 +211,13 @@ function nestRegions(parentRegions) {
 	const higherLevelRegion = parentRegions[1];
 
 	if (parentRegions.length < 2) {
+		lowerLevelRegion.regions = lowerLevelRegion.regions.map((region) => ({
+			...region,
+			regionLevel: lowerLevelRegion.regionLevel,
+			hierarchyIndex: lowerLevelRegion.hierarchyIndex,
+			regionGroup: lowerLevelRegion.regionGroup,
+			// regions: [],
+		}));
 		return lowerLevelRegion;
 	}
 

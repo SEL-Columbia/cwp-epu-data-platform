@@ -2,7 +2,7 @@ import VectorSource from '../VectorSource';
 
 import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
 
-const simplificationLevels = [1, 5, 10, 20, 50];
+const simplificationLevels = [1, 10];
 
 const vectorPriorityByNameMap = {
 	// higher numbers will be rendered on top of lower numbers
@@ -180,15 +180,15 @@ const adminVectorSpecs = [
 			},
 		},
 	},
-	// TODO replace duplicate Uganda levels below for actual Ethiopia/Tanzania levels
 	{
 		name: 'Ethiopia Regions',
 		label: 'Ethiopia',
 		hierarchyIndex: 0,
-		isDefault: true,
+		isDefault: false,
 		showOnHome: true,
 		tableIdentifier: 'modilab.ethiopia_geodata:2.ethiopia_regions:3',
-		geoVariables: [{ name: 'geom' }],
+		geoVariables: [{ name: 'geoBuf' }],
+		isGeobuf: true,
 		filterVariables: [],
 		metadataVariables: [{ name: 'ADM1_EN', label: 'Region' }],
 		regionNameVariable: { name: 'ADM1_EN' },
@@ -225,15 +225,14 @@ const adminVectorSpecs = [
 		name: 'Tanzania Regions',
 		label: 'Tanzania',
 		hierarchyIndex: 0,
-		isDefault: true,
+		isDefault: false,
 		showOnHome: true,
-		tableIdentifier: 'modilab.uganda_geodata:3.uganda_regions:9',
+		tableIdentifier: 'modilab.tanzania_geodata:4.tanzania_regions:2',
 		geoVariables: [{ name: 'geoBuf' }],
 		isGeobuf: true,
 		filterVariables: [],
-		metadataVariables: [{ name: 'AREA' }, { name: 'PERIMETER' }, { name: 'ID' }, { name: 'CAPTION' }],
-		regionNameVariable: { name: 'ID' },
-		regionParentVariable: { name: 'CAPTION' },
+		metadataVariables: [{ name: 'ADM1_EN', label: 'Region' }],
+		regionNameVariable: { name: 'ADM1_EN' },
 		regionBoundingBoxVariable: { name: 'BBOX' },
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: ['fill', 'line'],
