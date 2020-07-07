@@ -1,12 +1,6 @@
 import VectorSource from '../VectorSource';
 
-/*
- * name: display name, required. Must be unique.
- * tableIdentifier: The fully qualified Redivis table identifier. Make sure to point to the current version
- * geoVariables:
- * filterVariables
- * metadataVariables
- * */
+const simplificationLevels = [1, 5, 10, 20, 50];
 
 import adminVectors from './adminVectors';
 
@@ -17,11 +11,12 @@ const vectorPriorityByNameMap = {
 };
 
 const vectors = [
-	new VectorSource({
+	{
 		name: 'Uganda Electricity Transmission Lines',
 		label: 'Uganda',
-		tableIdentifier: 'modilab.uganda_geodata:1:current.uganda_electricity_transmission_lines:12',
-		geoVariables: [{ name: 'geom' }],
+		tableIdentifier: 'modilab.uganda_geodata:3.uganda_electricity_transmission_lines:6',
+		geoVariables: [{ name: 'geoBuf' }],
+		isGeobuf: true,
 		filterVariables: [{ name: 'VOLTAGE_KV' }, { name: 'STATUS' }, { name: 'INSTALLATI' }, { name: 'STRUCTURE_' }],
 		metadataVariables: [
 			{ name: 'OBJECTID' },
@@ -61,7 +56,7 @@ const vectors = [
 					'#74a9cf',
 					'66',
 					'#bdc9e1',
-					'#f1eef6', /* other */
+					'#f1eef6' /* other */,
 				],
 				'line-width': 4,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
@@ -78,13 +73,14 @@ const vectors = [
 				// ],
 			},
 		},
-	}),
-	new VectorSource({
+	},
+	{
 		name: 'UMEME REA power distribution lines 2018',
 		label: 'Uganda',
-		isDefault: true,
-		tableIdentifier: `modilab.uganda_geodata:1:v2_5.umeme_rea_power_distribution_lines_2018:7`,
-		geoVariables: [{ name: 'geom' }],
+		isDefault: false,
+		tableIdentifier: `modilab.uganda_geodata:3.umeme_rea_power_distribution_lines_2018:5`,
+		geoVariables: [{ name: 'geoBuf' }],
+		isGeobuf: true,
 		filterVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		metadataVariables: [{ name: 'Voltage' }, { name: 'Status' }, { name: 'Phase' }],
 		legendVariable: { name: 'Voltage', mapboxPaintProperty: 'line-color' },
@@ -107,7 +103,7 @@ const vectors = [
 					'#dd1c77',
 					'11 kV',
 					'#c994c7',
-					'#e7e1ef', /* other */
+					'#e7e1ef' /* other */,
 				],
 				'line-width': 2,
 				// TODO: 'line-dasharray' doesn't yet support data expressions (check for 'data-driven styling' row in each layer property at https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#line)
@@ -124,7 +120,20 @@ const vectors = [
 				// ],
 			},
 		},
-	}),
+	},
 ];
 
-export default vectors;
+for (let i = 0; i < vectors.length; i++) {
+	for (let n = 0; n < simplificationLevels.length; n++) {
+		const level = simplificationLevels[n];
+		vectors.splice(i + n + 1, 0, {
+			...vectors[i],
+			isDefault: false,
+			name: `${vectors[i].name} (${level}%)`,
+			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
+		});
+	}
+	i += simplificationLevels.length;
+}
+
+export default vectors.map((obj) => new VectorSource(obj));

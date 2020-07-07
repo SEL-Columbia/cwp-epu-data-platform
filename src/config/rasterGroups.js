@@ -3,7 +3,7 @@ import RasterSourceGroup from '../RasterSourceGroup';
 const rasterGroups = [
 	new RasterSourceGroup({
 		label: 'Uganda',
-		tableIdentifier: `modilab.uganda_geodata:1.raster_layer_metadata:13`,
+		tableIdentifier: `modilab.uganda_geodata:3.raster_layer_metadata:1`,
 		mapboxIdVariable: { name: 'mapbox_id' },
 		minNativeZoomVariable: { name: 'zoom_min' },
 		maxNativeZoomVariable: { name: 'zoom_max' },
