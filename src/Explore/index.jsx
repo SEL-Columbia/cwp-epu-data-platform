@@ -50,24 +50,26 @@ const CustomNestedList = withStyles((theme) => ({
 			}
 			className={classes.root}
 		>
-			{regionGroup === 'Uganda' && // TODO remove once Ethiopia + Tanzania are regions are populated
+			{(regionGroup === 'Uganda' || regionGroup === 'Ethiopia') && // TODO remove once Ethiopia + Tanzania are regions are populated
 				regions
 					.sort((a, b) => a.name.localeCompare(b.name))
 					.map((region) => {
-						const { name, regions } = region;
+						const { name, regions = [] } = region;
 						const isCollapsed = regionIsCollapsed[regionGroup][name];
 						return (
 							<React.Fragment key={`${regionGroup}_${name}`}>
 								<ListItem button onClick={() => onSelectRegion(region)}>
 									<ListItemText primary={name} />
 									<ListItemSecondaryAction>
-										<IconButton
-											edge="end"
-											aria-label="comments"
-											onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
-										>
-											{isCollapsed ? <ExpandLess /> : <ExpandMore />}
-										</IconButton>
+										{!!regions.length && (
+											<IconButton
+												edge="end"
+												aria-label="comments"
+												onClick={() => onToggleRegionIsCollapsed(regionGroup, name)}
+											>
+												{isCollapsed ? <ExpandLess /> : <ExpandMore />}
+											</IconButton>
+										)}
 									</ListItemSecondaryAction>
 								</ListItem>
 								<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
