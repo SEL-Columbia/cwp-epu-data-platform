@@ -63,13 +63,40 @@ const CustomSlider = withStyles({
 	},
 	mark: {
 		backgroundColor: grey[500],
-	}
+	},
+})(Slider);
+
+const LegendSlider = withStyles({
+	thumb: {
+		backgroundColor: grey[500],
+		display: 'none',
+		// '&:focus, &:hover, &$active': {
+		// 	boxShadow: '#ccc 0 2px 3px 1px',
+		// },
+	},
+	track: {
+		backgroundColor: grey[500],
+		display: 'none',
+	},
+	rail: {
+		backgroundColor: grey[500],
+		display: 'none',
+	},
+	mark: {
+		backgroundColor: grey[500],
+	},
+	root: {
+		padding: 0,
+	},
+	markLabel: {
+		top: 5,
+	},
 })(Slider);
 
 const CustomCircularProgress = withStyles({
 	root: {
 		color: grey[300],
-	}
+	},
 })((props) => <CircularProgress size={15} {...props} />);
 
 const CustomCollapse = withStyles({
@@ -98,7 +125,7 @@ const CustomListItem = withStyles({
 		marginLeft: -30,
 		marginRight: -30,
 	},
-})(ListItem)
+})(ListItem);
 
 const CustomListItemText = withStyles({
 	primary: {
@@ -121,15 +148,14 @@ const LegendList = withStyles({
 		paddingLeft: 20,
 		paddingBottom: 10,
 		marginRight: 16,
-	}
+	},
 })(List);
 
-function hexToRgba(hex, opacity){
+function hexToRgba(hex, opacity) {
 	const r = parseInt(hex.slice(1, 3), 16);
 	const g = parseInt(hex.slice(3, 5), 16);
 	const b = parseInt(hex.slice(5), 16);
 	return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-
 }
 
 function ValueLabelComponent(props) {
@@ -142,18 +168,18 @@ function ValueLabelComponent(props) {
 	);
 }
 
-import vectorStyles from './vectorStyles'
+import vectorStyles from './vectorStyles';
 
 import * as styles from './styles.css';
 
-function groupOptions(options){
+function groupOptions(options) {
 	const groupLabelsSet = new Set([]);
 	const groups = [];
-	for (const option of options){
+	for (const option of options) {
 		const label = option.label || '';
-		if (!groupLabelsSet.has(label)){
+		if (!groupLabelsSet.has(label)) {
 			groups.push({ label, options: [] });
-			groupLabelsSet.add(label)
+			groupLabelsSet.add(label);
 		}
 		const group = groups.find((group) => group.label === label);
 		group.options.push(option);
@@ -162,7 +188,7 @@ function groupOptions(options){
 }
 
 function sortValues(a, b) {
-	if (!isNaN(a) && !isNaN(b)){
+	if (!isNaN(a) && !isNaN(b)) {
 		return parseInt(b, 10) - parseInt(a, 10);
 	} else {
 		return b.localeCompare(a);
@@ -194,13 +220,13 @@ export default function Filters({
 	isLoadingObservationVectors,
 	isLoadingAdminVectors,
 }) {
-	function handleSelectBaseMapLayer(selectedBaseMapLayerName){
+	function handleSelectBaseMapLayer(selectedBaseMapLayerName) {
 		onUpdateBaseMapLayer(selectedBaseMapLayerName);
 	}
 
-	function handleToggleVectorLayer(name, checked){
+	function handleToggleVectorLayer(name, checked) {
 		let nextSelectedVectorLayerNamesSet = new Set([...selectedVectorLayerNamesSet]);
-		if (checked){
+		if (checked) {
 			nextSelectedVectorLayerNamesSet.add(name);
 		} else {
 			nextSelectedVectorLayerNamesSet.delete(name);
@@ -208,9 +234,9 @@ export default function Filters({
 		onUpdateVectorLayers(nextSelectedVectorLayerNamesSet);
 	}
 
-	function handleToggleRasterLayer(name, checked){
+	function handleToggleRasterLayer(name, checked) {
 		let nextSelectedRasterLayerNamesSet = new Set([...selectedRasterLayerNamesSet]);
-		if (checked){
+		if (checked) {
 			nextSelectedRasterLayerNamesSet.add(name);
 		} else {
 			nextSelectedRasterLayerNamesSet.delete(name);
@@ -218,34 +244,34 @@ export default function Filters({
 		onUpdateRasterLayers(nextSelectedRasterLayerNamesSet);
 	}
 
-	function handleUpdateRasterOpacity(name, opacity){
+	function handleUpdateRasterOpacity(name, opacity) {
 		let nextRasterOpacityByNameMap = { ...rasterOpacityByNameMap };
 		nextRasterOpacityByNameMap[name] = opacity;
 		onUpdateRasterLayerOpacityByNameMap(nextRasterOpacityByNameMap);
 	}
 
-	function handleToggleObservationVectorLayer(name, checked){
+	function handleToggleObservationVectorLayer(name, checked) {
 		let nextSelectedObservationVectorLayerNamesSet = new Set([...selectedObservationVectorLayerNamesSet]);
-		if (checked){
+		if (checked) {
 			nextSelectedObservationVectorLayerNamesSet.add(name);
 		} else {
 			nextSelectedObservationVectorLayerNamesSet.delete(name);
 		}
 		onUpdateObservationVectorLayers(nextSelectedObservationVectorLayerNamesSet);
-	};
+	}
 
-	function handleSelectAdminVectorLayer(selectedAdminVectorLayerName){
+	function handleSelectAdminVectorLayer(selectedAdminVectorLayerName) {
 		onUpdateAdminVectorLayer(selectedAdminVectorLayerName);
 	}
 
-	function handleToggleFilter(checked, value, filterName, vectorName){
+	function handleToggleFilter(checked, value, filterName, vectorName) {
 		const nextVectorFiltersByNamesMap = { ...vectorFiltersByNamesMap };
 
 		const nextSelectedValuesSet = new Set([
 			...nextVectorFiltersByNamesMap[vectorName][filterName].selectedValuesSet,
 		]);
 
-		if (checked){
+		if (checked) {
 			nextSelectedValuesSet.add(value);
 		} else {
 			nextSelectedValuesSet.delete(value);
@@ -263,7 +289,7 @@ export default function Filters({
 		});
 	}
 
-	function renderLegend(checked, option){
+	function renderLegend(checked, option) {
 		const { name, mapboxLayerOptions, legendVariable, legend, customLegend } = option;
 
 		if (legendVariable) {
@@ -274,14 +300,9 @@ export default function Filters({
 				filterName: legendVariable.name,
 				valuesSet: ((filtersMap || {})[legendVariable.name] || {}).valuesSet,
 				selectedValuesSet: ((filtersMap || {})[legendVariable.name] || {}).selectedValuesSet,
-			}
+			};
 
-			const {
-				vectorName,
-				filterName,
-				valuesSet = new Set([]),
-				selectedValuesSet = new Set([]),
-			} = legendFilter;
+			const { vectorName, filterName, valuesSet = new Set([]), selectedValuesSet = new Set([]) } = legendFilter;
 			const values = [...valuesSet];
 
 			const colorsByValue = {};
@@ -302,7 +323,9 @@ export default function Filters({
 							const checked = selectedValuesSet.has(value);
 							const LegendListItem = withStyles({
 								root: {
-									backgroundColor: checked ? colorsByValue[value] || colorsByValue.default : grey[200],
+									backgroundColor: checked
+										? colorsByValue[value] || colorsByValue.default
+										: grey[200],
 								},
 							})(ListItem);
 
@@ -323,14 +346,14 @@ export default function Filters({
 							})(Switch);
 
 							return (
-								<LegendListItem
-									key={value}
-								>
-									<ListItemText primary={value}/>
+								<LegendListItem key={value}>
+									<ListItemText primary={value} />
 									<ListItemSecondaryAction>
 										<LegendSwitch
 											edge="end"
-											onChange={(e) => handleToggleFilter(e.target.checked, value, filterName, vectorName)}
+											onChange={(e) =>
+												handleToggleFilter(e.target.checked, value, filterName, vectorName)
+											}
 											checked={checked}
 										/>
 									</ListItemSecondaryAction>
@@ -340,8 +363,74 @@ export default function Filters({
 					</LegendList>
 				</Collapse>
 			);
-		} else if (customLegend){
+		} else if (customLegend) {
 			const opacity = rasterOpacityByNameMap[name];
+			const { type, categories, min, max } = customLegend;
+			let legendNode = null;
+			if (type === 'categorical') {
+				legendNode = categories.map(({ name, color }) => {
+					const LegendListItem = withStyles({
+						root: {
+							backgroundColor: hexToRgba(color, opacity),
+						},
+					})(ListItem);
+
+					return (
+						<LegendListItem key={name}>
+							<ListItemText primary={name} />
+							<ListItemSecondaryAction></ListItemSecondaryAction>
+						</LegendListItem>
+					);
+				});
+			} else if (type === 'continuous') {
+				const LegendListItem = withStyles({
+					root: {
+						background: `linear-gradient(to right, ${hexToRgba(min.color, opacity)}, ${hexToRgba(
+							max.color,
+							opacity,
+						)})`,
+					},
+				})(ListItem);
+				const LeftAlignedListItemText = withStyles({
+					root: {
+						color: max.color,
+					},
+				})(ListItemText);
+
+				const RightAlignedListItemText = withStyles({
+					root: {
+						textAlign: 'right',
+						color: min.color,
+					},
+				})(ListItemText);
+
+				const steps = [
+					{ value: 0, label: '0.0' },
+					{ value: 0.2, label: '0.2' },
+					{ value: 0.4, label: '0.4' },
+					{ value: 0.6, label: '0.6' },
+					{ value: 0.8, label: '0.8' },
+					{ value: 1, label: '1.0' },
+				];
+
+				legendNode = (
+					<React.Fragment>
+						<LegendListItem key={name}>
+							<LeftAlignedListItemText primary={min.name} />
+							<RightAlignedListItemText primary={max.name} />
+						</LegendListItem>
+						<LegendSlider
+							step={0.1}
+							min={0}
+							max={1}
+							valueLabelDisplay="auto"
+							disabled={true}
+							marks={steps}
+						/>
+					</React.Fragment>
+				);
+			}
+
 			return (
 				<Collapse in={checked} timeout="auto" unmountOnExit>
 					<LegendList component="div" disablePadding dense={true}>
@@ -358,28 +447,11 @@ export default function Filters({
 							min={0}
 							max={1}
 						/>
-						{customLegend.map(({ name, color }) => {
-							const LegendListItem = withStyles({
-								root: {
-									backgroundColor: hexToRgba(color, opacity),
-								},
-							})(ListItem);
-
-							return (
-								<LegendListItem
-									key={name}
-								>
-									<ListItemText primary={name} />
-									<ListItemSecondaryAction>
-
-									</ListItemSecondaryAction>
-								</LegendListItem>
-							);
-						})}
+						{legendNode}
 					</LegendList>
 				</Collapse>
 			);
-		} else if (legend){
+		} else if (legend) {
 			const LegendListItem = withStyles({
 				root: {
 					backgroundColor: checked ? mapboxLayerOptions.paint[legend.mapboxPaintProperty] : grey[200],
@@ -389,14 +461,12 @@ export default function Filters({
 			return (
 				<Collapse in={checked} timeout="auto" unmountOnExit>
 					<LegendList component="div" disablePadding dense={true}>
-						<LegendListItem
-							key={'legend'}
-						>
+						<LegendListItem key={'legend'}>
 							<ListItemText primary={legend.mapboxPaintProperty} />
 						</LegendListItem>
 					</LegendList>
 				</Collapse>
-			)
+			);
 		} else {
 			return null;
 		}
@@ -428,7 +498,12 @@ export default function Filters({
 								{baseMapLayers.map((layer) => {
 									const { name } = layer;
 									return (
-										<CustomFormControlLabel key={name} value={name} control={<CustomRadio />} label={name} />
+										<CustomFormControlLabel
+											key={name}
+											value={name}
+											control={<CustomRadio />}
+											label={name}
+										/>
 									);
 								})}
 							</RadioGroup>
@@ -439,7 +514,9 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowVectors(!showVectors)}>
 							<CustomListItemText primary={'Pre-existing maps & data'} />
-							{!!selectedVectorLayerNamesSet.size && <Chip size={'small'} label={selectedVectorLayerNamesSet.size} />}
+							{!!selectedVectorLayerNamesSet.size && (
+								<Chip size={'small'} label={selectedVectorLayerNamesSet.size} />
+							)}
 							{showVectors ? <ExpandMore edge={'end'} /> : <ExpandLess edge={'end'} />}
 						</CustomListItem>
 						<CustomCollapse in={showVectors}>
@@ -458,7 +535,9 @@ export default function Filters({
 															control={
 																<CustomSwitch
 																	checked={checked}
-																	onChange={(e) => handleToggleVectorLayer(name, e.target.checked)}
+																	onChange={(e) =>
+																		handleToggleVectorLayer(name, e.target.checked)
+																	}
 																	name={name}
 																/>
 															}
@@ -466,7 +545,7 @@ export default function Filters({
 														/>
 														{renderLegend(checked, option)}
 													</React.Fragment>
-												)
+												);
 											})}
 										</FormGroup>
 									</React.Fragment>
@@ -479,7 +558,9 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowRasters(!showRasters)}>
 							<CustomListItemText primary={'Landscape predictions'} />
-							{!!selectedRasterLayerNamesSet.size && <Chip size={'small'} label={selectedRasterLayerNamesSet.size} />}
+							{!!selectedRasterLayerNamesSet.size && (
+								<Chip size={'small'} label={selectedRasterLayerNamesSet.size} />
+							)}
 							{showRasters ? <ExpandMore edge={'end'} /> : <ExpandLess edge={'end'} />}
 						</CustomListItem>
 						<CustomCollapse in={showRasters}>
@@ -498,7 +579,9 @@ export default function Filters({
 															control={
 																<CustomSwitch
 																	checked={checked}
-																	onChange={(e) => handleToggleRasterLayer(name, e.target.checked)}
+																	onChange={(e) =>
+																		handleToggleRasterLayer(name, e.target.checked)
+																	}
 																	name={name}
 																/>
 															}
@@ -519,7 +602,9 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowObservationVectors(!showObservationVectors)}>
 							<CustomListItemText primary={'Landscape observations'} />
-							{!!selectedObservationVectorLayerNamesSet.size && <Chip size={'small'} label={selectedObservationVectorLayerNamesSet.size} />}
+							{!!selectedObservationVectorLayerNamesSet.size && (
+								<Chip size={'small'} label={selectedObservationVectorLayerNamesSet.size} />
+							)}
 							{showObservationVectors ? <ExpandMore edge={'end'} /> : <ExpandLess edge={'end'} />}
 						</CustomListItem>
 						<CustomCollapse in={showObservationVectors}>
@@ -538,7 +623,12 @@ export default function Filters({
 															control={
 																<CustomSwitch
 																	checked={checked}
-																	onChange={(e) => handleToggleObservationVectorLayer(name, e.target.checked)}
+																	onChange={(e) =>
+																		handleToggleObservationVectorLayer(
+																			name,
+																			e.target.checked,
+																		)
+																	}
 																	name={name}
 																/>
 															}
@@ -546,7 +636,7 @@ export default function Filters({
 														/>
 														{renderLegend(checked, option)}
 													</React.Fragment>
-												)
+												);
 											})}
 										</FormGroup>
 									</React.Fragment>
@@ -577,7 +667,12 @@ export default function Filters({
 											{options.map((option) => {
 												const { name } = option;
 												return (
-													<CustomFormControlLabel key={name} value={name} control={<CustomRadio />} label={name} />
+													<CustomFormControlLabel
+														key={name}
+														value={name}
+														control={<CustomRadio />}
+														label={name}
+													/>
 												);
 											})}
 										</React.Fragment>

@@ -53,14 +53,14 @@ const CustomNestedList = withStyles((theme) => ({
 			{regions
 				.sort((a, b) => a.name.localeCompare(b.name))
 				.map((region) => {
-					const { name, regions } = region;
+					const { name, regions = [] } = region;
 					const isCollapsed = regionIsCollapsed[regionGroup][name];
 					return (
 						<React.Fragment key={`${regionGroup}_${name}`}>
 							<ListItem button onClick={() => onSelectRegion(region)}>
 								<ListItemText primary={name} />
-								{regions && (
-									<ListItemSecondaryAction>
+								<ListItemSecondaryAction>
+									{!!regions.length && (
 										<IconButton
 											edge="end"
 											aria-label="comments"
@@ -68,29 +68,28 @@ const CustomNestedList = withStyles((theme) => ({
 										>
 											{isCollapsed ? <ExpandLess /> : <ExpandMore />}
 										</IconButton>
-									</ListItemSecondaryAction>
+									)}
+								</ListItemSecondaryAction>
 								)}
 							</ListItem>
-							{regions && (
-								<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
-									<List component="div" disablePadding dense={true}>
-										{regions
-											.sort((a, b) => a.name.localeCompare(b.name))
-											.map((region) => {
-												return (
-													<ListItem
-														key={`${regionGroup}_${name}_${region.name}`}
-														button
-														className={classes.nested}
-														onClick={() => onSelectRegion(region)}
-													>
-														<ListItemText primary={region.name} />
-													</ListItem>
-												);
-											})}
-									</List>
-								</Collapse>
-							)}
+							<Collapse in={isCollapsed} timeout="auto" unmountOnExit>
+								<List component="div" disablePadding dense={true}>
+									{regions
+										.sort((a, b) => a.name.localeCompare(b.name))
+										.map((region) => {
+											return (
+												<ListItem
+													key={`${regionGroup}_${name}_${region.name}`}
+													button
+													className={classes.nested}
+													onClick={() => onSelectRegion(region)}
+												>
+													<ListItemText primary={region.name} />
+												</ListItem>
+											);
+										})}
+								</List>
+							</Collapse>
 						</React.Fragment>
 					);
 				})}
