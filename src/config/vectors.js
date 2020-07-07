@@ -1,6 +1,6 @@
 import VectorSource from '../VectorSource';
 
-const simplificationLevels = [1, 10];
+const simplificationLevels = [];
 
 import adminVectors from './adminVectors';
 

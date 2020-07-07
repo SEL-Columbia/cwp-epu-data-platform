@@ -2,7 +2,7 @@ import VectorSource from '../VectorSource';
 
 import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
 
-const simplificationLevels = [1, 10];
+const simplificationLevels = [];
 
 const vectorPriorityByNameMap = {
 	// higher numbers will be rendered on top of lower numbers
