@@ -12,18 +12,18 @@ export default class RasterSourceGroup {
 		maxNativeZoomVariable,
 		boundingBoxVariable,
 		nameVariable,
-		customLegendsByName,
-		customNames,
+		customLegendsByMapboxId,
+		customNamesByMapboxId,
 	}) {
 		this.label = label;
-		this.customNames = customNames;
 		this.tableIdentifier = tableIdentifier;
 		this.mapboxIdVariable = mapboxIdVariable;
 		this.minNativeZoomVariable = minNativeZoomVariable;
 		this.maxNativeZoomVariable = maxNativeZoomVariable;
 		this.boundingBoxVariable = boundingBoxVariable;
 		this.nameVariable = nameVariable;
-		this.customLegendsByName = customLegendsByName;
+		this.customNamesByMapboxId = customNamesByMapboxId;
+		this.customLegendsByMapboxId = customLegendsByMapboxId;
 	}
 
 	fetchData = async () => {
@@ -69,9 +69,12 @@ export default class RasterSourceGroup {
 					minNativeZoom: row[1],
 					maxNativeZoom: row[2],
 					boundingBox: row[3],
-					name: this.customNames && this.customNames[row[4]] ? this.customNames[row[4]] : row[4],
+					name:
+						this.customNamesByMapboxId && this.customNamesByMapboxId[row[0]]
+							? this.customNamesByMapboxId[row[0]]
+							: row[4],
 					label: this.label,
-					customLegend: this.customLegendsByName && row[4] ? this.customLegendsByName[row[4]] : null,
+					customLegend: this.customLegendsByMapboxId && row[0] ? this.customLegendsByMapboxId[row[0]] : null,
 				});
 			});
 		return this.data;
