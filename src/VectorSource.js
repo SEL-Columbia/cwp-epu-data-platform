@@ -185,8 +185,7 @@ export default class VectorSource {
 			const currentTableVersion = await getTableVersion(this.tableIdentifier);
 			try {
 				const cachedVersion = await localforage.getItem(`version_${apiEndpoint}`);
-				// TODO: remove flag to re-enable caching
-				if (false && cachedVersion === currentTableVersion) {
+				if (cachedVersion === currentTableVersion) {
 					const cachedText = await localforage.getItem(`response_${apiEndpoint}`);
 					responseText = pako.inflate(cachedText, { to: 'string' });
 				}

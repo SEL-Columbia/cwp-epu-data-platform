@@ -9,18 +9,23 @@ const rasterGroups = [
 		maxNativeZoomVariable: { name: 'zoom_max' },
 		boundingBoxVariable: { name: 'bounding_box' },
 		nameVariable: { name: 'catalog_name' },
+		customNames: {
+			['Prediction of Woodland Presence']: 'Prediction of Woodland Presence (probability)',
+			['Prediction of Building Presence']: 'Prediction of Building Presence (probability)',
+			['Prediction of Crop Presence']: 'Prediction of Crop Presence (probability)',
+		},
 		customLegendsByName: {
 			['Land Cover Classification']: {
 				type: 'categorical',
 				categories: [
-					{ name: 'No buildings, no cropland, no woody cover', color: '#b1b1b2' },
-					{ name: 'Woody cover (> 60%)', color: '#077808' },
-					{ name: 'Cropland', color: '#f6bd84' },
-					{ name: 'Cropland and woody cover (> 60%)', color: '#f6f896' },
-					{ name: 'Buildings', color: '#f80808' },
-					{ name: 'Buildings and woody cover (> 60%)', color: '#ed0883' },
-					{ name: 'Buildings and cropland', color: '#bc5c1f' },
-					{ name: 'Buildings, cropland, and woody cover', color: '#b3b3b4' },
+					{ name: 'No buildings, no cropland, no woody cover', color: '#b9b6b9' },
+					{ name: 'Woody cover (> 60%)', color: '#0e7d0e' },
+					{ name: 'Cropland', color: '#fec28c' },
+					{ name: 'Cropland and woody cover (> 60%)', color: '#fcfe9c' },
+					{ name: 'Buildings', color: '#fe0c0c' },
+					{ name: 'Buildings and woody cover (> 60%)', color: '#ea3690' },
+					{ name: 'Buildings and cropland', color: '#ca7d47' },
+					{ name: 'Buildings, cropland, and woody cover', color: '#6d6d6d' },
 				],
 			},
 			['Prediction of Woodland Presence']: {
@@ -52,9 +57,9 @@ const rasterGroups = [
 			['Phenology analysis for 3 years (2016-2019)']: {
 				type: 'categorical',
 				categories: [
-					{ name: 'In-phase vegetation', color: '#f44336' },
-					{ name: 'Out-of-phase vegetation', color: '#76ff03' },
-					{ name: 'Dark', color: '#2196f3' },
+					{ name: 'In-phase vegetation', color: '#ff0000' },
+					{ name: 'Out-of-phase vegetation', color: '#00ff00' },
+					{ name: 'Dark', color: '#0000ff' },
 				],
 			},
 		},

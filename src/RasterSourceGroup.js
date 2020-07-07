@@ -13,8 +13,10 @@ export default class RasterSourceGroup {
 		boundingBoxVariable,
 		nameVariable,
 		customLegendsByName,
+		customNames,
 	}) {
 		this.label = label;
+		this.customNames = customNames;
 		this.tableIdentifier = tableIdentifier;
 		this.mapboxIdVariable = mapboxIdVariable;
 		this.minNativeZoomVariable = minNativeZoomVariable;
@@ -67,7 +69,7 @@ export default class RasterSourceGroup {
 					minNativeZoom: row[1],
 					maxNativeZoom: row[2],
 					boundingBox: row[3],
-					name: row[4],
+					name: this.customNames && this.customNames[row[4]] ? this.customNames[row[4]] : row[4],
 					label: this.label,
 					customLegend: this.customLegendsByName && row[4] ? this.customLegendsByName[row[4]] : null,
 				});
