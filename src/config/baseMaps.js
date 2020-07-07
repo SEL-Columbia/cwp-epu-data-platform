@@ -23,6 +23,10 @@ const baseMaps = [
 		name: 'Light',
 		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckbvofjle0cbj1ipjnzb8nhxr',
 	},
+	{
+		name: 'None',
+		mapboxStyle: 'mapbox://styles/columbia-dataplatform/ckccdqxri00ny1jtf2dhbs3hd',
+	},
 ];
 
 export default baseMaps;
