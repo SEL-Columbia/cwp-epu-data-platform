@@ -24,10 +24,10 @@ export default class RasterSource {
 		if (boundingBox) {
 			boundingBox = boundingBox.split(',');
 			this.bounds = [
-				parseInt(boundingBox[0]),
-				parseInt(boundingBox[1]),
-				parseInt(boundingBox[2]),
-				parseInt(boundingBox[3]),
+				parseFloat(boundingBox[0]),
+				parseFloat(boundingBox[1]),
+				parseFloat(boundingBox[2]),
+				parseFloat(boundingBox[3]),
 			];
 		}
 	}
