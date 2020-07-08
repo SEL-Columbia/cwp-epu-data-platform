@@ -2,6 +2,7 @@ import * as styles from './styles.css';
 
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { renderToString } from 'react-dom/server';
 
 import Filters from '../Filters';
 import Map from '../Map';
@@ -23,7 +24,7 @@ import getAdminRegionId from '../getAdminRegionId';
 
 import { DEFAULT_RASTER_OPACITY, SELECTED_ADMIN_VECTOR_OPACITY } from '../config/constants';
 
-const METADATA_NULL_VALUE = 'null';
+const METADATA_NULL_VALUE = null;
 
 const ZOOM_REGEX = /&zoom=([\d+\.]+)/;
 const LAT_REGEX = /&lat=(-?[\d+\.]+)/;
@@ -41,6 +42,7 @@ const CustomCard = withStyles({
 const CustomTitle = withStyles({
 	root: {
 		fontSize: 14,
+		marginBottom: 12,
 	},
 })(Typography);
 
@@ -58,8 +60,12 @@ function getFiltersMap(features, whitelist) {
 				if (!filters[property]) {
 					filters[property] = { valuesSet: new Set([]), selectedValuesSet: new Set([]) };
 				}
-				filters[property].valuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
-				filters[property].selectedValuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
+				filters[property].valuesSet.add(
+					feature.metadata[property] === null ? METADATA_NULL_VALUE : feature.metadata[property],
+				);
+				filters[property].selectedValuesSet.add(
+					feature.metadata[property] === null ? METADATA_NULL_VALUE : feature.metadata[property],
+				);
 			}
 		}
 	}
@@ -382,7 +388,7 @@ class MapWrapper extends Component {
 					(filterName) =>
 						feature.metadata[filterName] === undefined ||
 						filtersMap[filterName].selectedValuesSet.has(
-							feature.metadata[filterName] || METADATA_NULL_VALUE,
+							feature.metadata[filterName] === null ? METADATA_NULL_VALUE : feature.metadata[filterName],
 						),
 				)
 			);
@@ -464,6 +470,21 @@ class MapWrapper extends Component {
 		return object;
 	};
 
+	renderMetadataSection = (key, value) => {
+		return (
+			<div key={key} className={styles.regionSection}>
+				<CustomHeader color={'textSecondary'} gutterBottom>
+					{key}
+				</CustomHeader>
+				{value === null ? (
+					<CustomHeader color={'textSecondary'}>{'Not listed'}</CustomHeader>
+				) : (
+					<Chip size={'small'} label={value} />
+				)}
+			</div>
+		);
+	};
+
 	renderSelectedRegion = (selectedAdminVectorLayerNamesByLabel) => {
 		const { adminVectorFeaturesByIdMap } = this.state;
 		const regionName = getSelectedRegionName(this.props);
@@ -481,18 +502,7 @@ class MapWrapper extends Component {
 									<CustomTitle gutterBottom>{region.properties.regionName}</CustomTitle>
 									{Object.keys(region.metadata)
 										.filter((key) => key !== 'regionName')
-										.map((key, i) => (
-											<div key={key} className={styles.regionSection}>
-												<CustomHeader color={'textSecondary'} gutterBottom>
-													{key}
-												</CustomHeader>
-												{region.metadata[key] === null ? (
-													<CustomHeader color={'textSecondary'}>{'Not listed'}</CustomHeader>
-												) : (
-													<Chip size={'small'} label={region.metadata[key]} />
-												)}
-											</div>
-										))}
+										.map((key) => this.renderMetadataSection(key, region.metadata[key]))}
 								</CardContent>
 							</CustomCard>
 						</div>
@@ -590,6 +600,9 @@ class MapWrapper extends Component {
 						zoom={zoom}
 						center={center}
 						boundingBox={boundingBox}
+						renderMetadataSection={(key, metadata) =>
+							renderToString(this.renderMetadataSection(key, metadata))
+						}
 					/>
 				</div>
 			</div>

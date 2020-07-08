@@ -101,9 +101,10 @@ const LegendSlider = withStyles({
 
 const CustomCircularProgress = withStyles({
 	root: {
-		color: grey[300],
+		color: grey[500],
+		marginRight: 5,
 	},
-})((props) => <CircularProgress size={15} {...props} />);
+})((props) => <CircularProgress size={20} {...props} />);
 
 const CustomCollapse = withStyles({
 	entered: {
@@ -506,6 +507,7 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowVectors(!showVectors)}>
 							<CustomListItemText primary={'Pre-existing maps & data'} />
+							{isLoadingVectors && <CustomCircularProgress />}
 							{!!selectedVectorLayerNamesSet.size && (
 								<Chip size={'small'} label={selectedVectorLayerNamesSet.size} />
 							)}
@@ -550,6 +552,7 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowRasters(!showRasters)}>
 							<CustomListItemText primary={'Landscape predictions'} />
+							{isLoadingRasters && <CustomCircularProgress />}
 							{!!selectedRasterLayerNamesSet.size && (
 								<Chip size={'small'} label={selectedRasterLayerNamesSet.size} />
 							)}
@@ -594,6 +597,7 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowObservationVectors(!showObservationVectors)}>
 							<CustomListItemText primary={'Landscape observations'} />
+							{isLoadingObservationVectors && <CustomCircularProgress />}
 							{!!selectedObservationVectorLayerNamesSet.size && (
 								<Chip size={'small'} label={selectedObservationVectorLayerNamesSet.size} />
 							)}
@@ -641,7 +645,7 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowAdminVectors(!showAdminVectors)}>
 							<CustomListItemText primary={'Admin polygons'} />
-							{/*<Chip edge={'start'} size={'small'} label={selectedAdminVectorLayerName} />*/}
+							{isLoadingAdminVectors && <CustomCircularProgress />}
 							{showAdminVectors ? <ExpandMore edge={'end'} /> : <ExpandLess edge={'end'} />}
 						</CustomListItem>
 						<CustomCollapse in={showAdminVectors}>

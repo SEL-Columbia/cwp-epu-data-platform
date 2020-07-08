@@ -29,6 +29,6 @@
 	z-index: 1;
 }
 
-.regionSection{
+.regionSection:not(:first-of-type){
 	margin-top: 12px;
 }
