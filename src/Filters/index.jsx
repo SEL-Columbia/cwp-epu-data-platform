@@ -22,6 +22,12 @@ import List from '@material-ui/core/List';
 import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
 
+import vectorStyles from './vectorStyles';
+
+import groupOptions from '../groupOptions';
+
+import * as styles from './styles.css';
+
 const CustomSwitch = withStyles({
 	switchBase: {
 		color: grey[200],
@@ -168,25 +174,6 @@ function ValueLabelComponent(props) {
 	);
 }
 
-import vectorStyles from './vectorStyles';
-
-import * as styles from './styles.css';
-
-function groupOptions(options) {
-	const groupLabelsSet = new Set([]);
-	const groups = [];
-	for (const option of options) {
-		const label = option.label || '';
-		if (!groupLabelsSet.has(label)) {
-			groups.push({ label, options: [] });
-			groupLabelsSet.add(label);
-		}
-		const group = groups.find((group) => group.label === label);
-		group.options.push(option);
-	}
-	return groups;
-}
-
 function sortValues(a, b) {
 	if (!isNaN(a) && !isNaN(b)) {
 		return parseInt(b, 10) - parseInt(a, 10);
@@ -201,7 +188,7 @@ export default function Filters({
 	vectorLayers,
 	observationVectorLayers,
 	adminVectorLayers,
-	selectedAdminVectorLayerName,
+	selectedAdminVectorLayerNamesByLabel,
 	vectorFiltersByNamesMap,
 	selectedBaseMapLayerName,
 	selectedRasterLayerNamesSet,
@@ -213,7 +200,7 @@ export default function Filters({
 	onUpdateRasterLayerOpacityByNameMap,
 	onUpdateVectorLayers,
 	onUpdateObservationVectorLayers,
-	onUpdateAdminVectorLayer,
+	onUpdateAdminVectorLayers,
 	onUpdateVectorFilters,
 	isLoadingRasters,
 	isLoadingVectors,
@@ -260,8 +247,13 @@ export default function Filters({
 		onUpdateObservationVectorLayers(nextSelectedObservationVectorLayerNamesSet);
 	}
 
-	function handleSelectAdminVectorLayer(selectedAdminVectorLayerName) {
-		onUpdateAdminVectorLayer(selectedAdminVectorLayerName);
+	function handleSelectAdminVectorLayers(selectedAdminVectorLayerLabel, selectedAdminVectorLayerName) {
+		let nextSelectedAdminVectorLayerNamesByLabel = {
+			...selectedAdminVectorLayerNamesByLabel,
+			[selectedAdminVectorLayerLabel]: selectedAdminVectorLayerName,
+		};
+
+		onUpdateAdminVectorLayers(nextSelectedAdminVectorLayerNamesByLabel);
 	}
 
 	function handleToggleFilter(checked, value, filterName, vectorName) {
@@ -649,36 +641,36 @@ export default function Filters({
 					<CustomFormControl component="fieldset">
 						<CustomListItem button onClick={() => setShowAdminVectors(!showAdminVectors)}>
 							<CustomListItemText primary={'Admin polygons'} />
-							<Chip edge={'start'} size={'small'} label={selectedAdminVectorLayerName} />
+							{/*<Chip edge={'start'} size={'small'} label={selectedAdminVectorLayerName} />*/}
 							{showAdminVectors ? <ExpandMore edge={'end'} /> : <ExpandLess edge={'end'} />}
 						</CustomListItem>
 						<CustomCollapse in={showAdminVectors}>
-							<RadioGroup
-								aria-label="Admin polygons"
-								name="Admin polygons"
-								value={selectedAdminVectorLayerName}
-								onChange={(e) => handleSelectAdminVectorLayer(e.target.value)}
-							>
-								{groupOptions(adminVectorLayers).map((group) => {
-									const { label, options } = group;
-									return (
-										<React.Fragment key={label}>
-											<CustomFormHelperText>{label}</CustomFormHelperText>
-											{options.map((option) => {
-												const { name } = option;
-												return (
-													<CustomFormControlLabel
-														key={name}
-														value={name}
-														control={<CustomRadio />}
-														label={name}
-													/>
-												);
-											})}
-										</React.Fragment>
-									);
-								})}
-							</RadioGroup>
+							{groupOptions(adminVectorLayers).map((group) => {
+								const { label, options } = group;
+								const selectedAdminVectorLayerName = selectedAdminVectorLayerNamesByLabel[label];
+								return (
+									<RadioGroup
+										aria-label="Admin polygons"
+										name="Admin polygons"
+										value={selectedAdminVectorLayerName}
+										key={label}
+										onChange={(e) => handleSelectAdminVectorLayers(label, e.target.value)}
+									>
+										<CustomFormHelperText>{label}</CustomFormHelperText>
+										{options.map((option) => {
+											const { name } = option;
+											return (
+												<CustomFormControlLabel
+													key={name}
+													value={name}
+													control={<CustomRadio />}
+													label={name}
+												/>
+											);
+										})}
+									</RadioGroup>
+								);
+							})}
 						</CustomCollapse>
 					</CustomFormControl>
 				</div>
