@@ -4,6 +4,9 @@ import * as geobuf from 'geobuf';
 import * as Pbf from 'pbf';
 localforage.config({});
 
+// Update this if we ever want to bust everyone's cache
+const CACHE_TOKEN = 'a';
+
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 const MAX_RESULTS = 10000;
 export default class VectorSource {
@@ -113,8 +116,8 @@ export default class VectorSource {
 			});
 			return this.metadata;
 		} catch (e) {
-			await localforage.removeItem(`version_${apiEndpoint}`);
-			await localforage.removeItem(`response_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 			alert(`An error occurred when parsing data from ${this.tableIdentifier}: ${e.message}`);
 			return [];
 		}
@@ -172,31 +175,31 @@ export default class VectorSource {
 
 			return this.data;
 		} catch (e) {
-			await localforage.removeItem(`version_${apiEndpoint}`);
-			await localforage.removeItem(`response_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 			alert(`An error occurred when parsing data from ${this.tableIdentifier}: ${e.message}`);
 			return [];
 		}
 	};
 
-	#fetchFromApi = async (apiEndpoint) => {
+	#fetchFromApi = async (apiEndpoint, depth = 1) => {
 		try {
 			let responseText;
 			const currentTableVersion = await getTableVersion(this.tableIdentifier);
 			try {
-				const cachedVersion = await localforage.getItem(`version_${apiEndpoint}`);
+				const cachedVersion = await localforage.getItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
 				if (cachedVersion === currentTableVersion) {
-					const cachedText = await localforage.getItem(`response_${apiEndpoint}`);
+					const cachedText = await localforage.getItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 					responseText = pako.inflate(cachedText, { to: 'string' });
 				}
 			} catch (e) {
 				console.error(e);
-				await localforage.removeItem(`version_${apiEndpoint}`);
-				await localforage.removeItem(`response_${apiEndpoint}`);
+				await localforage.removeItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
+				await localforage.removeItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 			}
 
 			if (!responseText) {
-				const response = await fetch(apiEndpoint, {
+				const response = await retryableFetch(apiEndpoint, {
 					method: 'GET',
 					headers: {
 						Authorization: `Bearer ${ACCESS_TOKEN}`,
@@ -209,21 +212,29 @@ export default class VectorSource {
 
 				responseText = await response.text();
 				try {
-					await localforage.setItem(`version_${apiEndpoint}`, currentTableVersion);
-					await localforage.setItem(`response_${apiEndpoint}`, pako.deflate(responseText));
+					await localforage.setItem(`${CACHE_TOKEN}_version_${apiEndpoint}`, currentTableVersion);
+					await localforage.setItem(`${CACHE_TOKEN}_response_${apiEndpoint}`, pako.deflate(responseText));
 				} catch (e) {
 					console.error(e);
-					await localforage.removeItem(`version_${apiEndpoint}`);
-					await localforage.removeItem(`response_${apiEndpoint}`);
+					await localforage.removeItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
+					await localforage.removeItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 				}
 			}
 
-			return responseText.split('\n').map((row, i) => {
+			let rows = responseText.split('\n').map((row, i) => {
 				return JSON.parse(row);
 			});
+			if (rows.length === 10000) {
+				const additionalRows = await this.#fetchFromApi(
+					`${apiEndpoint.replace(/&startIndex=\d+/, '')}&startIndex=${depth * 10000}`,
+					depth + 1,
+				);
+				rows = rows.concat(additionalRows);
+			}
+			return rows;
 		} catch (e) {
-			await localforage.removeItem(`version_${apiEndpoint}`);
-			await localforage.removeItem(`response_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_version_${apiEndpoint}`);
+			await localforage.removeItem(`${CACHE_TOKEN}_response_${apiEndpoint}`);
 			alert(`An error occurred when fetching data from ${this.tableIdentifier}: ${e.message}`);
 			return [];
 		}
@@ -231,7 +242,7 @@ export default class VectorSource {
 }
 
 async function getTableVersion(identifier) {
-	const response = await fetch(`https://redivis.com/api/v1/tables/${identifier}`, {
+	const response = await retryableFetch(`https://redivis.com/api/v1/tables/${identifier}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${ACCESS_TOKEN}`,
@@ -243,4 +254,13 @@ async function getTableVersion(identifier) {
 	}
 	const table = await response.json();
 	return table.hash;
+}
+
+// Retry once to handle flakes
+async function retryableFetch(endpoint, params) {
+	let response = await fetch(endpoint, params);
+	if (!response.ok) {
+		response = await fetch(endpoint, params);
+	}
+	return response;
 }

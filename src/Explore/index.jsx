@@ -348,7 +348,7 @@ class Explore extends Component {
 		const { regionGroup, regionLevel, name, bbox } = region;
 		const path = `${process.env.ROOT_PATH}/map?&bbox=${bbox}&region=${encodeURIComponent(
 			name,
-		)}&adminLayer=${encodeURIComponent(regionLevel)}`;
+		)}&adminLayer_${encodeURIComponent(regionGroup)}=${encodeURIComponent(regionLevel)}`;
 		history.push(path);
 	};
 

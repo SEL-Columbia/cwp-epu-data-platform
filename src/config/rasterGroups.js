@@ -9,13 +9,13 @@ const rasterGroups = [
 		maxNativeZoomVariable: { name: 'zoom_max' },
 		boundingBoxVariable: { name: 'bounding_box' },
 		nameVariable: { name: 'catalog_name' },
-		customNames: {
-			['Prediction of Woodland Presence']: 'Prediction of Woodland Presence (probability)',
-			['Prediction of Building Presence']: 'Prediction of Building Presence (probability)',
-			['Prediction of Crop Presence']: 'Prediction of Crop Presence (probability)',
+		customNamesByMapboxId: {
+			['columbia-dataplatform.dpfypvjn']: 'Prediction of Woodland Presence (probability)',
+			['columbia-dataplatform.altp17rc']: 'Prediction of Building Presence (probability)',
+			['columbia-dataplatform.5y1gv038']: 'Prediction of Crop Presence (probability)',
 		},
-		customLegendsByName: {
-			['Land Cover Classification']: {
+		customLegendsByMapboxId: {
+			['columbia-dataplatform.0xf4g95w']: {
 				type: 'categorical',
 				categories: [
 					{ name: 'No buildings, no cropland, no woody cover', color: '#b9b6b9' },
@@ -28,17 +28,17 @@ const rasterGroups = [
 					{ name: 'Buildings, cropland, and woody cover', color: '#6d6d6d' },
 				],
 			},
-			['Prediction of Woodland Presence']: {
+			['columbia-dataplatform.dpfypvjn']: {
 				type: 'continuous',
 				min: { name: 'Less wooded', color: '#000000' },
 				max: { name: 'More wooded', color: '#ffffff' },
 			},
-			['Prediction of Building Presence']: {
+			['columbia-dataplatform.altp17rc']: {
 				type: 'continuous',
 				min: { name: 'Fewer buildings', color: '#000000' },
 				max: { name: 'More buildings', color: '#ffffff' },
 			},
-			['Prediction of Crop Presence']: {
+			['columbia-dataplatform.5y1gv038']: {
 				type: 'continuous',
 				min: { name: 'Less crop presence', color: '#000000' },
 				max: { name: 'More crop presence', color: '#ffffff' },
@@ -53,8 +53,8 @@ const rasterGroups = [
 		maxNativeZoomVariable: { name: 'zoom_max' },
 		boundingBoxVariable: { name: 'bounding_box' },
 		nameVariable: { name: 'catalog_name' },
-		customLegendsByName: {
-			['Phenology analysis for 3 years (2016-2019)']: {
+		customLegendsByMapboxId: {
+			['columbia-dataplatform.7w9iml7k']: {
 				type: 'categorical',
 				categories: [
 					{ name: 'In-phase vegetation', color: '#ff0000' },
