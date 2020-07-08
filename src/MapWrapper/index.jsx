@@ -483,10 +483,14 @@ class MapWrapper extends Component {
 										.filter((key) => key !== 'regionName')
 										.map((key, i) => (
 											<div key={key} className={styles.regionSection}>
-												<CustomHeader color="textSecondary" gutterBottom>
+												<CustomHeader color={'textSecondary'} gutterBottom>
 													{key}
 												</CustomHeader>
-												<Chip size={'small'} label={region.metadata[key]} />
+												{region.metadata[key] === null ? (
+													<CustomHeader color={'textSecondary'}>{'Not listed'}</CustomHeader>
+												) : (
+													<Chip size={'small'} label={region.metadata[key]} />
+												)}
 											</div>
 										))}
 								</CardContent>
