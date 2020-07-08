@@ -29,9 +29,12 @@ const observationVectors = [
 				coordinates: [parseFloat(lng), parseFloat(lat)],
 			};
 		},
-		filterVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
-		metadataVariables: [{ name: 'cs' }, { name: 'wp' }, { name: 'cp' }],
-		legend: { mapboxPaintProperty: 'circle-color' },
+		metadataVariables: [
+			{ name: 'bp', label: 'Building presence' },
+			{ name: 'cp', label: 'Crop presence' },
+			{ name: 'wp', label: 'Woodland presence' },
+			{ name: 'cs', label: 'Conservation structure' },
+		],
 		mapboxSourceType: 'geojson',
 		mapboxLayerType: 'circle',
 		mapboxLayerOptions: {
@@ -40,8 +43,11 @@ const observationVectors = [
 					adminVectors.length + vectors.length + vectorPriorityByNameMap['Uganda Geosurvey Results'],
 			},
 			paint: {
-				'circle-color': 'rgba(51,255,150,0.6)',
-				'circle-radius': 6,
+				'circle-color': 'rgb(0,0,0)',
+				'circle-stroke-color': 'white',
+				'circle-stroke-width': 1,
+				'circle-opacity': 0.6,
+				'circle-radius': 5,
 			},
 		},
 	}),

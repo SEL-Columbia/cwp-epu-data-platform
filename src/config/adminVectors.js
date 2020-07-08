@@ -2,7 +2,7 @@ import VectorSource from '../VectorSource';
 
 import { DEFAULT_ADMIN_VECTOR_OPACITY } from './constants';
 
-const simplificationLevels = [1, 10];
+const simplificationLevels = [10];
 
 const vectorPriorityByNameMap = {
 	// higher numbers will be rendered on top of lower numbers
@@ -16,7 +16,7 @@ const vectorPriorityByNameMap = {
 
 const adminVectorSpecs = [
 	{
-		name: 'Regions',
+		name: 'Regions (full size)',
 		label: 'Uganda',
 		hierarchyIndex: 0,
 		isDefault: true,
@@ -57,7 +57,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Districts',
+		name: 'Districts (full size)',
 		label: 'Uganda',
 		hierarchyIndex: 1,
 		isDefault: false,
@@ -102,7 +102,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Subcounties',
+		name: 'Subcounties (full size)',
 		label: 'Uganda',
 		hierarchyIndex: 2,
 		isDefault: false,
@@ -141,7 +141,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Parishes',
+		name: 'Parishes (full size)',
 		label: 'Uganda',
 		hierarchyIndex: 3,
 		isDefault: false,
@@ -181,7 +181,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Regions',
+		name: 'Regions (full size)',
 		label: 'Ethiopia',
 		hierarchyIndex: 0,
 		isDefault: true,
@@ -222,7 +222,7 @@ const adminVectorSpecs = [
 		},
 	},
 	{
-		name: 'Regions',
+		name: 'Regions (full size)',
 		label: 'Tanzania',
 		hierarchyIndex: 0,
 		isDefault: true,
@@ -270,7 +270,7 @@ for (let i = 0; i < adminVectorSpecs.length; i++) {
 			...adminVectorSpecs[i],
 			isDefault: false,
 			showOnHome: false,
-			name: `${adminVectorSpecs[i].name} (${level}%)`,
+			name: `${adminVectorSpecs[i].name}`.replace('full size', 'reduced'),
 			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
 		});
 	}
