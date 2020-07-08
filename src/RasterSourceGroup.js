@@ -1,4 +1,5 @@
 import RasterSource from './RasterSource';
+import retryableFetch from './helpers/retryableFetch';
 
 const ACCESS_TOKEN = process.env.REDIVIS_API_TOKEN;
 const MAX_RESULTS = 10000;
@@ -40,7 +41,7 @@ export default class RasterSourceGroup {
 			]),
 		];
 
-		const response = await fetch(
+		const response = await retryableFetch(
 			`https://redivis.com/api/v1/tables/${this.tableIdentifier}/rows?selectedVariables=${variablesToFetch.join(
 				',',
 			)}&maxResults=${MAX_RESULTS}`,

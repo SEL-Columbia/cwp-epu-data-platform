@@ -2,6 +2,7 @@ import * as pako from 'pako';
 import * as localforage from 'localforage';
 import * as geobuf from 'geobuf';
 import * as Pbf from 'pbf';
+import retryableFetch from './helpers/retryableFetch';
 localforage.config({});
 
 // Update this if we ever want to bust everyone's cache
@@ -254,13 +255,4 @@ async function getTableVersion(identifier) {
 	}
 	const table = await response.json();
 	return table.hash;
-}
-
-// Retry once to handle flakes
-async function retryableFetch(endpoint, params) {
-	let response = await fetch(endpoint, params);
-	if (!response.ok) {
-		response = await fetch(endpoint, params);
-	}
-	return response;
 }
