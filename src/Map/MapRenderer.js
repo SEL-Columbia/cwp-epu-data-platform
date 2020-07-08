@@ -23,7 +23,14 @@ export default class MapRenderer {
 		this.observationVectorLayers = new Map();
 		this.adminVectorLayers = new Map();
 
-		const { baseMapLayer, center, zoom } = props;
+		const {
+			baseMapLayer,
+			center,
+			zoom,
+			renderMetadataSection = (key, metadata) => `<p><b>${key}</b><br>${metadata[key]}</p>`,
+		} = props;
+
+		this.renderMetadataSection = renderMetadataSection;
 
 		const initialBaseMapLayer = baseMapLayer || baseMaps.find(({ isDefault }) => isDefault);
 		this.baseLayers.set(getLayerIdentifier(initialBaseMapLayer), initialBaseMapLayer);
@@ -146,8 +153,8 @@ export default class MapRenderer {
 			// add layer to map
 			if (!this.map.getLayer(id)) {
 				this.map.addLayer(mapLayer);
-				// set tooltip listener
 
+				// set tooltip listener
 				if (onFeatureClick) {
 					this.map.on('click', id, (e) => {
 						let features = this.map.queryRenderedFeatures(e.point, { layers: [id] });
@@ -186,7 +193,7 @@ export default class MapRenderer {
 								.setLngLat(coordinates)
 								.setHTML(
 									Object.keys(metadata)
-										.map((key) => `<p><b>${key}</b><br>${metadata[key]}</p>`)
+										.map((key) => this.renderMetadataSection(key, metadata[key]))
 										.join(''),
 								)
 								.addTo(this.map);

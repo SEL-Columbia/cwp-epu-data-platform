@@ -8,6 +8,24 @@ import MapWrapper from '../MapWrapper';
 import About from '../About';
 import Download from '../Download';
 
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
+import { grey } from '@material-ui/core/colors';
+
+const CustomTitle = withStyles({
+	root: {
+		fontSize: 20,
+	},
+})(Typography);
+
+const CustomSubTitle = withStyles({
+	root: {
+		marginLeft: 10,
+		fontSize: 20,
+		color: grey[600],
+	},
+})(Typography);
+
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -23,7 +41,8 @@ class App extends Component {
 		return (
 			<div className={styles.headerWrapper}>
 				<div className={styles.header}>
-					<h2>{'Columbia World Projects Energy for Productive Use'}</h2>
+					<CustomTitle component={'h4'}>{'Columbia World Projects'}</CustomTitle>
+					<CustomSubTitle component={'h4'}>{'Energy for Productive Use'}</CustomSubTitle>
 				</div>
 				<div className={styles.navigation}>
 					<NavLink

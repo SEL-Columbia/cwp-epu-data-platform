@@ -27,11 +27,8 @@
 	position: absolute;
 	right: 0px;
 	z-index: 1;
-	padding: 20px;
-	background: white;
-	border-radius: 0 0 0 4px;
 }
 
-.regionHeader {
-	margin-bottom: 20px;
+.regionSection:not(:first-of-type){
+	margin-top: 12px;
 }

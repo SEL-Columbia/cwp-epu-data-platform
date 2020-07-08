@@ -2,6 +2,7 @@ import * as styles from './styles.css';
 
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { renderToString } from 'react-dom/server';
 
 import Filters from '../Filters';
 import Map from '../Map';
@@ -11,12 +12,19 @@ import vectors from '../config/vectors';
 import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+
+import { withStyles } from '@material-ui/core/styles';
+
 import groupOptions from '../groupOptions';
 import getAdminRegionId from '../getAdminRegionId';
 
 import { DEFAULT_RASTER_OPACITY, SELECTED_ADMIN_VECTOR_OPACITY } from '../config/constants';
 
-const METADATA_NULL_VALUE = 'null';
+const METADATA_NULL_VALUE = null;
 
 const ZOOM_REGEX = /&zoom=([\d+\.]+)/;
 const LAT_REGEX = /&lat=(-?[\d+\.]+)/;
@@ -24,6 +32,25 @@ const LNG_REGEX = /&lng=(-?[\d+\.]+)/;
 const BBOX_REGEX = /&bbox=(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+)/;
 const REGION_NAME_REGEX = /&region=([^&]+)/;
 const ADMIN_LAYER_REGEX = /&adminLayer_([^(&=)]+)=([^&]+)/g;
+
+const CustomCard = withStyles({
+	root: {
+		minWidth: 200,
+	},
+})(Card);
+
+const CustomTitle = withStyles({
+	root: {
+		fontSize: 14,
+		marginBottom: 12,
+	},
+})(Typography);
+
+const CustomHeader = withStyles({
+	root: {
+		fontSize: 12,
+	},
+})(Typography);
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -33,8 +60,12 @@ function getFiltersMap(features, whitelist) {
 				if (!filters[property]) {
 					filters[property] = { valuesSet: new Set([]), selectedValuesSet: new Set([]) };
 				}
-				filters[property].valuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
-				filters[property].selectedValuesSet.add(feature.metadata[property] || METADATA_NULL_VALUE);
+				filters[property].valuesSet.add(
+					feature.metadata[property] === null ? METADATA_NULL_VALUE : feature.metadata[property],
+				);
+				filters[property].selectedValuesSet.add(
+					feature.metadata[property] === null ? METADATA_NULL_VALUE : feature.metadata[property],
+				);
 			}
 		}
 	}
@@ -357,7 +388,7 @@ class MapWrapper extends Component {
 					(filterName) =>
 						feature.metadata[filterName] === undefined ||
 						filtersMap[filterName].selectedValuesSet.has(
-							feature.metadata[filterName] || METADATA_NULL_VALUE,
+							feature.metadata[filterName] === null ? METADATA_NULL_VALUE : feature.metadata[filterName],
 						),
 				)
 			);
@@ -439,6 +470,21 @@ class MapWrapper extends Component {
 		return object;
 	};
 
+	renderMetadataSection = (key, value) => {
+		return (
+			<div key={key} className={styles.regionSection}>
+				<CustomHeader color={'textSecondary'} gutterBottom>
+					{key}
+				</CustomHeader>
+				{value === null ? (
+					<CustomHeader color={'textSecondary'}>{'Not listed'}</CustomHeader>
+				) : (
+					<Chip size={'small'} label={value} />
+				)}
+			</div>
+		);
+	};
+
 	renderSelectedRegion = (selectedAdminVectorLayerNamesByLabel) => {
 		const { adminVectorFeaturesByIdMap } = this.state;
 		const regionName = getSelectedRegionName(this.props);
@@ -451,20 +497,14 @@ class MapWrapper extends Component {
 				if (region) {
 					return (
 						<div className={styles.regionTileWrapper}>
-							<div className={styles.regionHeader}>
-								<span>{region.properties.regionName}</span>
-							</div>
-							<div className={styles.regionBody}>
-								{Object.keys(region.metadata)
-									.filter((key) => key !== 'regionName')
-									.map((key) => (
-										<p key={key}>
-											<b>{key}</b>
-											<br />
-											<span>{region.metadata[key]}</span>
-										</p>
-									))}
-							</div>
+							<CustomCard>
+								<CardContent>
+									<CustomTitle gutterBottom>{region.properties.regionName}</CustomTitle>
+									{Object.keys(region.metadata)
+										.filter((key) => key !== 'regionName')
+										.map((key) => this.renderMetadataSection(key, region.metadata[key]))}
+								</CardContent>
+							</CustomCard>
 						</div>
 					);
 				}
@@ -560,6 +600,9 @@ class MapWrapper extends Component {
 						zoom={zoom}
 						center={center}
 						boundingBox={boundingBox}
+						renderMetadataSection={(key, metadata) =>
+							renderToString(this.renderMetadataSection(key, metadata))
+						}
 					/>
 				</div>
 			</div>
