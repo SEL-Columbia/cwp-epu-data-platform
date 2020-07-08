@@ -159,7 +159,6 @@ class MapWrapper extends Component {
 				for (const feature of nextState.adminVectorFeaturesByIdMap[
 					getAdminRegionId({ name: selectedAdminVectorLayerNamesByLabel[label], label })
 				] || []) {
-					console.log('feature', label, feature);
 					// if (previousRegionName && feature.properties.regionName === previousRegionName) {
 					feature.properties.opacity = undefined;
 					// }
