@@ -11,6 +11,13 @@ import vectors from '../config/vectors';
 import observationVectors from '../config/observationVectors';
 import adminVectors from '../config/adminVectors';
 
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+
+import { withStyles } from '@material-ui/core/styles';
+
 import groupOptions from '../groupOptions';
 import getAdminRegionId from '../getAdminRegionId';
 
@@ -24,6 +31,24 @@ const LNG_REGEX = /&lng=(-?[\d+\.]+)/;
 const BBOX_REGEX = /&bbox=(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+),(-?[\d+\.]+)/;
 const REGION_NAME_REGEX = /&region=([^&]+)/;
 const ADMIN_LAYER_REGEX = /&adminLayer_([^(&=)]+)=([^&]+)/g;
+
+const CustomCard = withStyles({
+	root: {
+		minWidth: 200,
+	},
+})(Card);
+
+const CustomTitle = withStyles({
+	root: {
+		fontSize: 14,
+	},
+})(Typography);
+
+const CustomHeader = withStyles({
+	root: {
+		fontSize: 12,
+	},
+})(Typography);
 
 function getFiltersMap(features, whitelist) {
 	const filters = {};
@@ -451,20 +476,21 @@ class MapWrapper extends Component {
 				if (region) {
 					return (
 						<div className={styles.regionTileWrapper}>
-							<div className={styles.regionHeader}>
-								<span>{region.properties.regionName}</span>
-							</div>
-							<div className={styles.regionBody}>
-								{Object.keys(region.metadata)
-									.filter((key) => key !== 'regionName')
-									.map((key) => (
-										<p key={key}>
-											<b>{key}</b>
-											<br />
-											<span>{region.metadata[key]}</span>
-										</p>
-									))}
-							</div>
+							<CustomCard>
+								<CardContent>
+									<CustomTitle gutterBottom>{region.properties.regionName}</CustomTitle>
+									{Object.keys(region.metadata)
+										.filter((key) => key !== 'regionName')
+										.map((key, i) => (
+											<div key={key} className={styles.regionSection}>
+												<CustomHeader color="textSecondary" gutterBottom>
+													{key}
+												</CustomHeader>
+												<Chip size={'small'} label={region.metadata[key]} />
+											</div>
+										))}
+								</CardContent>
+							</CustomCard>
 						</div>
 					);
 				}
