@@ -402,12 +402,13 @@ class MapWrapper extends Component {
 		} = this.props;
 		if (properties.regionName) {
 			const region = search.match(REGION_NAME_REGEX);
+			const nextRegionName = encodeURIComponent(properties.regionName);
 
 			const nextSearch = region
 				? `${search.slice(0, region.index)}${
-						properties ? `&region=${encodeURIComponent(properties.regionName)}` : ''
+						nextRegionName !== region[1] ? `&region=${nextRegionName}` : ''
 				  }${search.slice(region.index + region[0].length)}`
-				: search.concat(`&region=${encodeURIComponent(properties.regionName)}`);
+				: search.concat(`&region=${nextRegionName}`);
 
 			history.replace({ search: nextSearch });
 		}
