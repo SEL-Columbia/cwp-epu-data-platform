@@ -270,7 +270,7 @@ for (let i = 0; i < adminVectorSpecs.length; i++) {
 			...adminVectorSpecs[i],
 			isDefault: false,
 			showOnHome: false,
-			name: `${adminVectorSpecs[i].name}`.replace('full size', 'reduced'),
+			name: `${adminVectorSpecs[i].name}`.replace('full size', `${level}%`),
 			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
 		});
 	}
