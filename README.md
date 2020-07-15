@@ -98,7 +98,7 @@ new RasterSourceGroup(options)
 | **options.boundingBoxVariable** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | Variable containing the bounding box values for the raster layer. The variable must have a `name` property. Bounding box value should be an ordered array of numbers: [SW corner longitude, SW corner latitude, NE corner longitude, NE corner latitude]. |
 | **options.nameVariable** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | Variable containing the name displayed on the raster layer. The variable must have a `name` property. |
 | **options.customNamesByMapboxId** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | An object that maps raster layer mapboxIds (from `options.mapboxIdVariable`) to a string, which represents the name that should be shown on the layer toggle instead of the value specified by `options.nameVariable`. |
-| **options.customLegendsByMapboxId** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | An object that maps raster layer mapboxIds (from `options.mapboxIdVariable`) to an array of objects, each with the `name` and `color` of a block in the legend. |
+| **options.customLegendsByMapboxId** [`Object`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) | An object that maps raster layer mapboxIds (from `options.mapboxIdVariable`) to an object, specifying a `type: 'categorical'` legend with `categories` array containing legend blocks, or a `type: 'continuous'` legend with `min` and `max` blocks. |
 
 ##### Opacity
 
