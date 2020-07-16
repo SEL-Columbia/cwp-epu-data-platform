@@ -337,7 +337,7 @@ export default class MapRenderer {
 					layer = this.addVectorLayerToMap(vectorLayer, true);
 					this.adminVectorLayers.set(getLayerIdentifier(vectorLayer, true), layer);
 				} else {
-					if (this.map.getSource(getLayerIdentifier(vectorLayer, true))) {
+					if (this.map.getSource(getLayerIdentifier(vectorLayer, true)) && vectorLayer.features.length) {
 						this.map.getSource(getLayerIdentifier(vectorLayer, true)).setData({
 							type: 'FeatureCollection',
 							features: vectorLayer.features,
@@ -425,5 +425,9 @@ export default class MapRenderer {
 				}
 			}
 		});
+	}
+
+	unload() {
+		clearTimeout(this.styleTimeout);
 	}
 }
