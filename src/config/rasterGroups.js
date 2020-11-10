@@ -28,6 +28,15 @@ const rasterGroups = [
 					{ name: 'Buildings, cropland, and woody cover', color: '#6d6d6d' },
 				],
 			},
+			['columbia-dataplatform.6abx7bi6']: {
+				type: 'categorical',
+				categories: [
+					{ name: 'Predicted Not Cropland', color: '#0B60B0' },
+					{ name: 'Predicted No Irrigation', color: '#26AC72' },
+					{ name: 'Predicted Irrigation', color: '#ECEC0B' },
+
+				],
+			},
 			['columbia-dataplatform.dpfypvjn']: {
 				type: 'continuous',
 				min: { name: 'Less wooded', color: '#000000' },
