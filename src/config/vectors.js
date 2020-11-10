@@ -14,6 +14,7 @@ const vectors = [
 	{
 		name: 'Uganda Electricity Transmission Lines (full size)',
 		label: 'Uganda',
+		isDefault: false,
 		tableIdentifier: 'modilab.uganda_geodata:3.uganda_electricity_transmission_lines:6',
 		geoVariables: [{ name: 'geoBuf' }],
 		isGeobuf: true,
@@ -129,7 +130,7 @@ for (let i = 0; i < vectors.length; i++) {
 		vectors.splice(i + n + 1, 0, {
 			...vectors[i],
 			isDefault: false,
-			name: `${vectors[i].name}`.replace('full size', 'reduced'),
+			name: `${vectors[i].name}`.replace('full size', `${level}%`),
 			geoVariables: [{ name: `geoBuf_simplified_${level}` }],
 		});
 	}

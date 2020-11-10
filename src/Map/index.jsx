@@ -25,6 +25,10 @@ export default class Map extends Component {
 		this.mapRenderer.update(this.props);
 	}
 
+	componentWillUnmount() {
+		this.mapRenderer.unload();
+	}
+
 	render() {
 		return <div ref={(mapElement) => (this.mapElement = mapElement)} className={styles.wrapper} />;
 	}
